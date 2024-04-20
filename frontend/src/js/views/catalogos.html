@@ -1,0 +1,22 @@
+
+<div class="navlistcontainer">
+    <oj-navigation-list
+        selection="{{selectedItem}}"
+        id="navilist1"
+        edge="top"
+        aria-label="Choose a navigation item"
+        drill-mode="none"
+        data="[[dataProvider]]">
+        <template slot="itemTemplate" data-oj-as="item">
+        <li :class="[[{'oj-disabled' : item.data.disabled === 'true'}]]">
+            <a href="#">
+            <oj-bind-text value="[[item.data.name]]"></oj-bind-text>
+            </a>
+        </li>
+        </template>
+    </oj-navigation-list>
+</div>
+
+<oj-module
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/' + selectedItem()})]]"
+     class="demo-height oj-bg-info-20"></oj-module>

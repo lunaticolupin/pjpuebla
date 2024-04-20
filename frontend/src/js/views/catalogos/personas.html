@@ -1,0 +1,49 @@
+<h4>Personas</h4>
+
+<oj-data-grid
+  id="datagrid"
+  aria-label="My Data Grid"
+  data='[[dataSource]]'>
+</oj-data-grid>
+
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Perfil </h1>
+    <h2 class="oj-typography-subheading-xs">Información Personal</h2>
+    <oj-c-form-layout id="personal-information" direction="row" max-columns="2">
+      <oj-c-input-text
+        id="firstname"
+        label-hint="First Name"
+        required="true"
+        value=""></oj-c-input-text>
+      <oj-c-input-text
+        id="lastname"
+        label-hint="Last Name"
+        required="true"
+        value=""></oj-c-input-text>
+      <oj-c-input-text
+        id="address"
+        label-hint="Address"
+        autocomplete="off"
+        value=""></oj-c-input-text>
+      <oj-c-form-layout direction="row" columns="2">
+        <oj-c-select-single
+          id="state"
+          label-hint="State"
+          item-text="label"
+          required="true"></oj-c-select-single>
+        <oj-c-input-text
+          id="zip"
+          label-hint="Zip"
+          value=""></oj-c-input-text>
+      </oj-c-form-layout>
+      <oj-c-input-text
+        id="phone"
+        label-hint="Phone"
+        value=""></oj-c-input-text>
+      <oj-c-input-text
+        id="email"
+        label-hint="Email"
+        value=""></oj-c-input-text>
+    </oj-c-form-layout>
+    <h1 class="oj-typography-heading-xs">Empleo</h1>
+</div>
