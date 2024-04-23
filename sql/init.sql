@@ -6,10 +6,10 @@ CREATE TABLE core.persona (
   nombre                   varchar NOT NULL, 
   apellido_paterno         varchar, 
   apellido_materno         varchar, 
-  CURP                     varchar(20) UNIQUE, 
-  RFC                      varchar UNIQUE, 
+  CURP                     varchar(20), 
+  RFC                      varchar, 
   sexo                     varchar(1), 
-  email                    varchar UNIQUE, 
+  email                    varchar, 
   telefono                 varchar(15), 
   calle                    varchar, 
   CP                       varchar(5), 
@@ -19,8 +19,9 @@ CREATE TABLE core.persona (
   usuario_creo             varchar(50) NOT NULL, 
   fecha_actualizacion      timestamp, 
   usuario_actualizo        varchar(50), 
-  hablante_lengua_distinta bool DEFAULT 'false' NOT NULL, 
-  PRIMARY KEY (id));
+  hablante_lengua_distinta bool DEFAULT 'false', 
+  PRIMARY KEY (id),
+  CONSTRAINT persona_unique UNIQUE (nombre, apellido_paterno, apellido_materno, curp, rfc, email));
 
   --
 
@@ -54,8 +55,8 @@ CREATE TABLE core.rol_modulo_permiso (
   permiso_id int4 NOT NULL, 
   modulo_id  int4 NOT NULL, 
   estatus    int2 DEFAULT 1 NOT NULL, 
-  CONSTRAINT rol_permiso_modulo_unique 
-    UNIQUE (rol_id, permiso_id, modulo_id));
+  CONSTRAINT rol_permiso_modulo_pk 
+    PRIMARY KEY (rol_id, permiso_id, modulo_id));
 
 --
 
@@ -86,8 +87,8 @@ CREATE TABLE core.rol_usuario (
   fecha_actualizacion timestamp DEFAULT CURRENT_TIMESTAMP, 
   usuario_actualizo   varchar(50), 
   usuariopersona_id   int4, 
-  CONSTRAINT usuario_rol_unique 
-    UNIQUE (usuario_id, rol_id));
+  CONSTRAINT usuario_rol_PK 
+    PRIMARY KEY (usuario_id, rol_id));
 
 --
 
@@ -180,8 +181,8 @@ CREATE TABLE core.detalle_persona (
   persona_id       int4 NOT NULL, 
   clasificacion_id int4 NOT NULL, 
   fecha_creacion   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, 
-  CONSTRAINT persona_clasificacion_unique 
-    UNIQUE (persona_id, clasificacion_id));
+  CONSTRAINT persona_clasificacion_PK
+    PRIMARY KEY (persona_id, clasificacion_id));
 
 --
 
@@ -249,6 +250,7 @@ CREATE TABLE mediacion.solicitud (
 --
 
 CREATE TABLE mediacion.asistencia (
+  id serial4 NOT NULL,
   solicitud_id        int4 NOT NULL, 
   sesion_mediacion_id int4 NOT NULL, 
   fecha_asistencia    date DEFAULT CURRENT_DATE NOT NULL, 
@@ -260,7 +262,8 @@ CREATE TABLE mediacion.asistencia (
   fecha_registro      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, 
   usuario_creo        varchar(50) NOT NULL, 
   fecha_actualizacion timestamp, 
-  usuario_actualizo   varchar(50));
+  usuario_actualizo   varchar(50),
+  PRIMARY KEY (id));
 
 --
 
@@ -294,8 +297,7 @@ CREATE TABLE mediacion.formato_fase (
   formato_id int4 NOT NULL, 
   activo     bool DEFAULT 'true' NOT NULL, 
   opcional   bool DEFAULT 'false' NOT NULL, 
-  CONSTRAINT fase_formato_unique 
-    UNIQUE (fase_id, formato_id));
+  CONSTRAINT formato_fase_pk PRIMARY KEY (fase_id, formato_id));
 
 --
 
@@ -352,7 +354,8 @@ CREATE TABLE mediacion.revision_acuerdo (
   fecha_revision     timestamp NOT NULL, 
   archivo_id         int4 NOT NULL, 
   estatus            int2 DEFAULT 0 NOT NULL, 
-  observaciones      text);
+  observaciones      text,
+  CONSTRAINT revision_acuerdo_pk PRIMARY KEY (acuerdo_id, usuario_id_revisor, archivo_id));
 
 --
 
@@ -368,7 +371,9 @@ CREATE TABLE mediacion.tipo_apertura (
 CREATE TABLE mediacion.solicitud_electonica (
   solicitud_id   int4 NOT NULL, 
   url            varchar NOT NULL, 
-  fecha_creacion timestamp DEFAULT CURRENT_TIMESTAMP);
+  fecha_creacion timestamp DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT solicitud_electonica_pk PRIMARY KEY (solicitud_id, num_sesion)
+);
 
 --
 
@@ -376,7 +381,9 @@ CREATE TABLE mediacion.solicitud_juzgado (
   solicitud_id     int4 NOT NULL, 
   juzgado_id       int4 NOT NULL, 
   persona_id_turno int4, 
-  fecha_creacion   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL);
+  fecha_creacion   timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  CONSTRAINT solicitud_juzgado_pk PRIMARY KEY (solicitud_id, juzgado_id)
+);
 
 --
 
@@ -388,7 +395,9 @@ CREATE TABLE mediacion.solicitud_archivo (
   fecha_creacion      timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, 
   usuario_creo        varchar(50) NOT NULL, 
   fecha_actualizacion timestamp, 
-  usuario_actualizo   varchar(50)); 
+  usuario_actualizo   varchar(50),
+  CONSTRAINT solicitud_archivo_pk PRIMARY KEY (solicitud_id, formato_id, archivo_id)
+); 
 
 --
 
@@ -398,8 +407,8 @@ CREATE TABLE mediacion.detalle_usuario_solicitud (
   persona_id             int4 NOT NULL, 
   numero_identificacion  int4 NOT NULL, 
   fecha_creacion         timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL, 
-  CONSTRAINT solicitud_persona_unique 
-    UNIQUE (solicitud_id, persona_id));
+  CONSTRAINT detalle_usuario_solicitud_pk PRIMARY KEY (solicitud_id, tipo_identificacion_id, persona_id)
+);
 
 --
 
