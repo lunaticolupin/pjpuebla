@@ -1,0 +1,62 @@
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Perfil </h1>
+    <h2 class="oj-typography-subheading-xs">Información Personal</h2>
+    <oj-c-form-layout id="personal-information" direction="row" max-columns="3">
+      <oj-c-input-text
+        id="firstname"
+        label-hint="Nombre o Razón Social"
+        required="true"
+        value="{{nombre}}" autocomplete="off"></oj-c-input-text>
+      <oj-c-input-text
+        id="lastname"
+        label-hint="Apellido Paterno"
+        required="false"
+        value="{{apellidoPaterno}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-input-text
+        id="lastname"
+        label-hint="Apellido Materno"
+        required="false"
+        value="{{apellidoMaterno}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-input-text
+        id="zip"
+        label-hint="CURP"
+        value="{{curp}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-input-text
+        id="zip"
+        label-hint="RFC"
+        value="{{rfc}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-select-single
+        id="estadoCivil"
+        data="[[dataProviderSexo]]"
+        item-text="label"
+        label-hint="Sexo"
+        value="{{sexo}}" required="true"></oj-c-select-single>
+    <oj-c-select-single
+        id="estadoCivil"
+        data="[[dataProviderEC]]"
+        item-text="label"
+        label-hint="Estado Civil"
+        value="{{estadoCivil}}" required="true" ></oj-c-select-single>
+    <oj-c-checkbox value="{{personaMoral}}">Persona Moral</oj-c-checkbox>
+    <oj-c-input-text
+        id="zip"
+        label-hint="Correo"
+        value="{{email}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-input-text
+        id="zip"
+        label-hint="Telefóno"
+        value="{{telefono}}" autocomplete="off"></oj-c-input-text>
+    <oj-c-input-text
+        id="address"
+        label-hint="Dirección"
+        autocomplete="off"
+        value="{{calle}}" autocomplete="off"></oj-c-input-text>
+    </oj-c-form-layout>
+</div>
+<oj-c-button
+chroming="borderless"
+
+on-oj-action="[[guardar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-content-item-detail">Guardar</span>
+</oj-c-button>

@@ -1,6 +1,5 @@
-define(['../../accUtils', 'require',  'knockout', 'ojs/ojarraydataprovider',  "ojs/ojdatagridprovider",
-"ojs/ojvalidation-base", "oj-c/input-date-text", "ojs/ojknockout", "oj-c/button", "oj-c/input-text", "oj-c/radioset", "oj-c/checkbox", "oj-c/checkboxset", "oj-c/select-single", "oj-c/form-layout"], 
-function (accUtils, require, ko, ArrayDataProvider, DataGridProvider) {
+define(['../../accUtils', 'knockout', 'ojs/ojarraydataprovider'], 
+function (accUtils, ko, ArrayDataProvider) {
     class UsuarioViewModel {
          constructor() {
             var self = this;

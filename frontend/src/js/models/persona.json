@@ -1,0 +1,16 @@
+{
+    "id": "",
+    "nombre":"Test",
+    "apellidoPaterno":"",
+    "apellidoMaterno":"",
+    "curp": "",
+    "rfc": "",
+    "sexo": "",
+    "email": "",
+    "telefono": "",
+    "calle":"",
+    "cp":"",
+    "personaMoral": false,
+    "estadoCivil": "",
+    "hablanteLenguaDistinta":false
+}

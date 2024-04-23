@@ -1,49 +1,44 @@
 <h4>Personas</h4>
 
-<oj-data-grid
-  id="datagrid"
-  aria-label="My Data Grid"
-  data='[[dataSource]]'>
-</oj-data-grid>
+<oj-table id = "personas" data = "[[dataProvider]]"
+  columns-default='{"sortable": "disabled"}'
+  selection-mode.row="none"
+  scroll-policy="loadMoreOnScroll"
+  scroll-policy-options.fetch-size="10"
+  scroll-policy-options.scroller="#samplePage"
+  scroll-policy-options.scroller-offset-top="0"
+  scroll-policy-options.scroller-offset-bottom="100"
+  scroll-policy-options.scroller-offset-start="0"
+  scroll-policy-options.scroller-offset-end="100"
+  columns='[
+  {"headerText":"ID", "field":"id","minWidth":"50"},
+  {"headerText":"Nombre", "field":"nombre", "minWidth":"200" },
+  {"headerText":"Apellido Paterno", "field":"apellidoPaterno"},
+  {"headerText":"Apellido Materno", "field":"apellidoMaterno"},
+  {"headerText":"CURP", "field":"curp", "minWidth":"100"},
+  {"headerText":"Persona Moral", "field":"personaMoral", "template":"personaMoralTemplate", "id":"pMoral"}, 
+  {"headerText": "Detalle",
+  "maxWidth": "10rem",
+  "sortable": "disabled",
+  "headerStyle": "text-align: center;",
+  "frozenEdge": "end",
+  "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+  "template": "actionTemplate", "id": "action" }]'
+  style="width: 100%;">
+  <template slot="actionTemplate" data-oj-as="cell">
+    <oj-c-button
+      chroming="borderless"
+      display="icons"
+      on-oj-action="[[detallePersona]]"
+      data-oj-clickthrough="disabled">
+      <span slot="startIcon" class="oj-ux-ico-content-item-detail"></span>
+    </oj-c-button>
+  </template>
+  <template slot="personaMoralTemplate" data-oj-as="cell">
+    <oj-c-checkbox value="[[cell.data]]" readonly></oj-c-checkbox>
+  </template>
+</oj-table>
 
-<div id="form-container">
-    <h1 class="oj-typography-heading-xs">Perfil </h1>
-    <h2 class="oj-typography-subheading-xs">Información Personal</h2>
-    <oj-c-form-layout id="personal-information" direction="row" max-columns="2">
-      <oj-c-input-text
-        id="firstname"
-        label-hint="First Name"
-        required="true"
-        value=""></oj-c-input-text>
-      <oj-c-input-text
-        id="lastname"
-        label-hint="Last Name"
-        required="true"
-        value=""></oj-c-input-text>
-      <oj-c-input-text
-        id="address"
-        label-hint="Address"
-        autocomplete="off"
-        value=""></oj-c-input-text>
-      <oj-c-form-layout direction="row" columns="2">
-        <oj-c-select-single
-          id="state"
-          label-hint="State"
-          item-text="label"
-          required="true"></oj-c-select-single>
-        <oj-c-input-text
-          id="zip"
-          label-hint="Zip"
-          value=""></oj-c-input-text>
-      </oj-c-form-layout>
-      <oj-c-input-text
-        id="phone"
-        label-hint="Phone"
-        value=""></oj-c-input-text>
-      <oj-c-input-text
-        id="email"
-        label-hint="Email"
-        value=""></oj-c-input-text>
-    </oj-c-form-layout>
-    <h1 class="oj-typography-heading-xs">Empleo</h1>
-</div>
+<oj-module
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: userInfoSignal}})]]"
+     class="oj-bg-info-20"></oj-module>

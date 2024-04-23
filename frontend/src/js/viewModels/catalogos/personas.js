@@ -1,16 +1,23 @@
-define(['../../accUtils', 'require',  'knockout', 'ojs/ojarraydataprovider',  "ojs/ojdatagridprovider",
-"ojs/ojvalidation-base", "oj-c/input-date-text", "ojs/ojknockout", "oj-c/button", "oj-c/input-text", "oj-c/radioset", "oj-c/checkbox", "oj-c/checkboxset", "oj-c/select-single", "oj-c/form-layout"], 
-function (accUtils, require, ko, ArrayDataProvider, DataGridProvider) {
+define(['../../accUtils', 'webConfig', 'utils',  'knockout', 'ojs/ojarraydataprovider', 'ojs/ojmodule-element-utils', 'signals',
+"ojs/ojknockout", "oj-c/button", "oj-c/checkbox",  'ojs/ojtable', 'ojs/ojmodule-element'], 
+function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, signals ) {
     class PersonalViewModel {
          constructor() {
             var self = this;
 
             self.personas = ko.observableArray();
-            this.dataSource = DataGridProvider.
+            self.baseUrl = config.baseEndPoint + '/personas';
+            self.personaSeleccionada = ko.observable();
+
+            this.ModuleElementUtils = ModuleElementUtils;
+            this.dataProvider = new ArrayDataProvider(self.personas, {keyAttributes: 'id'});
+            this.userInfoSignal = new signals.Signal();
 
             this.connected = () => {
                 accUtils.announce('Catalogos page loaded.', 'assertive');
                 document.title = "Catálogos / Personas";
+
+                self.getPersonas(self.baseUrl); 
                 // Implement further logic if needed
             };
 
@@ -28,6 +35,23 @@ function (accUtils, require, ko, ArrayDataProvider, DataGridProvider) {
             this.transitionCompleted = () => {
                 // Implement if needed
             };
+
+            self.getPersonas = (url, params = {}) => {
+                utils.getData(url, params).then((data)=>{
+                    self.personas(data);
+                })         
+            }
+
+            this.detallePersona = (event, data) =>{
+                console.log(data);
+                if(data.item.data){
+                    self.personaSeleccionada(data.item.data);
+                }
+            };
+
+            ko.computed(()=>{
+                this.userInfoSignal.dispatch(self.personaSeleccionada());
+            })
 
          }
     }
