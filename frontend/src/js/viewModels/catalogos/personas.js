@@ -1,6 +1,6 @@
-define(['../../accUtils', 'webConfig', 'utils',  'knockout', 'ojs/ojarraydataprovider', 'ojs/ojmodule-element-utils', 'signals',
+define(['../../accUtils', 'webConfig', 'utils',  'knockout', 'ojs/ojarraydataprovider', 'ojs/ojmodule-element-utils', 'signals', 'text!models/persona.json',
 "ojs/ojknockout", "oj-c/button", "oj-c/checkbox",  'ojs/ojtable', 'ojs/ojmodule-element'], 
-function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, signals ) {
+function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, signals, PersonaModel ) {
     class PersonalViewModel {
          constructor() {
             var self = this;
@@ -43,15 +43,19 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
             }
 
             this.detallePersona = (event, data) =>{
-                console.log(data);
                 if(data.item.data){
                     self.personaSeleccionada(data.item.data);
                 }
             };
 
+            this.agregarPersona = () =>{
+                let newPersona = JSON.parse(PersonaModel);
+                self.personaSeleccionada(newPersona);
+            };
+
             ko.computed(()=>{
                 this.userInfoSignal.dispatch(self.personaSeleccionada());
-            })
+            });
 
          }
     }

@@ -24,7 +24,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
             self.cp = ko.observable();
             self.sexo = ko.observable();
             self.estadoCivil = ko.observable();
-            self.personaMoral = ko.observable(true);
+            self.personaMoral = ko.observable(false);
             self.hablanteLenguaDistinta = ko.observable(false);
 
             self.estadoCivilArray = [
@@ -49,14 +49,14 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
             {keyAttributes:'value'});
 
             this.guardar = (()=>{
-                console.log(self.parsePersonaSave());
                 let url = this.serviceURL+"/save";
 
                 let data = self.parsePersonaSave();
 
                 utils.postData(url, data).then((result)=>{
                     console.log(result);
-                    alert(result);
+                    alert("Cambios realizados");
+                    window.location.reload();
                 })
             });
 
@@ -73,14 +73,13 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     self.email(data.email);
                     self.cp(data.cp);
                     self.estadoCivil(data.estadoCivil);
-                    //self.personaMoral(data.personaMoral);
+                    self.personaMoral(data.personaMoral);
                     self.hablanteLenguaDistinta(data.hablanteLenguaDistinta);
                 }
 
             });
 
             this.parsePersonaSave = (()=>{
-                console.log(self.personaMoral());
                 return {
                     id: self.id(),
                     nombre: self.nombre(),

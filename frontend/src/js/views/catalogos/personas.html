@@ -31,7 +31,7 @@
       display="icons"
       on-oj-action="[[detallePersona]]"
       data-oj-clickthrough="disabled">
-      <span slot="startIcon" class="oj-ux-ico-content-item-detail"></span>
+      <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
     </oj-c-button>
   </template>
   <template slot="personaMoralTemplate" data-oj-as="cell">
@@ -39,6 +39,13 @@
   </template>
 </oj-table>
 
+<oj-c-button
+label="Agregar"
+on-oj-action="[[agregarPersona]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-add-create-page"></span>
+</oj-c-button>
+
 <oj-module
-    config="[[ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: userInfoSignal}})]]"
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: userInfoSignal, accion: accion}})]]"
      class="oj-bg-info-20"></oj-module>
