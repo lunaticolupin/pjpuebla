@@ -37,9 +37,14 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
             };
 
             self.getPersonas = (url, params = {}) => {
-                utils.getData(url, params).then((data)=>{
-                    self.personas(data);
-                })         
+                utils.getData(url, params).then((response)=>{
+
+                    if (response.success){
+                        console.log(response);
+                        self.personas(response.data);
+                    }
+                    
+                }).catch(error => console.log(error));         
             }
 
             this.detallePersona = (event, data) =>{

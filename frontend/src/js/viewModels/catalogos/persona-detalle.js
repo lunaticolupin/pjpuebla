@@ -26,6 +26,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
             self.estadoCivil = ko.observable();
             self.personaMoral = ko.observable(false);
             self.hablanteLenguaDistinta = ko.observable(false);
+            self.usuarioCreo = ko.observable("INFOR");
 
             self.estadoCivilArray = [
                 {value:"S", label:"Soltero"},
@@ -41,8 +42,12 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 {value:"", label:"No aplica"}
             ];
 
-            self.aplicaDato = ko.computed(() =>{
-                return false;
+            self.disableEliminar = ko.computed(() =>{
+                if (self.id()){
+                    return false;
+                }
+
+                return true;
             });
 
             this.dataProviderEC = new ArrayDataProvider(self.estadoCivilArray,
@@ -53,11 +58,34 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
 
                 let data = self.parsePersonaSave();
 
-                utils.postData(url, data).then((result)=>{
-                    console.log(result);
-                    alert("Cambios realizados");
-                    window.location.reload();
-                })
+                utils.postData(url, data).then((response)=>{
+                    console.log(response);
+                    if (response.success){
+                        alert(response.message);
+                    }else{
+                        alert(JSON.stringify(response.errors));
+                    }
+
+                    //window.location.reload();
+                }).catch(error => console.log(error));
+            });
+
+            this.eliminar = (()=>{
+                let id = self.id();
+                if (id==undefined || id==null){
+                    return false;
+                }
+
+                let url = this.serviceURL+"/delete/"+id;
+            
+
+                utils.postData(url,{}).then((response)=>{
+                    console.log(response);
+                    
+                    alert(response.message);
+
+                    //window.location.reload();
+                }).catch(error => console.log(error));
             });
 
             this.parsePersona = ((data)=>{
@@ -75,6 +103,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     self.estadoCivil(data.estadoCivil);
                     self.personaMoral(data.personaMoral);
                     self.hablanteLenguaDistinta(data.hablanteLenguaDistinta);
+                    self.usuarioCreo(data.usuarioCreo);
                 }
 
             });
@@ -94,7 +123,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     cp: self.cp(),
                     estadoCivil: self.estadoCivil(),
                     personaMoral: self.personaMoral(),
-                    hablanteLenguaDistinta: self.personaMoral()
+                    hablanteLenguaDistinta: self.personaMoral(),
+                    usuarioCreo: self.usuarioCreo()
                 }
             });
 
