@@ -372,6 +372,7 @@ CREATE TABLE mediacion.solicitud_electonica (
   solicitud_id   int4 NOT NULL, 
   url            varchar NOT NULL, 
   fecha_creacion timestamp DEFAULT CURRENT_TIMESTAMP,
+  num_sesion int2 NOT NULL,  
   CONSTRAINT solicitud_electonica_pk PRIMARY KEY (solicitud_id, num_sesion)
 );
 
