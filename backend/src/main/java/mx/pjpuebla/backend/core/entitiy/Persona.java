@@ -68,7 +68,6 @@ public class Persona implements Serializable {
 	@Column(name="fecha_creacion", nullable=false, length=6)	
 	private Date fechaCreacion = new Date();
 	
-	@JsonIgnore
 	@Column(name="usuario_creo", nullable=false, length=50)	
 	private String usuarioCreo;
 	
