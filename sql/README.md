@@ -1,9 +1,9 @@
 # Guía ráoida para el uso de Postgres desde la consola
 
 # Conexión 
-# el parametro -W es para introducir el password desde la consola
-# el parametro -d es opcional
 $ psql -U usuario -h servidor -W -d base_datos
+* el parametro -W es para introducir el password desde la consola
+* el parametro -d es opcional
 
 # Importar script
 $ psql -U usuario -h servidor -W -d base_datos < /ruta/archivo/script.sql
