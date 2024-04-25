@@ -18,7 +18,6 @@ ojet create aplicacion --template=navdrawer
 * Este paso crea una carpeta con el código fuente
 
 # Correr la aplicación web
-# Debe estar dentro de la carpeta de la aplicación
-ojet serve
+~/aplicacion$ ojet serve
 
 * La aplicación esta disponible por default en la dirección http://localhost:8000
