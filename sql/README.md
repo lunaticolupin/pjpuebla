@@ -1,4 +1,4 @@
-# Guía ráoida para el uso de Postgres desde la consola
+# Guía rápida para el uso de Postgres desde la consola
 
 # Conexión 
 $ psql -U usuario -h servidor -W -d base_datos
