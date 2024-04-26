@@ -1,6 +1,5 @@
 package mx.pjpuebla.backend.core.entitiy;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,7 +19,7 @@ import lombok.Setter;
 @Table(name="persona", schema="core", uniqueConstraints={ @UniqueConstraint(name="persona_curp_key", columnNames={ "curp" }), @UniqueConstraint(name="persona_email_key", columnNames={ "email" }), @UniqueConstraint(name="persona_rfc_key", columnNames={ "rfc" }) })
 @Getter
 @Setter
-public class Persona implements Serializable {
+public class Persona {
     @Column(name="id", nullable=false)	
 	@Id	
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERSONA_ID_GENERATOR")	

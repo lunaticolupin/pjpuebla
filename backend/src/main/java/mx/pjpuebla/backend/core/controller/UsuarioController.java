@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.header.Header;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,18 +24,14 @@ import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.core.entitiy.Usuario;
 import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.core.service.UsuarioService;
-import mx.pjpuebla.backend.models.UsuarioEstatus;
+
 import mx.pjpuebla.backend.request.Login;
 import mx.pjpuebla.backend.response.Credencial;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
 
-
-
-
-@Controller
+@RestController
 @RequestMapping("usuarios")
 @RequiredArgsConstructor
 public class UsuarioController {
