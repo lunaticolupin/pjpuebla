@@ -1,10 +1,18 @@
-define(['../../accUtils', 'knockout', 'ojs/ojarraydataprovider'], 
-function (accUtils, ko, ArrayDataProvider) {
+define(['../../accUtils', 'webConfig', 'utils', 'knockout', 'ojs/ojarraydataprovider'], 
+function (accUtils, config, utils, ko, ArrayDataProvider) {
     class UsuarioViewModel {
          constructor() {
             var self = this;
 
             self.dataSource = ko.observableArray();
+            self.baseUrl = config.baseEndpoint;
+
+            self.getUsuarios = (()=>{
+                const url = self.baseUrl+'/usuarios';
+                utils.getData(url,{}).then((response)=>{
+                    console.log(response);
+                });
+            });
 
             this.connected = () => {
                 accUtils.announce('Catalogos page loaded.', 'assertive');
@@ -26,6 +34,7 @@ function (accUtils, ko, ArrayDataProvider) {
             this.transitionCompleted = () => {
                 // Implement if needed
             };
+
 
          }
     }
