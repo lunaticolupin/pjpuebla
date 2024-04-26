@@ -8,10 +8,7 @@ import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
-
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
