@@ -40,7 +40,7 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
                 utils.getData(url, params).then((response)=>{
 
                     if (response.success){
-                        console.log(response);
+                        //console.log(response);
                         self.personas(response.data);
                     }
                     

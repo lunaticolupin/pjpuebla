@@ -1,5 +1,9 @@
 <h2>Usuarios</h2>
 
-<oj-table id = "personas" data = "[[dataProvider]]">
-    
-</oj-table>
+<oj-table id = "usuarios" data = "[[dataProvider]]"
+columns='[{"headerText": "Clave", "field": "clave"},
+{"headerText": "Nombre", "field": "usuario.nombreCompleto"},
+{"headerText": "Correo", "field": "correoInstitucional"},
+{"headerText": "Estatus", "field": "estatus"}
+]' 
+style="width: 100%;"></oj-table>
