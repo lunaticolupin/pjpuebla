@@ -1,31 +1,57 @@
 package mx.pjpuebla.backend.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mx.pjpuebla.backend.configuration.PropertiesApiKey;
 
-public class JWTAuthorizationFilter {
-	private final String PREFIX = "Bearer ";
+import mx.pjpuebla.backend.core.repository.UserInfoService;
+import mx.pjpuebla.backend.core.service.JwtService;
+
+@Component
+public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private PropertiesApiKey properties;
+    private UserInfoService userDetailsService;
 
-    private Claims validateToken(HttpServletRequest request){
-        String jwtToken = request.getHeader(properties.getHeader()).replace(PREFIX, "");
+    @Autowired
+    private JwtService jwtService;
 
-        return Jwts.parser().verifyWith(properties.secretKey()).build().parseSignedClaims(jwtToken).getPayload();
+    @SuppressWarnings("null")
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
+
+        if(authHeader != null && authHeader.startsWith("Bearer ")){
+            token = authHeader.replace("Bearer ", "");
+            username = jwtService.extractUsername(token);
+        }
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtService.validateToken(token, userDetails)){
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                request.setAttribute("usuario", username);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+
     }
 
-    private boolean checkJWTToken(HttpServletRequest request, HttpServletResponse response){
-        String authenticationHeader = request.getHeader(properties.getHeader());
-
-        if (authenticationHeader == null || authenticationHeader.isEmpty())
-            return false;
-
-        return true;
-    }
 }

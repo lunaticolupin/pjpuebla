@@ -1,11 +1,16 @@
 package mx.pjpuebla.backend.core.controller;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.header.Header;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,12 +21,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import mx.pjpuebla.backend.configuration.PropertiesApiKey;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.core.entitiy.Usuario;
+import mx.pjpuebla.backend.core.repository.UserInfoService;
+import mx.pjpuebla.backend.core.service.JwtService;
 import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.core.service.UsuarioService;
 
@@ -35,12 +42,15 @@ import jakarta.validation.Valid;
 @RequestMapping("usuarios")
 @RequiredArgsConstructor
 public class UsuarioController {
-    @Autowired
-    private PropertiesApiKey properties;
 
     private GenericResponse response;
     private final UsuarioService usuarios;
     private final PersonaService personas;
+    private final UserInfoService service;
+    private final JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> getUsuarios() {
@@ -49,7 +59,8 @@ public class UsuarioController {
         response.setSuccess(true);
         response.setMessage("OK");
         response.setData(usuarios.findAll());
-        return ResponseEntity.ok(null);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -105,7 +116,8 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            item.generarPasswd();
+            //item.generarPasswd();
+            //item.setPasswd(encoder.encode(item.getPasswdTxt()));
             item.setPersona(p);
 
             Usuario usuario = usuarios.save(item);
@@ -152,50 +164,72 @@ public class UsuarioController {
         
         
     }
+
     
+    @GetMapping("/test")
+    public ResponseEntity<GenericResponse> test (@RequestAttribute("usuario") String usuario) {
+        response = new GenericResponse(true, "OK", null, usuario);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<GenericResponse> login(@RequestBody Login login) {
-        Usuario usuario = usuarios.findByClave(login.getUsuario());
-        Credencial credencial;
-
         response = new GenericResponse();
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+            String token;
 
-        if (usuario == null){
-            response.setMessage("El usuario no existe");
+            token = jwtService.generateJWTToken(login.getUsername(), login.getEmail());
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+            service.saveLogin(login.getUsername());
 
-        if (!usuario.passwordValido(login.getPasswd())){
-            response.setMessage("La contraseña es incorrecta");
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(new Credencial(login.getUsername(), login.getEmail(), token));
 
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        if (!usuario.esActivo()){
-            String mensaje = String.format("Usuario %s", usuario.getEstatus());
-
-            response.setMessage(mensaje);
+            return ResponseEntity.ok(response);
+        }catch(DisabledException | LockedException | BadCredentialsException e){
+            response.setMessage("Error al iniciar sesión");
+            response.setErrors(Arrays.asList(e.getMessage()));
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
-
-        credencial = new Credencial(usuario.getClave(), usuario.getCorreoInstitucional());
-        credencial.generateJWTToken(properties);
-
-        response.setSuccess(true);
-        response.setMessage("OK");
-        response.setData(credencial);
         
-        usuarios.registrarLogin(usuario);
 
-        return ResponseEntity.ok(response);
+        
+        
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<GenericResponse> addUser(@RequestBody Usuario usuario) {
+
+        boolean result;
+        response = new GenericResponse();
+        
+        Persona p = personas.findById(usuario.getPersonaId());
+
+            if (p==null){
+                response.setMessage("No se puede encontrar la Persona relacionada");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            //item.generarPasswd();
+            //item.setPasswd(encoder.encode(item.getPasswdTxt()));
+            usuario.setPersona(p);
+            result    = service.addUser(usuario);
+
+        
+
+        if (result){
+            response.setSuccess(result);
+            response.setMessage("OK");
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.internalServerError().body(response);
     }
     
-    @GetMapping("test")
-    public ResponseEntity<GenericResponse> test (@RequestHeader("Authorization") Header header) {
-        return ResponseEntity.ok(response);
-    }
+    
     
 
 }

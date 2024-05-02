@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HexFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -115,5 +116,16 @@ public class Usuario {
 		return this.estatus == UsuarioEstatus.ACTIVO;
 	}
 
-	//public boolean
+	@JsonProperty
+	public String nombreCompleto (){
+		if (this.persona != null){
+			return String.format("%s %s %s", this.persona.getNombre(), this.persona.getApellidoPaterno(), this.persona.getApellidoMaterno());
+		}
+
+		return "";
+	}
+
+	public String getRoles(){
+		return "ROLE_USER";
+	}
 }

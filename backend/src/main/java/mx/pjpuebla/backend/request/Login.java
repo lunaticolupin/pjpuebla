@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class Login {
     @NotBlank(message = "Dato requerido")
-    private String usuario;
+    private String username;
     
     @NotBlank(message = "Dato requerido")
-    private String passwd;
+    private String password;
     
     private String email;
 }

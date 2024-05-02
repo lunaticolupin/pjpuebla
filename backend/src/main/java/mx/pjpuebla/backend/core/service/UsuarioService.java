@@ -26,7 +26,11 @@ public class UsuarioService {
     }
 
     public Usuario findByClave(String clave){
-        return this.repo.findByClave(clave);
+        if (repo.findByClave(clave).isPresent()){
+            return this.repo.findByClave(clave).get();
+        }
+        
+        return null;
     }
 
     public List<Usuario> findAll(){
