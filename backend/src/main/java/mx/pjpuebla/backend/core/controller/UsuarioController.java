@@ -10,8 +10,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.header.Header;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,13 +21,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import mx.pjpuebla.backend.core.entitiy.Persona;
+/*import mx.pjpuebla.backend.core.entitiy.Rol;
+import mx.pjpuebla.backend.core.entitiy.RolUsuario;
+import mx.pjpuebla.backend.core.entitiy.RolUsuarioKey;*/
 import mx.pjpuebla.backend.core.entitiy.Usuario;
-import mx.pjpuebla.backend.core.repository.UserInfoService;
 import mx.pjpuebla.backend.core.service.JwtService;
 import mx.pjpuebla.backend.core.service.PersonaService;
+//import mx.pjpuebla.backend.core.service.RolUsuarioService;
+import mx.pjpuebla.backend.core.service.UserInfoService;
 import mx.pjpuebla.backend.core.service.UsuarioService;
 
 import mx.pjpuebla.backend.request.Login;
@@ -48,6 +49,7 @@ public class UsuarioController {
     private final PersonaService personas;
     private final UserInfoService service;
     private final JwtService jwtService;
+    //private final RolUsuarioService rolesUsuarios;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -75,10 +77,14 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
+        response.setSuccess(true);
+        response.setMessage("OK");
+        response.setData(usuario);
+
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{clave}")
+    @GetMapping("/find/{clave}")
     public ResponseEntity<GenericResponse> getUsuarioClave(@PathVariable("clave") String claveUsuario) {
         Usuario usuario = usuarios.findByClave(claveUsuario);
 
@@ -116,8 +122,6 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            //item.generarPasswd();
-            //item.setPasswd(encoder.encode(item.getPasswdTxt()));
             item.setPersona(p);
 
             Usuario usuario = usuarios.save(item);
@@ -195,9 +199,6 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
         
-
-        
-        
     }
 
     @PostMapping("/add")
@@ -213,8 +214,6 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            //item.generarPasswd();
-            //item.setPasswd(encoder.encode(item.getPasswdTxt()));
             usuario.setPersona(p);
             result    = service.addUser(usuario);
 
@@ -223,12 +222,34 @@ public class UsuarioController {
         if (result){
             response.setSuccess(result);
             response.setMessage("OK");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response); 
         }
 
         return ResponseEntity.internalServerError().body(response);
     }
     
+    /*@PostMapping("{usuario_id}/agregar/{rol_id}")
+    public ResponseEntity<GenericResponse> agregarRol(@PathVariable("usuario_id") Integer usuarioId, @PathVariable("rol_id") Integer rolId) {
+        
+        RolUsuario rolUsuario = new RolUsuario();
+        RolUsuarioKey key = new RolUsuarioKey(usuarioId, rolId);
+
+        rolUsuario.setId(key);
+        rolUsuario.setUsuarioCreo("TEST");
+        
+        response = new GenericResponse();
+
+        if (rolesUsuarios.save(rolUsuario)){
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(rolUsuario);
+            return ResponseEntity.ok(response);
+        }
+
+        response.setMessage("ERROR");
+        
+        return ResponseEntity.badRequest().body(response);
+    }*/
     
     
 

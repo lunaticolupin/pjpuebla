@@ -14,9 +14,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import mx.pjpuebla.backend.core.repository.UserInfoService;
 import mx.pjpuebla.backend.core.service.JwtService;
+import mx.pjpuebla.backend.core.service.UserInfoService;
 
 @Component
 public class JWTAuthorizationFilter extends OncePerRequestFilter {

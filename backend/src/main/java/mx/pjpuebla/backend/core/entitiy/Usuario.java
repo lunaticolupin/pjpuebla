@@ -4,6 +4,11 @@ import java.security.MessageDigest;
 import java.util.Date;
 //import java.util.List;
 import java.util.HexFormat;
+//import java.util.List;
+import java.util.List;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,15 +18,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+//import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.ManyToOne;
+//import jakarta.persistence.ForeignKey;
+//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-//import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -82,10 +88,8 @@ public class Usuario {
 	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })	
 	private Persona persona;
 	
-	/* @OneToMany(mappedBy="usuario", targetEntity=mx.puebla.RolUsuario.class)	
-	@org.hibernate.annotations.Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.LOCK})	
-	@org.hibernate.annotations.LazyCollection(org.hibernate.annotations.LazyCollectionOption.TRUE)	
-	private List<Object> rolUsuario; */
+	@OneToMany(fetch = FetchType.LAZY, mappedBy="usuario")
+	private List<RolUsuario> rolUsuario;
 
 	public void generarPasswd(){
 		this.passwd = cifrarPassword(this.passwdTxt);

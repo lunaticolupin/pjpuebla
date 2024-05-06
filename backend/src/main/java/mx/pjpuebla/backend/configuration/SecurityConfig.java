@@ -26,7 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import mx.pjpuebla.backend.core.repository.UserInfoService;
+import mx.pjpuebla.backend.core.service.UserInfoService;
 import mx.pjpuebla.backend.security.JWTAuthorizationFilter;
 
 @Configuration

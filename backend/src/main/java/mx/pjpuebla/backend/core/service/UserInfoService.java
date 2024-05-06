@@ -1,4 +1,4 @@
-package mx.pjpuebla.backend.core.repository;
+package mx.pjpuebla.backend.core.service;
 
 import java.util.Date;
 import java.util.Optional;
@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import mx.pjpuebla.backend.core.entitiy.Usuario;
+import mx.pjpuebla.backend.core.repository.UsuarioRepository;
 import mx.pjpuebla.backend.models.UserInfoDetails;
 
 @Service

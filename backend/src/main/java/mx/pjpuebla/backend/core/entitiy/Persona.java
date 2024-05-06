@@ -23,7 +23,6 @@ public class Persona {
     @Column(name="id", nullable=false)	
 	@Id	
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERSONA_ID_GENERATOR")	
-	//@org.hibernate.annotations.GenericGenerator(name="MX_PUEBLA_PERSONA_ID_GENERATOR", strategy="sequence", parameters={ @org.hibernate.annotations.Parameter(name="sequence", value="core.persona_id_seq") })
     @SequenceGenerator(name = "PERSONA_ID_GENERATOR", sequenceName = "core.persona_id_seq", allocationSize = 1)
 	private Integer id;
 	
