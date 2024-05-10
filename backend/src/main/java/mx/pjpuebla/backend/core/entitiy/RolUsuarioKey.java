@@ -7,10 +7,10 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class RolUsuarioKey implements Serializable {
-    @Column(name = "usuario_id")
+    @Column(name = "usuario_id", nullable=false, insertable=false, updatable=false)
     private Integer usuarioId;
 
-    @Column(name = "rol_id")
+    @Column(name = "rol_id", nullable=false, insertable=false, updatable=false )
     private Integer rolId;
 
     @Override

@@ -1,8 +1,10 @@
 package mx.pjpuebla.backend.core.entitiy;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +21,7 @@ import lombok.Setter;
 @Table(name="persona", schema="core", uniqueConstraints={ @UniqueConstraint(name="persona_curp_key", columnNames={ "curp" }), @UniqueConstraint(name="persona_email_key", columnNames={ "email" }), @UniqueConstraint(name="persona_rfc_key", columnNames={ "rfc" }) })
 @Getter
 @Setter
-public class Persona {
+public class Persona implements Serializable {
     @Column(name="id", nullable=false)	
 	@Id	
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERSONA_ID_GENERATOR")	
@@ -79,4 +81,13 @@ public class Persona {
 	
 	@Column(name="hablante_lengua_distinta", nullable=false)	
 	private boolean hablanteLenguaDistinta = false;
+
+	@JsonProperty
+	public String nombreCompleto(){
+		if (personaMoral){
+			return nombre;
+		}
+
+		return String.format("%s %s %s", nombre, apellidoPaterno, apellidoMaterno);
+	}
 }

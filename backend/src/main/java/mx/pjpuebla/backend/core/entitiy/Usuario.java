@@ -1,5 +1,6 @@
 package mx.pjpuebla.backend.core.entitiy;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Date;
 //import java.util.List;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +42,7 @@ import mx.pjpuebla.backend.models.UsuarioEstatus;
 @Table(name="usuario", schema="core", uniqueConstraints={ @UniqueConstraint(name="usuario_clave_key", columnNames={ "clave" }), @UniqueConstraint(name="usuario_correo_institucional_key", columnNames={ "correo_institucional" }) })
 @Getter
 @Setter
-public class Usuario {
+public class Usuario implements Serializable{
 
     @Column(name="id", nullable=false)	
 	@Id	
@@ -88,7 +90,8 @@ public class Usuario {
 	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })	
 	private Persona persona;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy="usuario")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@JoinColumn(name="usuario_id")
 	private List<RolUsuario> rolUsuario;
 
 	public void generarPasswd(){
@@ -130,6 +133,21 @@ public class Usuario {
 	}
 
 	public String getRoles(){
-		return "ROLE_USER";
+		
+		String roles = "";
+
+		for (RolUsuario tmp : rolUsuario) {
+			roles += tmp.rol.getClave() + ",";
+		}
+
+		if (roles.length()>0){
+			roles = roles.substring(0, roles.length()-1);
+			System.out.println(roles);
+		}
+		
+		return roles;
+
+		//  "ROLE_USER";
+
 	}
 }
