@@ -1,0 +1,90 @@
+<h2>Mediación</h2>
+<div class="oj-panel">
+    <h4 class="oj-helper-text-align-center">Solicitudes</h4>
+    <div>
+        <oj-c-button label="Nueva" on-oj-action="[[nuevaSolicitud]]"><span slot="startIcon" class="oj-ux-ico-plus"></span></oj-c-button>
+    </div>
+    <oj-table
+    data='[[dataProvider]]'
+    columns='[
+        {"headerText":"Número", "field":"folio"},
+        {"headerText":"Fecha de solicitud", "field":"fechaSolicitud", "template":"fechaTemplate", "id":"fechaSolicitud"},
+        {"headerText":"Materia", "field":"materia.descripcion"},
+        {"headerText":"Nombre u Razón Usuario", "field":"usuarioPersona.nombreCompleto"},
+        {"headerText":"Estatus", "field":"estatus"},
+        {"headerText":"Seguimiento", "field":"seguimiento"},
+        {"headerText":"", "width":"150", "template":"botonesTemplate"}
+    ]'
+    selection-mode.row="single"
+    first-selected-row="{{solicitudSeleccionada}}"
+    on-first-selected-row-changed="[[firstSelectedRowChangedListener]]"
+    style="width: 100%;"
+    >
+        <template slot="fechaTemplate" data-oj-as="item">
+            <oj-bind-text value="[[dateConverter(item.data)]]"></oj-bind-text>
+        </template>
+        <template slot="botonesTemplate" data-oj-as="cell">
+            <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-edit"></span></oj-c-button>
+            <oj-c-button label="Imprimir" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
+            <oj-c-button label="Borrar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-delete-all"></span></oj-c-button>
+        </template>
+    </oj-table>
+    <oj-bind-if test="[[solicitudSeleccionada()]]">
+        <div class="oj-panel">
+            <h4 class="oj-typography-subheading-xs">Datos generales</h4>
+            <oj-c-form-layout max-columns="3" direction="row" >
+                <oj-c-input-text id="solicitudId" value="{{solicitudId}}" label-hint="ID" readonly></oj-c-input-text>
+                <oj-c-input-text id="solicitudFolio" value="{{solicitudFolio}}" label-hint="Folio" readonly></oj-c-input-text>
+                <oj-input-date id="fechaSolicitud" value="{{solicitudFecha}}" label-hint="Fecha de Solicitud" 
+                    converter="[[dateConverterInput]]"
+                    required></oj-input-date>
+                <oj-c-select-single 
+                    id = "selectMateria"
+                    data="[[materiasDP]]" 
+                    item-text="descripcion" 
+                    value="{{solicitudMateriaId}}"
+                    on-oj-value-action="[[valueActionHandler]]"
+                    label-hint="Materia"
+                    required></oj-c-select-single>
+                <oj-c-select-single
+                    id = "selectTipoApertura" 
+                    data="[[tipoAperturaDP]]" 
+                    item-text="descripcion" 
+                    value="{{solicitudTipoAperturaId}}"
+                    on-oj-value-action="[[valueActionHandler]]"
+                    label-hint="Apertura"
+                    required></oj-c-select-single>
+                    <oj-c-text-area column-span="3" value="{{solicitudDescripcion}}" 
+                        label-hint="Descripción del Conflicto"
+                        required></oj-c-text-area>
+            </oj-c-form-layout>
+        </div>
+
+        <div class="oj-panel">
+            <h4 class="oj-typography-subheading-xs">Datos del Usuario</h4>
+            <oj-c-form-layout max-columns="3" direction="row">
+                <oj-c-input-text value="{{solicitudUsuario().nombre}}"  label-hint="Nombre o Razón Social" autocomplete="off" required></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudUsuario().apellidoPaterno}}" label-hint="Apellido Paterno" autocomplete="off" disabled="[[usuarioPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudUsuario().apellidoMaterno}}" label-hint="Apellido Materno" autocomplete="off" disabled="[[usuarioPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudUsuario().curp}}" label-hint="CURP" autocomplete="off" disabled="[[usuarioPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudUsuario().rfc}}" label-hint="RFC" autocomplete="off" required="[[usuarioPM]]"></oj-c-input-text>
+                <oj-c-checkbox id="usuarioPM" value="{{solicitudUsuario().personaMoral}}" on-value-changed="[[valueChangeHandler]]">Persona Moral</oj-c-checkbox>
+            </oj-c-form-layout>
+
+            <h4 class="oj-typography-subheading-xs">Datos del Invitado</h4>
+            <oj-c-form-layout max-columns="3" direction="row" >
+                <oj-c-input-text value="{{solicitudInvitado().nombre}}" label-hint="Nombre o Razón Social" autocomplete="off" required></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudInvitado().apellidoPaterno}}" label-hint="Apellido Paterno" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudInvitado().apellidoMaterno}}" label-hint="Apellido Materno" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudInvitado().curp}}" label-hint="CURP" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
+                <oj-c-input-text value="{{solicitudInvitado().rfc}}" label-hint="RFC" autocomplete="off" required="[[invitadoPM]]""></oj-c-input-text>
+                <oj-c-checkbox id="invitadoPM" value="{{solicitudInvitado().personaMoral}}" on-value-changed="[[valueChangeHandler]]">Persona Moral</oj-c-checkbox>
+            </oj-c-form-layout>
+        </div>
+        
+        <div class="oj-panel">
+            <oj-c-button label="Guardar" on-oj-action="[[guardarSolicitud]]"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
+
+        </div>
+    </oj-bind-if>
+</div>
