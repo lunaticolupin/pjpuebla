@@ -1,5 +1,5 @@
 define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
-    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox',
+    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'sweetalert',
     'oj-c/text-area'
 ],
  function(accUtils, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1) {
@@ -214,12 +214,22 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
 
-                console.log(data);
+                utils.postData(url, data).then((response)=>{                    
+                    if (response.success){
+                        const folio = response.data.folio;
 
-                utils.postData(url, data).then((response)=>{
-                    console.log(response);
-                    self.getSolicitudes();
-                    alert('Solicitud Registrada');
+                        self.getSolicitudes();
+                        swal("Solicitud Registrada","Folio: " + folio, "success");
+                        
+                        return true;
+                    }
+
+                    const errores = JSON.stringify(response.errors);
+                    swal(response.message, errores, "error");
+                }).catch((response)=>{
+                    const errores = JSON.stringify(response);
+                    
+                    swal("Error al procesar la petición", errores, "error");
                 });
             });
          }
