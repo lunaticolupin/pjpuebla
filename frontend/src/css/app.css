@@ -36,6 +36,27 @@ html[dir="rtl"] .demo-oracle-icon {
   display:inline
 }
 
+.logo-pjpuebla {
+  width:137px;
+  height:45px;
+}
+
+.logo-pjpuebla:before{
+  content: url("images/logo_pjpuebla.svg");
+}
+
+html:not([dir="rtl"]) .logo-pjpuebla {
+  padding-right:4px
+}
+
+html[dir="rtl"] .logo-pjpuebla {
+  padding-left:4px
+}
+
+.logo-pjpuebla:before {
+  display:inline
+}
+
 .demo-appheader-avatar {
   width:24px;
   height:24px

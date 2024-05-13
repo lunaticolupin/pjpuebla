@@ -30,9 +30,18 @@ define([],
             return respuesta.json();
         }
 
+        parseFecha = (fecha)=>{
+            const options = {
+                month: '2-digit', day: '2-digit', year: 'numeric', timeZone: 'UTC'
+            };
+
+            return new Date(fecha).toLocaleDateString('es', options);
+        }
+
         return {
             getData: getData,
-            postData: postData
+            postData: postData,
+            parseFecha: parseFecha
         }
     }
 );

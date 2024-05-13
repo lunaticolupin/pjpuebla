@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "api.key",
+    "type": "java.lang.String",
+    "description": "Token para el acceso a Endpoints"
+  },
+  {
+    "name": "api.secret",
+    "type": "java.lang.String",
+    "description": "Cadena para la generación del SecretKet"
+  },
+  {
+    "name": "api.issuer",
+    "type": "java.lang.String",
+    "description": "Emisor del JWT"
+  },
+  {
+    "name": "api.header",
+    "type": "java.lang.String",
+    "description": "Nombre del encabezado donde va el JWT"
+  }
+]}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,6 @@ public class Persona implements Serializable {
     @Column(name="id", nullable=false)	
 	@Id	
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERSONA_ID_GENERATOR")	
-	//@org.hibernate.annotations.GenericGenerator(name="MX_PUEBLA_PERSONA_ID_GENERATOR", strategy="sequence", parameters={ @org.hibernate.annotations.Parameter(name="sequence", value="core.persona_id_seq") })
     @SequenceGenerator(name = "PERSONA_ID_GENERATOR", sequenceName = "core.persona_id_seq", allocationSize = 1)
 	private Integer id;
 	
@@ -81,4 +81,13 @@ public class Persona implements Serializable {
 	
 	@Column(name="hablante_lengua_distinta", nullable=false)	
 	private boolean hablanteLenguaDistinta = false;
+
+	@JsonProperty
+	public String nombreCompleto(){
+		if (personaMoral){
+			return nombre;
+		}
+
+		return String.format("%s %s %s", nombre, apellidoPaterno, apellidoMaterno);
+	}
 }
