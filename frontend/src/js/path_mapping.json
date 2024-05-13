@@ -395,7 +395,19 @@
          "path": "libs/chai/chai.js",
          "cdnPath": "chai/chai-4.3.10.min"
       }
-   }
+    },
+
+    "sweetalert":{
+      "cwd": "node_modules/sweetalert/dist",
+      "debug":{
+        "src":"sweetalert.min.js",
+        "path":"libs/sweetalert/dist/sweetalert.min.js"
+      },
+      "release":{
+        "src":"sweetalert.min.js",
+        "path":"libs/sweetalert/dist/sweetalert.min.js"
+      }
+    }
 
   }
 }
