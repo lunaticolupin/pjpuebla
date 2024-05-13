@@ -180,6 +180,7 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
             /** REST */
             self.getSolicitudes = (()=>{
                 const url = self.urlBase + '/solicitud';
+                self.solicitudes([]);
 
                 utils.getData(url, {}).then((response) => {
                     if (response.success){
@@ -217,6 +218,8 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
 
                 utils.postData(url, data).then((response)=>{
                     console.log(response);
+                    self.getSolicitudes();
+                    alert('Solicitud Registrada');
                 });
             });
          }
