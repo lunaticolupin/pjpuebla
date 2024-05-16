@@ -90,7 +90,7 @@ public class Usuario implements Serializable{
 	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })	
 	private Persona persona;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
 	@JoinColumn(name="usuario_id")
 	private List<RolUsuario> rolUsuario;
 
