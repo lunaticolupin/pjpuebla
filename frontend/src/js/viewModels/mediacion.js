@@ -6,6 +6,9 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
     class MediacionViewModel {
          constructor() {
             var self = this;
+            var rootViewModel = ko.dataFor(document.getElementById('globalBody'));
+
+            rootViewModel.validaSesion();
 
             self.urlBase = config.baseEndPoint + '/mediacion';
 
