@@ -37,6 +37,8 @@ define(['knockout', 'ojs/ojcorerouter'],(ko)=>{
 
         window.localStorage.setItem('pjpuebla', '{}');
 
+        pjStorage = JSON.parse(window.localStorage.getItem('pjpuebla'));
+
     });
 
     parseJwt = ((token) => {
