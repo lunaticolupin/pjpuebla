@@ -4,7 +4,7 @@
     <div>
         <oj-c-button label="Nueva" on-oj-action="[[nuevaSolicitud]]"><span slot="startIcon" class="oj-ux-ico-plus"></span></oj-c-button>
     </div>
-    <oj-table
+    <oj-table id="solicitudes"
     data='[[dataProvider]]'
     columns='[
         {"headerText":"Número", "field":"folio"},
@@ -24,18 +24,18 @@
             <oj-bind-text value="[[dateConverter(item.data)]]"></oj-bind-text>
         </template>
         <template slot="botonesTemplate" data-oj-as="cell">
-            <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-edit"></span></oj-c-button>
-            <oj-c-button label="Imprimir" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
+            <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm" on-oj-action="[[editarSolicitud]]"><span slot="startIcon" class="oj-ux-ico-edit"></span></oj-c-button>
+            <oj-c-button label="Imprimir" display="icons" chroming="borderless" size="sm" on-oj-action="[[open]]"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
             <oj-c-button label="Borrar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-delete-all"></span></oj-c-button>
         </template>
     </oj-table>
     <oj-bind-if test="[[solicitudSeleccionada()]]">
-        <div class="oj-panel">
+        <div id="solicitud" class="oj-panel">
             <h4 class="oj-typography-subheading-xs">Datos generales</h4>
             <oj-c-form-layout max-columns="3" direction="row" >
                 <oj-c-input-text id="solicitudId" value="{{solicitudId}}" label-hint="ID" readonly></oj-c-input-text>
                 <oj-c-input-text id="solicitudFolio" value="{{solicitudFolio}}" label-hint="Folio" readonly></oj-c-input-text>
-                <oj-input-date id="fechaSolicitud" value="{{solicitudFecha}}" label-hint="Fecha de Solicitud" 
+                <oj-input-date id="fechaSolicitud" value="{{solicitudFecha}}" label-hint="Fecha de Solicitud" autofocus="true"
                     converter="[[dateConverterInput]]"
                     required></oj-input-date>
                 <oj-c-select-single 
@@ -82,9 +82,19 @@
             </oj-c-form-layout>
         </div>
         
-        <div class="oj-panel">
-            <oj-c-button label="Guardar" on-oj-action="[[guardarSolicitud]]"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
-
-        </div>
+        <oj-toolbar chroming="outlined">
+            <oj-c-button label="Cancelar" on-oj-action="[[cancelarSolicitud]]" ><span slot="startIcon" class="oj-ux-ico-cancel"></span></oj-c-button>
+            <oj-c-button label="Guardar" on-oj-action="[[guardarSolicitud]]" chroming="callToAction"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
+        </oj-toolbar>
     </oj-bind-if>
 </div>
+
+<oj-dialog id="modalDialog1" dialog-title="Solicitud" aria-describedby="desc" style="width: 90vw; height: 90vh;">
+    <div slot="body">
+      <iframe id="pdfHolder" :src="[[dataPDF]]" style="height: 60vh; width: 99%;">
+      </iframe>
+    </div>
+    <div slot="footer">
+      <oj-c-button id="okButton" on-oj-action="[[close]]" label="OK"></oj-c-button>
+    </div>
+  </oj-dialog>

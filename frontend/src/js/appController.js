@@ -102,7 +102,6 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
           this.router.go({path: 'login'});
         }
 
-
       });
 
      }

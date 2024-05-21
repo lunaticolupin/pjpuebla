@@ -8,9 +8,12 @@
 /*
  * Your dashboard ViewModel code goes here
  */
-define(['../accUtils', 'sesion'],
- function(accUtils, Sesion) {
+define(['../accUtils','knockout', 'sesion'],
+ function(accUtils, ko, Sesion) {
     function DashboardViewModel() {
+      var rootViewModel = ko.dataFor(document.getElementById('globalBody'));
+
+      rootViewModel.validaSesion();
       // Below are a set of the ViewModel methods invoked by the oj-module component.
       // Please reference the oj-module jsDoc for additional information.
 
@@ -27,7 +30,7 @@ define(['../accUtils', 'sesion'],
         document.title = "Dashboard";
         // Implement further logic if needed
 
-        Sesion.valida();
+        //Sesion.valida();
       };
 
       /**
