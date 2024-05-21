@@ -18,5 +18,15 @@
     "name": "api.header",
     "type": "java.lang.String",
     "description": "Nombre del encabezado donde va el JWT"
+  },
+  {
+    "name": "api.reportes.jasper",
+    "type": "java.lang.String",
+    "description": "Ubicación de los archivos de Jasper"
+  },
+  {
+    "name": "api.reportes.images",
+    "type": "java.lang.String",
+    "description": "Ubicación de las imágenes de los reportes de Jasper'"
   }
 ]}
