@@ -136,6 +136,24 @@ public class SolicitudController {
         
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<GenericResponse> eliminar(@PathVariable("id") Integer id) {
+        //TODO: process POST request
+        response = new GenericResponse();
+
+        if (solicitudes.esEliminable(id)){
+            response.setSuccess(solicitudes.delete(id));
+            response.setMessage("Solicitud eliminada");
+            return ResponseEntity.ok(response);
+        }
+        
+        response.setMessage("La Solicitud no puede ser eliminada");
+
+        return ResponseEntity.badRequest().body(response);
+        
+    }
+    
     
     @GetMapping("template")
     public ResponseEntity<GenericResponse> getJsonTemplate() {
