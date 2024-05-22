@@ -65,6 +65,7 @@ html[dir="rtl"] .logo-pjpuebla {
 .demo-appheader-avatar:before {
   content:url("images/avatar_24px.png")
 }
+
 @media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi), (min-resolution: 1.5dppx) {
   .demo-appheader-avatar:before {
       content:url("images/avatar_24px_2x.png");
@@ -72,3 +73,8 @@ html[dir="rtl"] .logo-pjpuebla {
       transform:translate(-25%, -25%) scale(0.5)
   }
 }
+
+header[role="banner"]{
+  min-height: 100px;
+}
+

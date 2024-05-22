@@ -1,0 +1,30 @@
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Información de las Materias </h1>
+    <oj-c-form-layout id="materia-information" direction="row" max-columns="3">
+        <oj-c-input-text
+            id="clave"
+            label-hint="Clave"
+            required="true"
+            value="{{clave}}" autocomplete="off"></oj-c-input-text>
+        <oj-c-input-text
+            id="descripcion"
+            label-hint="Descripción"
+            required="true"
+            value="{{descripcion}}" autocomplete="off"></oj-c-input-text>    
+    </oj-c-form-layout>
+</div>
+
+<oj-c-button
+label="Guardar"
+on-oj-action="[[guardar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-save"></span>
+</oj-c-button>
+
+<oj-c-button
+label="Eliminar"
+on-oj-action="[[eliminar]]"
+data-oj-clickthrough="disabled"
+:disabled="[[disableEliminar]]">
+<span slot="startIcon" class="oj-ux-ico-delete-all"></span>
+</oj-c-button>

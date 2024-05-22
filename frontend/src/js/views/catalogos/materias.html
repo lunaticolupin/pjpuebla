@@ -1,0 +1,73 @@
+<div class="container" style="background-color: white;">
+    <h4>Materias</h4>
+  
+    <oj-button id="buttonOpener" on-oj-action="[[open]]" style="padding-top: 1rem;">Agregar nueva Materia</oj-button>
+    
+    
+    <oj-table id = "materias" data = "[[dataProvider]]"
+      columns-default='{"sortable": "disabled"}'
+      selection-mode.row="none"
+      scroll-policy="loadMoreOnScroll"
+      scroll-policy-options.fetch-size="10"
+      scroll-policy-options.scroller="#samplePage"
+      scroll-policy-options.scroller-offset-top="0"
+      scroll-policy-options.scroller-offset-bottom="100"
+      scroll-policy-options.scroller-offset-start="0"
+      scroll-policy-options.scroller-offset-end="100"
+      columns='[
+      {"headerText":"ID", "field":"id","minWidth":"50"},
+      {"headerText":"Clave", "field":"clave"},
+      {"headerText":"Descripción", "field":"descripcion"},
+      {"headerText": "Editar","template": "actionTemplate", "id": "action"},
+      {"headerText":"Eliminar","template": "actionTemplateDelete","id": "action"}]'
+      style="width: 100%; padding-top: 4rem; background-color: white;">
+      <template slot="actionTemplate" data-oj-as="cell">
+        <oj-c-button
+          chroming="borderless"
+          display="icons"
+          on-oj-action="[[open]]"
+          data-oj-clickthrough="disabled">
+          <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+        </oj-c-button>
+        
+      </template>
+      <template slot="actionTemplateDelete" data-oj-as="cell">
+        <oj-c-button
+          chroming="borderless"
+          display="icons"
+          on-oj-action="[[eliminar]]"
+          data-oj-clickthrough="disabled">
+          <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
+        </oj-c-button>
+        
+      </template>
+    </oj-table>
+    <oj-paging-control data="[[dataProvider]]" page-size="5"></oj-paging-control>
+
+    <div id="dialogWrapper">
+      <oj-dialog id="modalDialog1" dialog-title="Modal Dialog" aria-describedby="desc">
+        <div slot="body">
+          <h1 class="oj-typography-heading-xs">Información de las Materias </h1>
+        <oj-c-form-layout id="materia-information" direction="row" max-columns="3">
+            <oj-c-input-text
+                id="clave"
+                label-hint="Clave"
+                required="true"
+                autocomplete="off"></oj-c-input-text>
+            <oj-c-input-text
+                id="descripcion"
+                label-hint="Descripción"
+                required="true"
+                autocomplete="off"></oj-c-input-text>    
+        </oj-c-form-layout>
+        </div>
+        <div slot="footer">
+          <oj-button id="okButton" on-oj-action="[[guardar]]">Guardar</oj-button>
+          <oj-button id="okButton" on-oj-action="[[close]]">Cancelar</oj-button>
+  
+        </div>
+        
+      </oj-dialog>
+  </div>
+  
+  

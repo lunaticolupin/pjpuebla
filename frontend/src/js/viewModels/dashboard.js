@@ -8,8 +8,8 @@
 /*
  * Your dashboard ViewModel code goes here
  */
-define(['../accUtils'],
- function(accUtils) {
+define(['../accUtils', 'sesion'],
+ function(accUtils, Sesion) {
     function DashboardViewModel() {
       // Below are a set of the ViewModel methods invoked by the oj-module component.
       // Please reference the oj-module jsDoc for additional information.
@@ -26,6 +26,8 @@ define(['../accUtils'],
         accUtils.announce('Dashboard page loaded.', 'assertive');
         document.title = "Dashboard";
         // Implement further logic if needed
+
+        Sesion.valida();
       };
 
       /**

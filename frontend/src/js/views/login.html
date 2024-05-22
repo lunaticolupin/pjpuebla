@@ -1,0 +1,16 @@
+<html lang="es">
+    <head>
+        <link rel="stylesheet" href="css/login.css">
+    </head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <oj-form-layout>
+                <oj-input-text label-hint="Nombre de Usuario" value="{{userName}}" required autofocus="true" ></oj-input-text>
+                <oj-input-password id="passwd" label-hint="Password" clear-icon="conditional" value="{{passwd}}" required></oj-input-password>
+                <oj-button label="Ingresar" chroming="callToAction" on-oj-action="[[iniciarSesion]]">Ingresar</oj-button>
+            </oj-form-layout>
+        </div>
+    </div>
+</body>
+</html>

@@ -5,10 +5,13 @@ define(['../accUtils', 'require', 'knockout', 'ojs/ojarraydataprovider', 'ojs/oj
          constructor() {
 
             var self = this;
+            var rootViewModel = ko.dataFor(document.getElementById('globalBody'));
 
             let data = [
                 { name: "Personas", id: "personas", icons: "oj-ux-ico-home" },
                 { name: "Usuarios", id: "usuarios", icons: "oj-ux-ico-book" },
+                { name: "Materias", id: "materias", icons: "oj-ux-ico-book" },
+
             ];
 
             self.catalogos = ko.observableArray(data);
@@ -20,6 +23,8 @@ define(['../accUtils', 'require', 'knockout', 'ojs/ojarraydataprovider', 'ojs/oj
             this.ModuleElementUtils = ModuleElementUtils;
             
             this.selectedItem = ko.observable("personas");
+
+            rootViewModel.validaSesion();
 
              this.connected = () => {
                  accUtils.announce('Catalogos page loaded.', 'assertive');

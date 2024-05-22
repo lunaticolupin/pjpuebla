@@ -1,0 +1,47 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.crud-container {
+    padding: 20px;
+}
+
+oj-table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+oj-button {
+    margin: 5px;
+}
+
+/* Estilos para el modal */
+oj-dialog .oj-dialog-body {
+    padding: 20px;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content oj-button {
+    margin-top: 20px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .crud-container {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .crud-container {
+        padding: 5px;
+    }
+}
