@@ -8,9 +8,9 @@
 /*
  * Your application specific code will go here
  */
-define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknockouttemplateutils', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojknockoutrouteradapter', 'ojs/ojurlparamadapter', 'ojs/ojresponsiveutils', 'ojs/ojresponsiveknockoututils', 'ojs/ojarraydataprovider',
+define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknockouttemplateutils', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojknockoutrouteradapter', 'ojs/ojurlparamadapter', 'ojs/ojresponsiveutils', 'ojs/ojresponsiveknockoututils', 'ojs/ojarraydataprovider','sesion',
         'ojs/ojdrawerpopup', 'ojs/ojmodule-element', 'ojs/ojknockout'],
-  function(ko, Context, moduleUtils, KnockoutTemplateUtils, CoreRouter, ModuleRouterAdapter, KnockoutRouterAdapter, UrlParamAdapter, ResponsiveUtils, ResponsiveKnockoutUtils, ArrayDataProvider) {
+  function(ko, Context, moduleUtils, KnockoutTemplateUtils, CoreRouter, ModuleRouterAdapter, KnockoutRouterAdapter, UrlParamAdapter, ResponsiveUtils, ResponsiveKnockoutUtils, ArrayDataProvider, Sesion) {
 
      function ControllerViewModel() {
 
@@ -34,28 +34,32 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       this.mdScreen = ResponsiveKnockoutUtils.createMediaQueryObservable(mdQuery);
 
       let navData = [
-        { path: '', redirect: 'dashboard' },
+        { path: '', redirect: 'login' },
+        { path: 'login' },
+        { path: 'logout' },
         { path: 'dashboard', detail: { label: 'Dashboard', iconClass: 'oj-ux-ico-bar-chart' } },
         { path: 'catalogos', detail: { label: 'Catálogos', iconClass: 'oj-ux-ico-documents' } },
         { path: 'mediacion', detail: { label: 'Mediación', iconClass: 'oj-ux-ico-child-solid' } },
+        
         /*{ path: 'incidents', detail: { label: 'Incidents', iconClass: 'oj-ux-ico-fire' } },
         { path: 'customers', detail: { label: 'Customers', iconClass: 'oj-ux-ico-contact-group' } },
         { path: 'about', detail: { label: 'About', iconClass: 'oj-ux-ico-information-s' } }*/
       ];
 
       // Router setup
-      let router = new CoreRouter(navData, {
+      this.router = new CoreRouter(navData, {
         urlAdapter: new UrlParamAdapter()
       });
-      router.sync();
+      
+      this.router.sync();
 
-      this.moduleAdapter = new ModuleRouterAdapter(router);
+      this.moduleAdapter = new ModuleRouterAdapter(this.router);
 
-      this.selection = new KnockoutRouterAdapter(router);
+      this.selection = new KnockoutRouterAdapter(this.router);
 
       // Setup the navDataProvider with the routes, excluding the first redirected
       // route.
-      this.navDataProvider = new ArrayDataProvider(navData.slice(1), {keyAttributes: "path"});
+      this.navDataProvider = new ArrayDataProvider(navData.slice(3), {keyAttributes: "path"});
 
       // Drawer
       self.sideDrawerOn = ko.observable(false);
@@ -72,7 +76,8 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       // Application Name used in Branding Area
       this.appName = ko.observable("PJPuebla");
       // User Info used in Global Navigation area
-      this.userLogin = ko.observable("informatica@pjpuebla.gob.mx");
+      this.userLogin = ko.observable(false);
+      this.userName = ko.observable();
 
       // Footer
       this.footerLinks = [
@@ -82,6 +87,23 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
         { name: "Terms Of Use", id: "termsOfUse", linkTarget: "http://www.oracle.com/us/legal/terms/index.html" },
         { name: "Your Privacy Rights", id: "yourPrivacyRights", linkTarget: "http://www.oracle.com/us/legal/privacy/index.html" },*/
       ];
+
+      this.menuUsuario = ((event)=>{
+        if(event.detail.selectedValue=='out'){
+          Sesion.init();
+          this.validaSesion();
+        }
+      });
+
+      this.validaSesion = (()=>{
+        Sesion.valida();
+
+        if (!Sesion.estaActiva()){
+          this.router.go({path: 'login'});
+        }
+
+      });
+
      }
      // release the application bootstrap busy state
      Context.getPageContext().getBusyContext().applicationBootstrapComplete();

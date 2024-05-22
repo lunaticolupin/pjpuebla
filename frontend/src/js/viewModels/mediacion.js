@@ -1,11 +1,14 @@
-define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
+define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
     'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'sweetalert',
-    'oj-c/text-area'
+    'oj-c/text-area', 'ojs/ojtoolbar'
 ],
- function(accUtils, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1) {
+ function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1) {
     class MediacionViewModel {
          constructor() {
             var self = this;
+            var rootViewModel = ko.dataFor(document.getElementById('globalBody'));
+
+            rootViewModel.validaSesion();
 
             self.urlBase = config.baseEndPoint + '/mediacion';
 
@@ -171,11 +174,57 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
             self.nuevaSolicitud = ((event)=>{
                 self.solicitudNueva(true);
                 self.getJSONTemp();
+
+                $('#solicitudes').hide();
             });
 
             self.guardarSolicitud = ((event)=>{
                 self.postSolicitud();
-            })
+            });
+
+            self.cancelarSolicitud = (()=>{
+                const element = document.getElementById('solicitudes');
+                const currentRow = element.currentRow;
+
+                if(currentRow) {                   
+                    element.selected = { row: new ojkeyset_1.KeySetImpl(), column: new ojkeyset_1.KeySetImpl() };
+                }
+                
+                self.solicitudSeleccionada(null);
+
+                $('#solicitudes').show();
+            });
+
+            self.editarSolicitud = ((event, detail)=>{
+
+                self.solicitudSeleccionada({key: detail.item.key, data:detail.item.data});
+                self.parseSolicitud(detail.item.data);              
+
+                const element = document.getElementById('solicitudes');
+                const seleccion = { 
+                    row: new ojkeyset_1.KeySetImpl([detail.key]), 
+                    column: new ojkeyset_1.KeySetImpl([detail.columnIndex]) };
+
+                element.selected = seleccion;
+            });
+
+            
+
+            this.close=(event)=> {
+                document.getElementById("modalDialog1").close();
+            }
+
+            this.open= (event, detail) => {
+                self.getReporte(detail.item.data).then(result => {
+                    document.getElementById("modalDialog1").open();
+                })
+                .catch(response => {
+                    console.log(response);
+                    swal(response.message, JSON.stringify(response.errors), "error");
+                });
+            }
+
+            this.dataPDF = ko.observable();
 
             /** REST */
             self.getSolicitudes = (()=>{
@@ -231,6 +280,36 @@ define(['../accUtils','webConfig','utils','knockout','ojs/ojarraydataprovider', 
                     
                     swal("Error al procesar la petición", errores, "error");
                 });
+            });
+
+            self.getReporte = ((data)=>{
+                const params = {
+                    "p_solicitud_id": data.id
+                };
+
+                const url = config.baseEndPoint + '/reportes/MediacionSolicitud';
+
+                this.dataPDF(null);
+
+                return new Promise ((resolve, reject)=>{
+                    utils.getReporte(url, params).then((response)=>{
+
+                        if (response.success!=undefined && response.success==false){    
+                            reject(response);
+                        }
+    
+                        const blobUrl = URL.createObjectURL(response);
+    
+                        this.dataPDF(blobUrl+"#view=FitH");
+    
+                        resolve(true);
+    
+                    }).catch(errors =>{
+                        console.log(errors);
+                        swal("Error", JSON.stringify(errors), "error")
+                    });
+                });
+
             });
          }
      }
