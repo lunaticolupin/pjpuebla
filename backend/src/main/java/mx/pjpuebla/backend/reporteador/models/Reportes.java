@@ -1,5 +1,6 @@
 package mx.pjpuebla.backend.reporteador.models;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class Reportes {
     private JasperPrint jasperPrint;
     private String jasperBase;
     private String jasperImages;
+    private Connection conn;
 
     @Autowired
     private DataSource dataSource;
@@ -74,8 +76,9 @@ public class Reportes {
 
     public void fillReport(){
         try{
-            jasperPrint = JasperFillManager.fillReport(reporteJasper, parametros, dataSource.getConnection());
-
+            conn = dataSource.getConnection();
+            jasperPrint = JasperFillManager.fillReport(reporteJasper, parametros, conn);
+            //dataSource.getConnection().close();
         }catch(JRException | SQLException ex){
             Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -137,5 +140,11 @@ public class Reportes {
 
     public void setJasperImages(String jasperImages) {
         this.jasperImages = jasperImages;
+    }
+
+    public void cerrarConexion() throws SQLException{
+        if (conn != null && !conn.isClosed()){
+            conn.close();
+        }
     }
 }
