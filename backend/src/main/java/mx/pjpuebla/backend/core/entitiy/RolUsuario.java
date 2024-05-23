@@ -5,8 +5,6 @@ import java.util.Date;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.Getter;
@@ -19,10 +17,6 @@ import lombok.Setter;
 public class RolUsuario implements Serializable {
     @EmbeddedId
     private RolUsuarioKey id;
-
-    @ManyToOne
-    @JoinColumn(name="rol_id")
-    Rol rol;
 
     private int estatus;
     private Date fechaCreacion = new Date();
