@@ -15,13 +15,13 @@ import jakarta.persistence.ManyToOne;
 @Embeddable
 public class RolModuloPermisoKey implements Serializable {
 
-    @Column(name = "rol_id", nullable=false, insertable=false, updatable=false)
+    @Column(name = "rol_id")
     private Integer rolId;
 
-    @Column(name = "permiso_id", nullable=false, insertable=false, updatable=false )
+    @Column(name = "permiso_id")
     private Integer permisoId;
 
-    @Column(name = "modulo_id", nullable=false, insertable=false, updatable=false )
+    @Column(name = "modulo_id")
     private Integer moduloId;
 
 
@@ -40,38 +40,31 @@ public class RolModuloPermisoKey implements Serializable {
         return Objects.hash(rolId, permisoId,moduloId);
     }
 
-    // private Integer rolId;
-    // private Integer moduloId;
-    // @Column(name = "rol_id")
-    // private Integer rolId;
-
-    // @Column(name = "modulo_id", nullable=false, insertable=false, updatable=false)
-    // private Integer moduloId;
-
-    // @Column(name = "permiso_id", nullable=false, insertable=false, updatable=false)
-    // private Integer permisoId;
-
-    // @Id
-    // private Integer rolId;
-
-    // @Id 
-    // private Integer moduloId;
-
-    // @Id
-    // private Integer permisoId;
-
-    // @ManyToOne
-    // @JoinColumn(name = "rolId", insertable = false, updatable = false)
-    // private Rol rol;
-
-    // @ManyToOne
-    // @JoinColumn(name = "moduloId", insertable = false, updatable = false)
-    // private Modulo modulo;
-
-    // @ManyToOne
-    // @JoinColumn(name = "permisoId", insertable = false, updatable = false)
-    // private Permiso permiso;
-
-    // private Integer estatus;
+    public Integer getRolId() {
+        return rolId;
+    }
     
+    public void setRolId(Integer rolId) {
+        this.rolId = rolId;
+    }
+
+    public Integer getPermisoId() {
+        return permisoId;
+    }
+    
+    public void setPermisoId(Integer permisoId) {
+        this.permisoId = permisoId;
+    }
+
+    public Integer getModuloId() {
+        return moduloId;
+    }
+
+    public void setModuloId(Integer moduloId) {
+        this.moduloId = moduloId;
+    }
+    
+    // public void setModuloId(Integer ModuloId) {
+    //     this.moduloId = moduloId;
+    // }
 }

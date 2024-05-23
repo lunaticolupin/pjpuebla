@@ -134,20 +134,20 @@ public class Usuario implements Serializable{
 
 	public String getRoles(){
 		
-		String roles = "";
+		// String roles = "";
 
-		for (RolUsuario tmp : rolUsuario) {
-			roles += tmp.rol.getClave() + ",";
-		}
+		// for (RolUsuario tmp : rolUsuario) {
+		// 	roles += tmp.rol.getClave() + ",";
+		// }
 
-		if (roles.length()>0){
-			roles = roles.substring(0, roles.length()-1);
-			System.out.println(roles);
-		}
+		// if (roles.length()>0){
+		// 	roles = roles.substring(0, roles.length()-1);
+		// 	System.out.println(roles);
+		// }
 		
-		return roles;
+		// return roles;
 
-		//  "ROLE_USER";
+		 return "ROLE_USER";
 
 	}
 }

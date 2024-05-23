@@ -2,6 +2,8 @@ package mx.pjpuebla.backend.core.entitiy;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,4 +27,17 @@ public class Permiso {
     private Integer clave;
     private String descripcion;
     private boolean activo;
+
+    public String descripcion() {
+        return this.descripcion;
+    }
+
+    // @JsonProperty
+    
+    // public String getDescripcion() {
+    //     if(this.descripcion != null) {
+    //         return String.format(descripcion, null)
+
+    //     }
+    // }
 }

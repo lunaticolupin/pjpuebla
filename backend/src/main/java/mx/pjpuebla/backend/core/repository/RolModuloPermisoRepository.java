@@ -17,6 +17,4 @@ public interface RolModuloPermisoRepository extends JpaRepository<RolModuloPermi
 
     @SuppressWarnings({"null","unchecked"})
     public RolModuloPermiso save(RolModuloPermiso rmp);
-
-    
 }

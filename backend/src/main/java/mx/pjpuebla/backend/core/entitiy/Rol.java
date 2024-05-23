@@ -22,4 +22,6 @@ public class Rol implements Serializable {
     private String descripcion;
 
     private boolean activo;
+
+    
 }
