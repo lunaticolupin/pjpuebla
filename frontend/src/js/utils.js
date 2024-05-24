@@ -1,5 +1,5 @@
-define([], 
-    () => {
+define(['jquery'], 
+    ($) => {
         /**
          * params = {method: 'GET/POST', body: data, headers: headers}
          */
@@ -16,8 +16,6 @@ define([],
                     return respuesta.json();
                 }
             }catch(error){
-                console.log(JSON.stringify(error));
-
                 return {
                     success: false,
                     error: error
@@ -34,12 +32,17 @@ define([],
                 }
             };
 
+            $("#overlay").fadeIn(300);
+
             try{
                 const respuesta = await fetch (url, params);
 
+                $("#overlay").fadeOut(300);
+
                 return respuesta.json();
             }catch(error){
-                console.log(error);
+
+                $("#overlay").fadeOut(300);
 
                 return {
                     success: false,
@@ -59,25 +62,32 @@ define([],
                 }
             }
 
+            let response;
+
+            $("#overlay").fadeIn(300);
+
             try{
                 const respuesta = await fetch (url, params);
                 const contentType = respuesta.headers.get("content-type");
 
                 if (contentType && contentType.includes("application/pdf")){
                     // Cuando se descarga un archivo
-                    return respuesta.blob();
+                    response = respuesta.blob();
                 }else{
                     //Ocurrio un error
-                    return respuesta.json();
+                    response = respuesta.json();
                 }
             }catch(error){
-                console.log(error);
 
-                return {
+                response = {
                     success: false,
                     error: error
                 }
             }
+
+            $("#overlay").fadeOut(300);
+
+            return response;
 
             
         }
@@ -94,11 +104,21 @@ define([],
 
         }
 
+        waiting = (stop=false)=>{
+            if (stop){
+                $("#overlay").fadeOut(300);
+                return;
+            }
+
+            $("#overlay").fadeIn(300);
+        }
+
         return {
             getData: getData,
             postData: postData,
             getReporte: getReporte,
-            parseFecha: parseFecha
+            parseFecha: parseFecha,
+            waiting: waiting
         }
     }
 );
