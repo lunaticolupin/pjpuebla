@@ -3,39 +3,32 @@ package mx.pjpuebla.backend.core.entitiy;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Date;
-//import java.util.List;
 import java.util.HexFormat;
-//import java.util.List;
 import java.util.List;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-//import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumns;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.JoinColumn;
-//import jakarta.persistence.ForeignKey;
-//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Getter;
-import lombok.Setter;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+
+import lombok.Getter;
+import lombok.Setter;
+
 import mx.pjpuebla.backend.models.UsuarioEstatus;
 
 @Entity
@@ -85,14 +78,14 @@ public class Usuario implements Serializable{
 	@Transient
 	private Integer personaId;
 	
-	//@ManyToOne(targetEntity=Persona.class, fetch=FetchType.LAZY)	
 	@OneToOne
-	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })	
+	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })
+	@JsonIgnore	
 	private Persona persona;
-	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
-	@JoinColumn(name="usuario_id")
-	private List<RolUsuario> rolUsuario;
+
+	@ManyToMany
+	@JoinTable(schema = "core", name = "rol_usuario", joinColumns = @JoinColumn(name="usuario_id"), inverseJoinColumns = @JoinColumn(name="rol_id"))
+	private List<Rol> rolUsuario;
 
 	public void generarPasswd(){
 		this.passwd = cifrarPassword(this.passwdTxt);
@@ -111,7 +104,6 @@ public class Usuario implements Serializable{
 			passwdCifrado=null;
             e.printStackTrace();
         }
-
 		return passwdCifrado;
 	}
 
@@ -126,7 +118,7 @@ public class Usuario implements Serializable{
 	@JsonProperty
 	public String nombreCompleto (){
 		if (this.persona != null){
-			return String.format("%s %s %s", this.persona.getNombre(), this.persona.getApellidoPaterno(), this.persona.getApellidoMaterno());
+			return this.persona.fullName();
 		}
 
 		return "";
@@ -134,20 +126,17 @@ public class Usuario implements Serializable{
 
 	public String getRoles(){
 		
-		// String roles = "";
+		String rolesTmp = "";
 
-		// for (RolUsuario tmp : rolUsuario) {
-		// 	roles += tmp.rol.getClave() + ",";
-		// }
+		for (Rol tmp : rolUsuario) {
+			rolesTmp += tmp.getClave() + ",";
+		}
 
-		// if (roles.length()>0){
-		// 	roles = roles.substring(0, roles.length()-1);
-		// 	System.out.println(roles);
-		// }
+		if (rolesTmp.length()>0){
+			rolesTmp = rolesTmp.substring(0, rolesTmp.length()-1);
+		}
 		
-		// return roles;
-
-		 return "ROLE_USER";
+		return rolesTmp;
 
 	}
 }

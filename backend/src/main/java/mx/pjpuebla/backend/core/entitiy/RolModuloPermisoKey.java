@@ -63,8 +63,5 @@ public class RolModuloPermisoKey implements Serializable {
     public void setModuloId(Integer moduloId) {
         this.moduloId = moduloId;
     }
-    
-    // public void setModuloId(Integer ModuloId) {
-    //     this.moduloId = moduloId;
-    // }
+
 }

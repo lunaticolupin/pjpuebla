@@ -84,6 +84,10 @@ public class Persona implements Serializable {
 
 	@JsonProperty
 	public String nombreCompleto(){
+		return fullName();
+	}
+
+	public String fullName(){
 		if (personaMoral){
 			return nombre;
 		}

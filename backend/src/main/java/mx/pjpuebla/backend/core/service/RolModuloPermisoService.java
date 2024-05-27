@@ -36,6 +36,16 @@ public class RolModuloPermisoService {
         return null;
     }
 
+    public boolean delete(RolModuloPermiso rmp) {
+        try {
+            this.repo.delete(rmp);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     
 }

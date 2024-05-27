@@ -95,7 +95,7 @@ public class PermisoController {
         GenericResponse response = new GenericResponse();
 
         if(permiso ==  null) {
-            response.setMessage("El rol no existe");
+            response.setMessage("El permiso no existe");
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }

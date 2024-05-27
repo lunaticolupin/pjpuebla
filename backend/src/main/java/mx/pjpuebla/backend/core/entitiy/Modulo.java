@@ -15,6 +15,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
@@ -44,25 +46,10 @@ public class Modulo implements Serializable {
     @Column(name = "estatus", nullable = true)
     private Integer estatus;
 
-    // @Column(name = "modulo_padre", nullable = true )
-    // private Integer modulo_padre;
+    @ManyToMany // 1 :: N Permisos
+	@JoinTable(schema = "core", name = "rol_modulo_permiso", joinColumns = @JoinColumn(name="modulo_id"), inverseJoinColumns = @JoinColumn(name="permiso_id"))
+	private List<Permiso> permisos;
 
-    // @OneToOne
-	// @JoinColumns(value={ @JoinColumn(name="modulo_padre", referencedColumnName="id", nullable=true) })	
-	// private Modulo modulo_padre;
 
-    // @JsonProperty
-	// public String descripcionPadre (){
-	// 	if (this.modulo_padre != null){
-	// 		return String.format("%s", this.modulo_padre.getDescripcion());
-	// 	}
-	// 	return "";
-	// }
-
-    // @JsonProperty
-	// public String descripcionPadre(){
-
-    //     return String.format("%",descripcion);
-	// }
 
 }

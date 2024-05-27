@@ -9,6 +9,7 @@ import mx.pjpuebla.backend.reporteador.models.ReportesExporter;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -31,12 +32,13 @@ public class ReportesController {
     @PostMapping(value="/{reporte}",
     produces = {"application/pdf"})
     public ResponseEntity<Object> descargarReporte(@PathVariable("reporte") String reporte, @RequestBody Map<String,Object> parametros) {
-        InputStream reporteInputStream = null;
+        InputStream reporteStream = null;
         String nombrePdf = reporte.concat(".pdf");
+        Reportes reportes = null;
 
         try{
-            Reportes reportes = config.reportesFiller();
             ReportesExporter exportaReporte = config.reportesExporter();
+            reportes = config.reportesFiller();
 
             reportes.setNombreReporte(reporte);
             reportes.setJasperBase(config.reportesBase());
@@ -54,18 +56,28 @@ public class ReportesController {
 
             exportaReporte.setJasperPrint(reportes.getJasperPrint());
             
-            reporteInputStream = exportaReporte.getReporte();
+            reporteStream = exportaReporte.getReporte();
 
-            if (reporteInputStream.available()==0){
+            if (reporteStream.available()==0){
                 throw new java.io.IOException("No hay datos disponibles");
             }
 
+            reportes.cerrarConexion();
+
             return ResponseEntity.ok()
-                .contentLength(reporteInputStream.available())
+                .contentLength(reporteStream.available())
                 .contentType(MediaType.APPLICATION_PDF)
                 .header("content-disposition", "filename=".concat(nombrePdf))
-                .body(new InputStreamResource(reporteInputStream));
+                .body(new InputStreamResource(reporteStream));
         }catch(Exception e){
+            if (reportes != null){
+                try{
+                    reportes.cerrarConexion();
+                }catch(SQLException ex){
+                    ex.printStackTrace();
+                }
+            }
+
             return ResponseEntity.internalServerError()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(

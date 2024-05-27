@@ -3,6 +3,7 @@ package mx.pjpuebla.backend.core.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import mx.pjpuebla.backend.core.entitiy.Modulo;
 import mx.pjpuebla.backend.core.entitiy.RolModuloPermiso;
 import mx.pjpuebla.backend.core.service.RolModuloPermisoService;
 import mx.pjpuebla.backend.response.GenericResponse;
@@ -90,6 +91,32 @@ public class RolModuloPermisoController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    @PostMapping("/delete/{id}")
+     public ResponseEntity<GenericResponse> borarrModulo(@PathVariable("id") RolModuloPermisoKey id) {
+        RolModuloPermiso rmp = rolmodulopermisos.findById(id);
+        GenericResponse response = new GenericResponse();
+
+        if(rmp == null){
+            response.setMessage("El Id no existe");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        try {
+            boolean result = rolmodulopermisos.delete(rmp);
+            if(result){
+                String mensaje = String.format("El registro con el ID %d fue eliminada", id);
+                response.setSuccess(result);
+                response.setMessage(mensaje);
+
+                return ResponseEntity.ok(response);
+            }
+
+            throw new SQLException("No se pudo eliminar el ID");
+
+        } catch (Exception e) {
+            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+     }
     
     
     
