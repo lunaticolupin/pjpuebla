@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -123,6 +126,26 @@ public class PersonaController {
         }
         
     }
+
+    @GetMapping("/find")
+    public ResponseEntity<GenericResponse> getMethodName(@RequestParam("value") String param) {
+        GenericResponse response = new GenericResponse();
+
+        Persona persona = personas.findByCurpOrRfc(param);
+
+        if (persona==null){
+
+            response.setMessage("No existe la entidad");
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.setSuccess(true);
+        response.setMessage("OK");
+        response.setData(persona);
+        return ResponseEntity.ok(response);
+    }
+    
 
 
 }

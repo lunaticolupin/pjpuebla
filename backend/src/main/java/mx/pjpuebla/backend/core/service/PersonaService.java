@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 
 import mx.pjpuebla.backend.core.entitiy.Persona;
+import mx.pjpuebla.backend.core.entitiy.Usuario;
 import mx.pjpuebla.backend.core.repository.PersonaRepository;
 
 @Service
@@ -47,6 +48,19 @@ public class PersonaService {
 
     public boolean existsByID(Integer id){
         return this.repo.existsById(id);
+    }
+
+    public Persona findByCurpOrRfc(String valor){
+        
+        if(this.repo.existsByCurp(valor)){
+            return this.repo.findByCurp(valor);
+        }
+
+        if(this.repo.existsByRfc(valor)){
+            return this.repo.findByRfc(valor);
+        }
+
+        return null;
     }
 
 }
