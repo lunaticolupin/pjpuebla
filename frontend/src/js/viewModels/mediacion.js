@@ -1,8 +1,9 @@
-define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
-    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'sweetalert',
+define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime', 
+    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required',
+    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'ojs/ojvalidationgroup', 'sweetalert',
     'oj-c/text-area', 'ojs/ojtoolbar'
 ],
- function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1) {
+ function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator) {
     class MediacionViewModel {
          constructor() {
             var self = this;
@@ -30,7 +31,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.solicitudEstatus = ko.observable();
             self.solicitudTipoApertura = ko.observable();
             self.solicitudTipoAperturaId = ko.observable();
-            self.solicitudNueva = ko.observable(false);
+            self.solicitudDetalle = ko.observable(false);
             self.usuarioPM = ko.observable(false);
             self.invitadoPM = ko.observable(false);
 
@@ -43,14 +44,21 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 ]
             );
 
+            self.estadoSolicitud = ko.observableArray([
+                {value: 0, label: 'En Recepción'},
+                {value: 1, label: "Por Determinar"}, 
+                {value: 2, label: "Mediable"},
+                {value: 3, label: "No Mediable"}
+            ]);
+
             /** Data Providers */
-            self.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
+            this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
             this.materiasDP = new ArrayDataProvider(self.materias, {keyAttributes:'id'});
             this.tipoAperturaDP = new ArrayDataProvider(self.tipoAperturas, {keyAttributes: 'id'});
-            
+            this.estadoSolicitudDP = new ArrayDataProvider(self.estadoSolicitud, {keyAttributes: 'value'});
 
             self.mostrarForm = ko.computed(()=>{
-                if (self.solicitudSeleccionada() || self.solicitudNueva())
+                if (self.solicitudSeleccionada() || self.solicitudDetalle())
                     return true;
             });
 
@@ -72,6 +80,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     const solicitud = itemContext.data;
 
                     self.parseSolicitud(solicitud);
+                    self.solicitudDetalle(true);
                 }
             });
 
@@ -107,13 +116,78 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 }
             }
 
+            this.viewPromise = ModuleElementUtils.createView({
+                viewPath: "views/mediacion/persona.html",
+            });
+
+            this.viewPromise1 = ModuleElementUtils.createView({
+                viewPath: "views/mediacion/persona.html",
+            });
+
+            this.moduleConfigUsuario = this.viewPromise.then((usuarioView) => {
+                return {
+                    view: usuarioView,
+                    viewModel: {
+                        persona: self.solicitudUsuario,
+                        moral: self.usuarioPM,
+                        valueChangeHandler: this.valueChangeHandler},
+                };
+            }, (error) => {
+                Logger.error("Error during loading view: " + error.message);
+                return {
+                    view: [],
+                };
+            });
+
+            this.moduleDetallePersona = ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: null}})
+
+            this.moduleConfigInvitado = this.viewPromise1.then((invitadoView) => {
+                return {
+                    view: invitadoView,
+                    viewModel: {
+                        persona: self.solicitudInvitado,
+                        moral: self.invitadoPM,
+                        valueChangeHandler: this.valueChangeHandler},
+                };
+            }, (error) => {
+                Logger.error("Error during loading view: " + error.message);
+                return {
+                    view: [],
+                };
+            });
+
+            this.groupValid = ko.observable();
+
+            this.requeridoValidator = [
+                new RequiredValidator({
+                    hint: "Dato Requerido",
+                    messageDetail: "Proporcione el dato para el campo '{label}'",
+                    messageSummary: "'{label}' es requerido",
+                })
+            ];
+
+            this.curpValidator = [
+                new AsyncRegExpValidator({
+                    pattern: '^([A-Z][AEIOUX][A-Z]{2}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\\d])(\\d)$',
+                    messageDetail: 'Error en la CURP'
+                })
+            ]
+
+            this.info = [{ summary: "summary", detail: "Dato requerido", severity: "info" }];
+
             this.connected = () => {
                 accUtils.announce('Mediacion page loaded.', 'assertive');
                 document.title = "Mediación";
 
-                self.getMaterias();
-                self.getSolicitudes();
-                // Implement further logic if needed
+                utils.waiting();
+
+                Promise.all([
+                    self.getMaterias(),
+                    self.getSolicitudes()
+                ]).finally(()=>{
+                    utils.waiting(true);
+                })
+
             };
 
             /**
@@ -130,10 +204,6 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             this.transitionCompleted = () => {
                 // Implement if needed
             };
-
-            self.detalleSolicitud = ((event, context)=>{
-                this.editRow({ rowKey: context.key });
-            });
 
             self.parseSolicitud =((solicitud)=>{
                 self.solicitudId(solicitud.id);
@@ -172,13 +242,24 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             });
 
             self.nuevaSolicitud = ((event)=>{
-                self.solicitudNueva(true);
+                self.solicitudDetalle(true);
                 self.getJSONTemp();
-
-                $('#solicitudes').hide();
             });
 
+            self.solicitudDetalle.subscribe((data)=>{
+                if (data){
+                    $('#solicitudes').hide();
+                    return;
+                }
+
+                $('#solicitudes').show();
+            }) 
+
             self.guardarSolicitud = ((event)=>{
+                const valid = this._checkValidationGroup();
+                if (!valid) {
+                    return false;
+                }
                 self.postSolicitud();
             });
 
@@ -191,12 +272,12 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 }
                 
                 self.solicitudSeleccionada(null);
-
-                $('#solicitudes').show();
+                self.solicitudDetalle(false);
             });
 
             self.editarSolicitud = ((event, detail)=>{
 
+                self.solicitudDetalle(true);
                 self.solicitudSeleccionada({key: detail.item.key, data:detail.item.data});
                 self.parseSolicitud(detail.item.data);              
 
@@ -215,11 +296,18 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             }
 
             this.open= (event, detail) => {
-                self.getReporte(detail.item.data).then(result => {
+                let solicitud;
+
+                if (event.srcElement.id == "btnImprimir"){
+                    solicitud = self.solicitudSeleccionada().data;
+                }else{
+                    solicitud = detail.item.data;
+                }
+
+                self.getReporte(solicitud).then(result => {
                     document.getElementById("modalDialog1").open();
                 })
                 .catch(response => {
-                    console.log(response);
                     swal(response.message, JSON.stringify(response.errors), "error");
                 });
             }
@@ -231,7 +319,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 const url = self.urlBase + '/solicitud';
                 self.solicitudes([]);
 
-                utils.getData(url, {}).then((response) => {
+                return utils.getData(url, {}).then((response) => {
                     if (response.success){
                         self.solicitudes(response.data);
                     }
@@ -241,7 +329,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.getMaterias = (()=>{
                 const url = config.baseEndPoint + '/materias';
                 
-                utils.getData(url, {}).then((response)=>{
+                return utils.getData(url, {}).then((response)=>{
                     if (response.success){
                         self.materias(response.data);
                     }
@@ -268,8 +356,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                         const folio = response.data.folio;
 
                         self.getSolicitudes();
+                        self.solicitudId(response.data.id);
                         swal("Solicitud Registrada","Folio: " + folio, "success");
-                        
+
                         return true;
                     }
 
@@ -294,7 +383,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 return new Promise ((resolve, reject)=>{
                     utils.getReporte(url, params).then((response)=>{
 
-                        if (response.success!=undefined && response.success==false){    
+                        if (response.hasOwnProperty("error")){    
                             reject(response);
                         }
     
@@ -305,13 +394,85 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                         resolve(true);
     
                     }).catch(errors =>{
-                        console.log(errors);
                         swal("Error", JSON.stringify(errors), "error")
                     });
                 });
 
             });
-         }
+
+            self.getPersona = ((event)=>{
+                
+
+                const pregunta = new Promise((resolve, reject )=>{
+                    var ojcInput = document.createElement("oj-c-input-text");
+
+                    swal({
+                        title:"Buscar Persona",
+                        content:{
+                            element: "input",
+                            attributes: {
+                                placeholder:"CURP o RFC",
+                                type: "text",
+                            },
+                        },
+                    }).then((respuesta)=>{
+                        if (respuesta && respuesta.length>0){
+                            resolve(respuesta);
+                        }else{
+                            reject(null);
+                        }
+                    });
+                });
+                
+                pregunta.then((data)=>{
+                    const url = config.baseEndPoint + "/personas/find?value="+data;
+
+                    utils.waiting();
+
+                    utils.getData(url, {})
+                    .then((response)=>{
+
+                        if (response.success){
+                            swal({
+                                title: 'Persona encontrada',
+                                text: `¿Selecciona a ${data} - ${response.data.nombreCompleto} como Usuario?`,
+                                buttons: true,
+                                dangerMode:true
+                            }).then((respuesta)=>{
+                                if(respuesta){
+                                    self.solicitudUsuario(response.data);
+                                }
+                            });
+    
+                        }else{
+                            swal('Persona', response.message, 'warning');
+                        }
+
+                        return true;
+                    })
+                    .catch((errors)=>{
+                        swal('Persona', JSON.stringify(errors), 'error');
+                    });
+    
+                    utils.waiting(true);
+                });
+                
+            });
+        }
+
+        _checkValidationGroup() {
+            const tracker = document.getElementById('trackerSolicitud');
+            if (tracker.valid === 'valid') {
+                return true;
+            }
+            else {
+                // show messages on all the components that are invalidHiddden, i.e., the
+                // required fields that the user has yet to fill out.
+                tracker.showMessages();
+                tracker.focusOn('@firstInvalidShown');
+                return false;
+            }
+        }
      }
 
     /*

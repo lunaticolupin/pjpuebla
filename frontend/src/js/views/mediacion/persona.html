@@ -1,0 +1,8 @@
+<oj-c-form-layout max-columns="3" direction="row">
+    <oj-c-input-text value="{{persona().nombre}}"  label-hint="Nombre o Razón Social" autocomplete="off" required></oj-c-input-text>
+    <oj-c-input-text value="{{persona().apellidoPaterno}}" label-hint="Apellido Paterno" autocomplete="off" disabled="[[moral]]"></oj-c-input-text>
+    <oj-c-input-text value="{{persona().apellidoMaterno}}" label-hint="Apellido Materno" autocomplete="off" disabled="[[moral]]"></oj-c-input-text>
+    <oj-c-input-text value="{{persona().curp}}" label-hint="CURP" autocomplete="off" disabled="[[moral]]"></oj-c-input-text>
+    <oj-c-input-text value="{{persona().rfc}}" label-hint="RFC" autocomplete="off" required="[[moral]]"></oj-c-input-text>
+    <oj-c-checkbox id="usuarioPM" value="{{persona().personaMoral}}" on-value-changed="[[valueChangeHandler]]">Persona Moral</oj-c-checkbox>
+</oj-c-form-layout>
