@@ -1,9 +1,10 @@
 define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime', 
-    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required',
+    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider',
     'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'ojs/ojvalidationgroup', 'sweetalert',
     'oj-c/text-area', 'ojs/ojtoolbar'
 ],
- function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator) {
+ function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator, 
+    signals, ListDataProviderView, ojdataprovider_1) {
     class MediacionViewModel {
          constructor() {
             var self = this;
@@ -34,6 +35,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.solicitudDetalle = ko.observable(false);
             self.usuarioPM = ko.observable(false);
             self.invitadoPM = ko.observable(false);
+            self.tipoPersonaSeleccionada=ko.observable();
+            self.personaSeleccionada = ko.observable();
+            this.filtro = ko.observable();
 
             /** Catalogos */
             self.materias = ko.observableArray();
@@ -52,10 +56,29 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             ]);
 
             /** Data Providers */
-            this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
+            // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
             this.materiasDP = new ArrayDataProvider(self.materias, {keyAttributes:'id'});
             this.tipoAperturaDP = new ArrayDataProvider(self.tipoAperturas, {keyAttributes: 'id'});
             this.estadoSolicitudDP = new ArrayDataProvider(self.estadoSolicitud, {keyAttributes: 'value'});
+
+            this.dataProvider = ko.computed(()=>{
+                let criterio = null;
+
+                if (this.filtro() && this.filtro()!=''){
+                    criterio = ojdataprovider_1.FilterFactory.getFilter({
+                        filterDef: {text: this.filtro()}
+                    })
+                }
+
+                const dataProvider = new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'});
+
+                return new ListDataProviderView(dataProvider, {filterCriterion: criterio});
+            }, this);
+
+            /** variables y funciones Knockout */
+            this.userInfoSignal = new signals.Signal();
+            this.dataPDF = ko.observable();
+            this.groupValid = ko.observable();
 
             self.mostrarForm = ko.computed(()=>{
                 if (self.solicitudSeleccionada() || self.solicitudDetalle())
@@ -110,53 +133,43 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 if (itemContext){
                     switch (id) {
-                        case 'usuarioPM': self.usuarioPM(itemContext.value); break;
-                        case 'invitadoPM': self.invitadoPM(itemContext.value); break;
+                        case 'UsuarioPM': self.usuarioPM(itemContext.value); break;
+                        case 'InvitadoPM': self.invitadoPM(itemContext.value); break;
                     }
                 }
             }
 
-            this.viewPromise = ModuleElementUtils.createView({
-                viewPath: "views/mediacion/persona.html",
+            this.handleValueChanged = () =>{
+                this.filtro(document.getElementById('filtro').rawValue);
+            }
+
+            self.moduleInfoPersona = ((tipo)=>{
+                let viewPromise = ModuleElementUtils.createView({
+                    viewPath: "views/mediacion/persona.html",
+                });
+
+                return viewPromise.then((personaView) => {
+                    return {
+                        view: personaView,
+                        viewModel: {
+                            persona: (tipo=='Usuario') ? self.solicitudUsuario : self.solicitudInvitado,
+                            moral: (tipo=='Usuario') ? self.usuarioPM : self.invitadoPM,
+                            tipoPersona: tipo,
+                            valueChangeHandler: this.valueChangeHandler,
+                            btnFindPersona: this.btnFindPersona,
+                            btnPersonaDetalle: this.btnPersonaDetalle,
+                            groupValid: this.groupValid
+                        },
+                    };
+                }, (error) => {
+                    Logger.error("Error during loading view: " + error.message);
+                    return {
+                        view: [],
+                    };
+                });
             });
 
-            this.viewPromise1 = ModuleElementUtils.createView({
-                viewPath: "views/mediacion/persona.html",
-            });
-
-            this.moduleConfigUsuario = this.viewPromise.then((usuarioView) => {
-                return {
-                    view: usuarioView,
-                    viewModel: {
-                        persona: self.solicitudUsuario,
-                        moral: self.usuarioPM,
-                        valueChangeHandler: this.valueChangeHandler},
-                };
-            }, (error) => {
-                Logger.error("Error during loading view: " + error.message);
-                return {
-                    view: [],
-                };
-            });
-
-            this.moduleDetallePersona = ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: null}})
-
-            this.moduleConfigInvitado = this.viewPromise1.then((invitadoView) => {
-                return {
-                    view: invitadoView,
-                    viewModel: {
-                        persona: self.solicitudInvitado,
-                        moral: self.invitadoPM,
-                        valueChangeHandler: this.valueChangeHandler},
-                };
-            }, (error) => {
-                Logger.error("Error during loading view: " + error.message);
-                return {
-                    view: [],
-                };
-            });
-
-            this.groupValid = ko.observable();
+            this.moduleDetallePersona = ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: this.userInfoSignal}})
 
             this.requeridoValidator = [
                 new RequiredValidator({
@@ -171,9 +184,12 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     pattern: '^([A-Z][AEIOUX][A-Z]{2}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\\d])(\\d)$',
                     messageDetail: 'Error en la CURP'
                 })
-            ]
+            ];
 
-            this.info = [{ summary: "summary", detail: "Dato requerido", severity: "info" }];
+            ko.computed(() => {
+                this.userInfoSignal.dispatch(self.personaSeleccionada(),"mediacionSolicitud");
+            }, this);
+
 
             this.connected = () => {
                 accUtils.announce('Mediacion page loaded.', 'assertive');
@@ -241,11 +257,6 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 return solicitud;
             });
 
-            self.nuevaSolicitud = ((event)=>{
-                self.solicitudDetalle(true);
-                self.getJSONTemp();
-            });
-
             self.solicitudDetalle.subscribe((data)=>{
                 if (data){
                     $('#solicitudes').hide();
@@ -253,17 +264,50 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 }
 
                 $('#solicitudes').show();
-            }) 
+            });
 
-            self.guardarSolicitud = ((event)=>{
+            /** Botones */
+
+            self.btnNuevaSolicitud = ((event)=>{
+                self.solicitudDetalle(true);
+                self.getJSONTemp();
+            });
+            
+            self.btnPersonaDetalle= ((event)=>{
+
+                const target = event.srcElement.id;
+
+                if (!target){
+                    return false;
+                }
+
+                const tipoPersona = target.replace("detalle","");
+
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(tipoPersona);
+
+                if (tipoPersona=='Usuario'){
+                    self.personaSeleccionada(self.solicitudUsuario());
+                }
+
+                if (tipoPersona=='Invitado'){
+                    self.personaSeleccionada(self.solicitudInvitado());
+                }
+
+                document.getElementById("modalPersona").open();
+            });
+
+            self.btnGuardarSolicitud = ((event)=>{
                 const valid = this._checkValidationGroup();
+
                 if (!valid) {
                     return false;
                 }
+
                 self.postSolicitud();
             });
 
-            self.cancelarSolicitud = (()=>{
+            self.btnCancelarSolicitud = (()=>{
                 const element = document.getElementById('solicitudes');
                 const currentRow = element.currentRow;
 
@@ -273,9 +317,11 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 
                 self.solicitudSeleccionada(null);
                 self.solicitudDetalle(false);
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(null);
             });
 
-            self.editarSolicitud = ((event, detail)=>{
+            self.btnEditarSolicitud = ((event, detail)=>{
 
                 self.solicitudDetalle(true);
                 self.solicitudSeleccionada({key: detail.item.key, data:detail.item.data});
@@ -289,13 +335,30 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 element.selected = seleccion;
             });
 
-            
+            this.btnClose=(event, detail)=> {
+                const modalId = event.srcElement.offsetParent.id;
 
-            this.close=(event)=> {
-                document.getElementById("modalDialog1").close();
+                if (modalId){
+                    if (modalId == 'modalPersona'){
+                        const url = config.baseEndPoint + '/personas/' + self.personaSeleccionada().id;
+
+                        self.getPersona(url).then((response)=>{
+                            if (self.tipoPersonaSeleccionada()=='Usuario'){
+                                self.solicitudUsuario(response);
+                            }
+
+                            if (self.tipoPersonaSeleccionada()=='Invitado'){
+                                self.solicitudInvitado(response);
+                            }
+                        }).catch((errors)=>{
+                            console.log(errors);
+                        });
+                    }
+                    document.getElementById(modalId).close();
+                }
             }
 
-            this.open= (event, detail) => {
+            this.btnOpen= (event, detail) => {
                 let solicitud;
 
                 if (event.srcElement.id == "btnImprimir"){
@@ -305,14 +368,64 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 }
 
                 self.getReporte(solicitud).then(result => {
-                    document.getElementById("modalDialog1").open();
+                    document.getElementById("modalPDF").open();
                 })
                 .catch(response => {
                     swal(response.message, JSON.stringify(response.errors), "error");
                 });
             }
 
-            this.dataPDF = ko.observable();
+            self.btnFindPersona = ((event)=>{
+
+                const tipoPersona = event.srcElement.id;
+
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(tipoPersona.replace("busca",""));
+
+                const inputValor = new Promise((resolve, reject )=>{
+                    swal({
+                        title:"Buscar Persona",
+                        content:{
+                            element: "input",
+                            attributes: {
+                                placeholder:"CURP o RFC",
+                                type: "text"
+                            },
+                        },
+                    }).then((respuesta)=>{
+                        if (respuesta && respuesta.length>0){
+                            resolve(respuesta);
+                        }else{
+                            reject(null);
+                        }
+                    });
+                });
+                
+                inputValor.then((data)=>{
+                    const url = config.baseEndPoint + "/personas/find?value="+data;
+
+                    self.getPersona(url).then((resolve, reject)=>{
+                        utils.confirmar('Persona encontrada', `¿Selecciona a ${data} - ${resolve.nombreCompleto} como - ${self.tipoPersonaSeleccionada()}?`)
+                            .then((confirmacion)=>{
+                                if(confirmacion){
+                                    if (this.tipoPersonaSeleccionada()=='Usuario'){
+                                        self.solicitudUsuario(resolve);
+                                    }
+                                    
+                                    if (this.tipoPersonaSeleccionada()=='Invitado'){
+                                        self.solicitudInvitado(resolve);
+                                    }
+                                }
+                            })
+                            .catch((errors)=>{
+                                swal('Persona', JSON.stringify(errors), 'error');
+                            });
+                    }).catch((errors)=>{
+                        console.log(errors);
+                    });
+                });
+                
+            });
 
             /** REST */
             self.getSolicitudes = (()=>{
@@ -351,23 +464,27 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
 
-                utils.postData(url, data).then((response)=>{                    
-                    if (response.success){
-                        const folio = response.data.folio;
-
-                        self.getSolicitudes();
-                        self.solicitudId(response.data.id);
-                        swal("Solicitud Registrada","Folio: " + folio, "success");
-
-                        return true;
+                utils.confirmar('Solicitud').then((confirmacion)=>{
+                    if (confirmacion){
+                        utils.postData(url, data).then((response)=>{                    
+                            if (response.success){
+                                const folio = response.data.folio;
+        
+                                self.getSolicitudes();
+                                self.solicitudId(response.data.id);
+                                swal("Solicitud Registrada","Folio: " + folio, "success");
+        
+                                return true;
+                            }
+        
+                            const errores = JSON.stringify(response.errors);
+                            swal(response.message, errores, "error");
+                        }).catch((response)=>{
+                            const errores = JSON.stringify(response);
+                            
+                            swal("Error al procesar la petición", errores, "error");
+                        });
                     }
-
-                    const errores = JSON.stringify(response.errors);
-                    swal(response.message, errores, "error");
-                }).catch((response)=>{
-                    const errores = JSON.stringify(response);
-                    
-                    swal("Error al procesar la petición", errores, "error");
                 });
             });
 
@@ -400,76 +517,47 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
             });
 
-            self.getPersona = ((event)=>{
-                
+            self.getPersona=((url)=>{
 
-                const pregunta = new Promise((resolve, reject )=>{
-                    var ojcInput = document.createElement("oj-c-input-text");
-
-                    swal({
-                        title:"Buscar Persona",
-                        content:{
-                            element: "input",
-                            attributes: {
-                                placeholder:"CURP o RFC",
-                                type: "text",
-                            },
-                        },
-                    }).then((respuesta)=>{
-                        if (respuesta && respuesta.length>0){
-                            resolve(respuesta);
-                        }else{
-                            reject(null);
-                        }
-                    });
-                });
-                
-                pregunta.then((data)=>{
-                    const url = config.baseEndPoint + "/personas/find?value="+data;
-
+                if (url){
                     utils.waiting();
 
-                    utils.getData(url, {})
-                    .then((response)=>{
+                    return new Promise((resolve, reject) => {
+                        utils.getData(url, {})
+                        .then((response)=>{
+                            utils.waiting(true);
 
-                        if (response.success){
-                            swal({
-                                title: 'Persona encontrada',
-                                text: `¿Selecciona a ${data} - ${response.data.nombreCompleto} como Usuario?`,
-                                buttons: true,
-                                dangerMode:true
-                            }).then((respuesta)=>{
-                                if(respuesta){
-                                    self.solicitudUsuario(response.data);
-                                }
-                            });
-    
-                        }else{
-                            swal('Persona', response.message, 'warning');
-                        }
-
-                        return true;
-                    })
-                    .catch((errors)=>{
-                        swal('Persona', JSON.stringify(errors), 'error');
+                            if (response.success){
+                                resolve(response.data);
+                            }else{
+                                swal('Persona', JSON.stringify(response.message), 'error');
+                                reject(response.errors);
+                            }
+                        })
+                        .catch((errors)=>{
+                            utils.waiting(true);
+                            swal('Persona', JSON.stringify(errors), 'error');
+                        });
                     });
-    
-                    utils.waiting(true);
-                });
-                
+                }
             });
+
         }
 
         _checkValidationGroup() {
-            const tracker = document.getElementById('trackerSolicitud');
-            if (tracker.valid === 'valid') {
+            const solicitud = document.getElementById('trackerSolicitud');
+            const usuario = document.getElementById('trackerUsuario');
+            const invitado = document.getElementById('trackerInvitado');
+
+            if (solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid') {
                 return true;
             }
             else {
-                // show messages on all the components that are invalidHiddden, i.e., the
-                // required fields that the user has yet to fill out.
-                tracker.showMessages();
-                tracker.focusOn('@firstInvalidShown');
+                solicitud.showMessages();
+                usuario.showMessages();
+                invitado.showMessages();
+
+                //tracker.focusOn('@firstInvalidShown');
                 return false;
             }
         }

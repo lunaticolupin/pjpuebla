@@ -2,17 +2,19 @@
 <div class="oj-panel">
     <h4 class="oj-helper-text-align-center">Solicitudes</h4>
     <div>
-        <oj-c-button label="Nueva" on-oj-action="[[nuevaSolicitud]]" size="lg" disabled="[[solicitudDetalle]]"><span slot="startIcon" class="oj-ux-ico-plus"></span></oj-c-button>
+        <oj-c-button label="Nueva" on-oj-action="[[btnNuevaSolicitud]]" size="lg" disabled="[[solicitudDetalle]]"><span slot="startIcon" class="oj-ux-ico-plus"></span></oj-c-button>
         <oj-c-input-text
-        id="filter"
+        id="filtro"
         class="oj-form-control-max-width-md"
         label-hint="Filtro"
         label-edge="inside"
         placeholder="Buscar por Num. de Solicitud"
         clear-icon="always"
+        on-raw-value-changed="[[handleValueChanged]]"
+        value="{{filtro}}"
         disabled="[[solicitudDetalle]]"></oj-c-input-text>
     </div>
-    <oj-table id="solicitudes"
+    <oj-table id="solicitudes" class="tabla"
     data='[[dataProvider]]'
     columns='[
         {"headerText":"Número", "field":"folio"},
@@ -27,27 +29,27 @@
     first-selected-row="{{solicitudSeleccionada}}"
     on-first-selected-row-changed="[[firstSelectedRowChangedListener]]"
     scroll-policy="loadMoreOnScroll"
-    style="width: 100%;"
-    >
+    scroll-policy-options.fetch-size="10">
         <template slot="estatusTemplate" data-oj-as="item">
             <oj-c-select-single 
             id = "estatusSolicitud"
             data="[[estadoSolicitudDP]]" 
             item-text="label" 
             value="{{item.data}}"
+            label-hint="Estatus"
             readonly></oj-c-select-single>
         </template>
         <template slot="fechaTemplate" data-oj-as="item">
             <oj-bind-text value="[[dateConverter(item.data)]]"></oj-bind-text>
         </template>
         <template slot="botonesTemplate" data-oj-as="cell">
-            <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm" on-oj-action="[[editarSolicitud]]"><span slot="startIcon" class="oj-ux-ico-edit"></span></oj-c-button>
-            <oj-c-button label="Imprimir" display="icons" chroming="borderless" size="sm" on-oj-action="[[open]]"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
+            <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm" on-oj-action="[[btnEditarSolicitud]]"><span slot="startIcon" class="oj-ux-ico-edit"></span></oj-c-button>
+            <oj-c-button label="Imprimir" display="icons" chroming="borderless" size="sm" on-oj-action="[[btnOpen]]"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
             <oj-c-button label="Borrar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-delete-all"></span></oj-c-button>
         </template>
     </oj-table>
     <oj-bind-if test="[[solicitudSeleccionada()]]">
-        <div id="solicitud" class="oj-panel">
+        <div id="solicitud" class="oj-panel oj-sm-margin-2x-top">
             <h4 class="oj-typography-subheading-xs">Datos generales</h4>
             <oj-validation-group
             id="trackerSolicitud"
@@ -95,90 +97,43 @@
             </oj-validation-group>
         </div>
 
-        <div class="oj-panel">
+        <div class="oj-panel oj-sm-margin-2x-vertical">
             <h4 class="oj-typography-subheading-xs">Datos del Usuario</h4>
-            <oj-c-form-layout max-columns="3" direction="row">
-                <oj-c-input-text value="{{solicitudUsuario().nombre}}"  label-hint="Nombre o Razón Social" autocomplete="off" required
-                required-message-detail="Dato requerido"></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudUsuario().apellidoPaterno}}" label-hint="Apellido Paterno" autocomplete="off" disabled="[[usuarioPM]]" required></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudUsuario().apellidoMaterno}}" label-hint="Apellido Materno" autocomplete="off" disabled="[[usuarioPM]]" required></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudUsuario().curp}}" label-hint="CURP" autocomplete="off" disabled="[[usuarioPM]]" required>
-                </oj-c-input-text>
-                <oj-c-input-text value="{{solicitudUsuario().rfc}}" label-hint="RFC" autocomplete="off" required="[[usuarioPM]]">
-                </oj-c-input-text>
-                <div class="oj-flex">
-                    <div class="oj-flex-item oj-sm-6">
-                        <oj-c-checkbox id="usuarioPM" value="{{solicitudUsuario().personaMoral}}" on-value-changed="[[valueChangeHandler]]">Persona Moral</oj-c-checkbox>
-                    </div>
-                    <div class="oj-flex-item oj-sm-6">
-                        <oj-c-button
-                            id="usuarioCURP"
-                            slot="end"
-                            display="icons"
-                            size="sm"
-                            chroming="borderless" label="Buscar Persona"
-                            on-oj-action="[[getPersona]]">
-                            <span slot="startIcon" class="oj-ux-ico-search"></span>
-                        </oj-c-button>
-                        <oj-c-button
-                            slot="end"
-                            display="icons"
-                            size="sm"
-                            chroming="borderless" label="Detalle de Persona"
-                            disabled="[[!solicitudUsuario().id]]">
-                            <span slot="startIcon" class="oj-ux-ico-view"></span>
-                        </oj-c-button>
-                    </div>
-                    
-
-                </div>
-            </oj-c-form-layout>
-            <!-- <oj-module id="usuario" config="[[moduleConfigUsuario]]"></oj-module> -->
+                <oj-module id="usuario" config="[[moduleInfoPersona('Usuario')]]"></oj-module>
 
             <h4 class="oj-typography-subheading-xs">Datos del Invitado</h4>
-            <oj-c-form-layout max-columns="3" direction="row" >
-                <oj-c-input-text value="{{solicitudInvitado().nombre}}" label-hint="Nombre o Razón Social" autocomplete="off" required></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudInvitado().apellidoPaterno}}" label-hint="Apellido Paterno" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudInvitado().apellidoMaterno}}" label-hint="Apellido Materno" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudInvitado().curp}}" label-hint="CURP" autocomplete="off" disabled="[[invitadoPM]]"></oj-c-input-text>
-                <oj-c-input-text value="{{solicitudInvitado().rfc}}" label-hint="RFC" autocomplete="off" required="[[invitadoPM]]""></oj-c-input-text>
-                <oj-c-checkbox id="invitadoPM" value="{{solicitudInvitado().personaMoral}}" on-value-changed="[[valueChangeHandler]]">Persona Moral</oj-c-checkbox>
-                <oj-c-select-single 
-                    id = "estatusSolicitud"
-                    data="[[estadoSolicitudDP]]" 
-                    item-text="label" 
-                    value="{{solicitudEstatus}}"
-                    label-hint="Estatus"
-                    required disabled></oj-c-select-single>
-            </oj-c-form-layout>
-            <!-- <oj-module id="invitado" config="[[moduleConfigInvitado]]"></oj-module> -->
+                <oj-module id="invitado" config="[[moduleInfoPersona('Invitado')]]"></oj-module>
         </div>
         
         <oj-toolbar chroming="outlined">
-            <oj-c-button id="btnCancelar" label="Cancelar" on-oj-action="[[cancelarSolicitud]]" ><span slot="startIcon" class="oj-ux-ico-cancel"></span></oj-c-button>
-            <oj-c-button id="btnGuardar" label="Guardar" on-oj-action="[[guardarSolicitud]]" chroming="callToAction"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
-            <oj-c-button id="btnImprimir" label="Imprimir" on-oj-action="[[open]]" disabled="[[!solicitudId()]]"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
+            <oj-c-button id="btnCancelar" label="Cancelar" on-oj-action="[[btnCancelarSolicitud]]" ><span slot="startIcon" class="oj-ux-ico-cancel"></span></oj-c-button>
+            <oj-c-button id="btnGuardar" label="Guardar" on-oj-action="[[btnGuardarSolicitud]]" chroming="callToAction"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
+            <oj-c-button id="btnImprimir" label="Imprimir" on-oj-action="[[btnOpen]]" disabled="[[!solicitudId()]]"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
         </oj-toolbar>
     </oj-bind-if>
 </div>
 
-<oj-dialog id="modalDialog1" dialog-title="Solicitud" aria-describedby="desc" style="width: 90vw; height: 90vh;">
+
+<!-- Modal para  la visualización de PDF -->
+<oj-dialog id="modalPDF" dialog-title="Solicitud" aria-describedby="desc" style="width: 90vw; height: 90vh;">
     <div slot="body">
       <iframe id="pdfHolder" :src="[[dataPDF]]" style="height: 60vh; width: 99%;">
       </iframe>
     </div>
     <div slot="footer">
-      <oj-c-button id="okButton" on-oj-action="[[close]]" label="OK"></oj-c-button>
+      <oj-c-button id="okButton" on-oj-action="[[btnClose]]" label="OK"></oj-c-button>
     </div>
 </oj-dialog>
 
-<oj-dialog id="modalPersona" dialog-title="Detalle de Persona" aria-describedby="desc" style="width: 90vw; height: 90vh;">
+
+<!-- Modal para la visualización de los detalles de la Persona Seleccionada -->
+<oj-dialog id="modalPersona" dialog-title="Detalle de Persona" aria-describedby="desc" style="width: 90vw; height: 90vh;" cancel-behavior="escape">
     <div slot="body">
-        <!-- <oj-module
-            config="[[moduleDetallePersona]]"
-            class="oj-bg-info-20"></oj-module> -->
+        <oj-module
+            config="[[moduleDetallePersona]]"></oj-module>
     </div>
     <div slot="footer">
-      <oj-c-button id="okButton" on-oj-action="[[close]]" label="OK"></oj-c-button>
+        <oj-c-button id="cancelButtonPersona" on-oj-action="[[btnClose]]" label="Cancelar"></oj-c-button>
+        <oj-c-button id="okButtonPersona" on-oj-action="[[btnClose]]" label="OK"></oj-c-button>
     </div>
 </oj-dialog>
