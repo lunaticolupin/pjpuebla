@@ -15,6 +15,8 @@ public interface RolModuloPermisoRepository extends JpaRepository<RolModuloPermi
 
     public List<RolModuloPermiso> findAll();
 
+    public List<RolModuloPermiso> findByActivo(boolean activo);
+
     @SuppressWarnings({"null","unchecked"})
     public RolModuloPermiso save(RolModuloPermiso rmp);
 }

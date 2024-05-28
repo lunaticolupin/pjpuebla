@@ -27,17 +27,27 @@ import jakarta.validation.Valid;
 public class PermisoController {
      private final PermisoService permisos;
 
-     @GetMapping("")
-     public ResponseEntity<GenericResponse> getPermisos() {
-         GenericResponse response = new GenericResponse();
-         
-         response.setSuccess(true);
-         response.setData(permisos.findByActivo(true));
-         
-         return ResponseEntity.ok(response);         
-     }
+    @GetMapping("all")
+    public ResponseEntity<GenericResponse> getPermisos() {
+        GenericResponse response = new GenericResponse();
+        
+        response.setSuccess(true);
+        response.setData(permisos.findAll());
+        
+        return ResponseEntity.ok(response);         
+    }
 
-     @GetMapping("/{id}")
+    @GetMapping("activos")
+    public ResponseEntity<GenericResponse> getPermisosActivos() {
+        GenericResponse response = new GenericResponse();
+        
+        response.setSuccess(true);
+        response.setData(permisos.findByActivo(true));
+        
+        return ResponseEntity.ok(response);         
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<GenericResponse> GetPermiso(@PathVariable("id") Integer id) {
         GenericResponse response = new GenericResponse();
         Permiso permiso = permisos.findById(id);
@@ -101,7 +111,6 @@ public class PermisoController {
         }
 
         try {
-            //Se realiza un borrado logico(solo se desactiva el rol)
             permiso.setActivo(false);
             permisos.save(permiso);
 
@@ -113,7 +122,7 @@ public class PermisoController {
             return ResponseEntity.ok(response);
 
         }catch (Exception e) {
-            // response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            response.setMessage(e.getCause().getCause().getLocalizedMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

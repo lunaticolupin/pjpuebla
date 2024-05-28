@@ -34,7 +34,7 @@ public class RolModuloPermisoController {
 
     private final RolModuloPermisoService rolmodulopermisos;
 
-    @GetMapping("")
+    @GetMapping("all")
     public ResponseEntity<GenericResponse> getRolModuloPermisos() {
 
         GenericResponse response = new GenericResponse();
@@ -45,8 +45,19 @@ public class RolModuloPermisoController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GenericResponse> getRolModuloPErmiso(@PathVariable("id") RolModuloPermisoKey id) {
+    @GetMapping("activos")
+    public ResponseEntity<GenericResponse> getRolModuloPermisosActivos() {
+
+        GenericResponse response = new GenericResponse();
+
+        response.setSuccess(true);
+        response.setData(rolmodulopermisos.findByActivo(true));;
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getRMP")
+    public ResponseEntity<GenericResponse> getRolModuloPermiso(@RequestBody RolModuloPermisoKey id) {
         GenericResponse response = new GenericResponse();
         RolModuloPermiso rolUsuarioPermiso = rolmodulopermisos.findById(id);
 
@@ -91,8 +102,9 @@ public class RolModuloPermisoController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
-    @PostMapping("/delete/{id}")
-     public ResponseEntity<GenericResponse> borarrModulo(@PathVariable("id") RolModuloPermisoKey id) {
+    @PostMapping("/delete")
+    //  public ResponseEntity<GenericResponse> borarrModulo(@PathVariable("id") RolModuloPermisoKey id) {
+        public ResponseEntity<GenericResponse> borarrModulo(@RequestBody RolModuloPermisoKey id) {
         RolModuloPermiso rmp = rolmodulopermisos.findById(id);
         GenericResponse response = new GenericResponse();
 
@@ -101,19 +113,31 @@ public class RolModuloPermisoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         try {
-            boolean result = rolmodulopermisos.delete(rmp);
-            if(result){
-                String mensaje = String.format("El registro con el ID %d fue eliminada", id);
-                response.setSuccess(result);
-                response.setMessage(mensaje);
 
-                return ResponseEntity.ok(response);
-            }
+            rmp.setActivo(false);
+            rolmodulopermisos.save(rmp);
 
-            throw new SQLException("No se pudo eliminar el ID");
+            String mensaje = String.format("El registro con el ID %d fue eliminada", id);
+            response.setSuccess(true);
+            response.setMessage(mensaje);
+            response.setData(rmp);
+
+
+            return ResponseEntity.ok(response);
+
+            // boolean result = rolmodulopermisos.delete(rmp);
+            // if(result){
+            //     String mensaje = String.format("El registro con el ID %d fue eliminada", id);
+            //     response.setSuccess(result);
+            //     response.setMessage(mensaje);
+
+            //     return ResponseEntity.ok(response);
+            // }
+
+            // throw new SQLException("No se pudo eliminar el ID");
 
         } catch (Exception e) {
-            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            // response.setMessage(e.getCause().getCause().getLocalizedMessage());
             return ResponseEntity.internalServerError().body(response);
         }
      }

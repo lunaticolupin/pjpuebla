@@ -22,6 +22,10 @@ public class RolModuloPermisoService {
         return repo.findAll();
     }
 
+    public List<RolModuloPermiso> findByActivo(boolean activo) {
+        return repo.findByActivo(activo);
+    }
+
     public RolModuloPermiso save(RolModuloPermiso rmp) {
         return this.repo.save(rmp);
     }
@@ -45,7 +49,4 @@ public class RolModuloPermisoService {
             return false;
         }
     }
-
-
-    
 }

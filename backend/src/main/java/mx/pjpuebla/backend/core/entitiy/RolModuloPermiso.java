@@ -29,5 +29,8 @@ public class RolModuloPermiso implements Serializable{
   @EmbeddedId
     private RolModuloPermisoKey id;
     private Integer estatus;
+
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = Boolean.valueOf(true);
     
 }
