@@ -1,4 +1,4 @@
-define(['jquery'], 
+define(['jquery','sweetalert'], 
     ($) => {
         /**
          * params = {method: 'GET/POST', body: data, headers: headers}
@@ -31,6 +31,8 @@ define(['jquery'],
                     "Content-Type": "application/json"
                 }
             };
+
+            
 
             $("#overlay").fadeIn(300);
 
@@ -113,12 +115,26 @@ define(['jquery'],
             $("#overlay").fadeIn(300);
         }
 
+        confirmar = ( async(title = "Confirmación", text = "¿Desea guardar la información?")=>
+            {
+                return await swal(
+                    {
+                        title: title,
+                        text: text,
+                        buttons: ["No", "Si"],
+                        dangerMode: true
+                    }
+                );
+            }
+        );
+
         return {
             getData: getData,
             postData: postData,
             getReporte: getReporte,
             parseFecha: parseFecha,
-            waiting: waiting
+            waiting: waiting,
+            confirmar: confirmar
         }
     }
 );
