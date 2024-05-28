@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 
@@ -118,17 +117,17 @@ public class PersonaController {
             }
 
             throw new SQLException("No se pudo eliminar el ID");
-    
             
         }catch (Exception e){
-            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            response.setMessage(e.getMessage());
+            //response.setErrors(personas.getErrores());
             return ResponseEntity.internalServerError().body(response);
         }
         
     }
 
     @GetMapping("/find")
-    public ResponseEntity<GenericResponse> getMethodName(@RequestParam("value") String param) {
+    public ResponseEntity<GenericResponse> buscarPersona(@RequestParam("value") String param) {
         GenericResponse response = new GenericResponse();
 
         Persona persona = personas.findByCurpOrRfc(param);
