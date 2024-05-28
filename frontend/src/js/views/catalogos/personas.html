@@ -1,15 +1,16 @@
 <h4>Personas</h4>
-
-<oj-table id = "personas" data = "[[dataProvider]]"
+<div class="oj-panel">
+  <oj-c-button
+    label="Agregar"
+    on-oj-action="[[agregarPersona]]"
+    data-oj-clickthrough="disabled">
+      <span slot="startIcon" class="oj-ux-ico-plus"></span>
+  </oj-c-button>
+  <oj-table id = "personas" data = "[[dataProvider]]" class="tabla oj-sm-margin-2x-bottom"
   columns-default='{"sortable": "disabled"}'
   selection-mode.row="none"
   scroll-policy="loadMoreOnScroll"
-  scroll-policy-options.fetch-size="10"
-  scroll-policy-options.scroller="#samplePage"
-  scroll-policy-options.scroller-offset-top="0"
-  scroll-policy-options.scroller-offset-bottom="100"
-  scroll-policy-options.scroller-offset-start="0"
-  scroll-policy-options.scroller-offset-end="100"
+  scroll-policy-options.fetch-size="15"
   columns='[
   {"headerText":"ID", "field":"id","minWidth":"50"},
   {"headerText":"Nombre", "field":"nombre", "minWidth":"200" },
@@ -23,13 +24,12 @@
   "headerStyle": "text-align: center;",
   "frozenEdge": "end",
   "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
-  "template": "actionTemplate", "id": "action" }]'
-  style="width: 100%;">
+  "template": "actionTemplate", "id": "action" }]'>
   <template slot="actionTemplate" data-oj-as="cell">
     <oj-c-button
       chroming="borderless"
       display="icons"
-    on-oj-action="[[detallePersona]]"
+      on-oj-action="[[detallePersona]]"
       data-oj-clickthrough="disabled">
       <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
     </oj-c-button>
@@ -39,13 +39,9 @@
   </template>
 </oj-table>
 
-<oj-c-button
-label="Agregar"
-on-oj-action="[[agregarPersona]]"
-data-oj-clickthrough="disabled">
-<span slot="startIcon" class="oj-ux-ico-add-create-page"></span>
-</oj-c-button>
-
 <oj-module
-    config="[[ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: userInfoSignal}})]]"
-     class="oj-bg-info-20"></oj-module>
+    config="[[moduleDetallePersona]]"></oj-module>
+</div>
+
+
+

@@ -50,6 +50,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 return true;
             });
 
+            this.moduloOrigen = ko.observable(null);
+
             this.dataProviderEC = new ArrayDataProvider(self.estadoCivilArray,
             {keyAttributes:'value'});
 
@@ -58,16 +60,24 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
 
                 let data = self.parsePersonaSave();
 
-                utils.postData(url, data).then((response)=>{
-                    console.log(response);
-                    if (response.success){
-                        alert(response.message);
-                    }else{
-                        alert(JSON.stringify(response.errors));
-                    }
+                utils.confirmar('Persona').then((confirmacion)=>{
+                    if(confirmacion){
+                        utils.postData(url, data).then((response)=>{
+                            if (response.success){
+                                swal('Persona',response.message, 'success');
 
-                    //window.location.reload();
-                }).catch(error => console.log(error));
+                                if (this.moduloOrigen()=='catalogoPersona'){
+                                    this.getPersonas(this.serviceURL);
+                                }
+                                
+                            }else{
+                                swal(response.message, JSON.stringify(response.errors), 'error');
+                            }
+                        }).catch(errors => {
+                            swal(response.message, JSON.stringify(errors), 'warning');
+                        });
+                    }
+                });
             });
 
             this.eliminar = (()=>{
@@ -78,14 +88,24 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
 
                 let url = this.serviceURL+"/delete/"+id;
             
-
-                utils.postData(url,{}).then((response)=>{
-                    console.log(response);
-                    
-                    alert(response.message);
-
-                    //window.location.reload();
-                }).catch(error => console.log(error));
+                utils.confirmar('Persona','¿Desea eliminar el registro?').then((confirmacion)=>{
+                    if(confirmacion){
+                        utils.postData(url,{}).then((response)=>{
+                            if(response.success){
+                                swal('Persona','El registro fue eliminado','success');
+                                if (this.moduloOrigen()=='catalogoPersona'){
+                                    this.getPersonas(this.serviceURL);
+                                }
+                            }else{
+                                swal(response.message, JSON.stringify(response.errors), 'error');
+                            }
+                        }).catch(errors => {
+                            console.log(errors);
+                            swal('Persona', JSON.stringify(errors), 'warning');
+                        });
+                    }
+                })
+                
             });
 
             this.parsePersona = ((data)=>{
@@ -104,6 +124,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     self.personaMoral(data.personaMoral);
                     self.hablanteLenguaDistinta(data.hablanteLenguaDistinta);
                     self.usuarioCreo(data.usuarioCreo);
+                    self.telefono(data.telefono);
+                    self.calle(data.calle);
                 }
 
             });
@@ -124,7 +146,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     estadoCivil: self.estadoCivil(),
                     personaMoral: self.personaMoral(),
                     hablanteLenguaDistinta: self.personaMoral(),
-                    usuarioCreo: self.usuarioCreo()
+                    usuarioCreo: self.usuarioCreo(),
                 }
             });
 
@@ -132,9 +154,15 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
             this.dataProviderSexo = new ArrayDataProvider(self.sexoArray,
                 {keyAttributes:'value'});
 
-            userInfoSignal.add((persona) => {
+            userInfoSignal.add((persona, moduloOrigen) => {
                 this.parsePersona(persona);
+
+                if (moduloOrigen){
+                    this.moduloOrigen(moduloOrigen);
+                }
             }, this);
+
+            this.getPersonas = params.getPersonas;
            
          }
      }

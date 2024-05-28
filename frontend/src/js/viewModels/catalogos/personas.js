@@ -37,14 +37,20 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
             };
 
             self.getPersonas = (url, params = {}) => {
+                utils.waiting();
+
                 utils.getData(url, params).then((response)=>{
 
                     if (response.success){
-                        //console.log(response);
                         self.personas(response.data);
                     }
+
+                    utils.waiting(stop=true);
                     
-                }).catch(error => console.log(error));         
+                }).catch(error => {
+                    utils.waiting(stop=true);
+                    console.log(error)
+                });         
             }
 
             this.detallePersona = (event, data) =>{
@@ -58,8 +64,16 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
                 self.personaSeleccionada(newPersona);
             };
 
+            this.moduleDetallePersona = ModuleElementUtils.createConfig(
+                {name: 'catalogos/persona-detalle', 
+                params: {
+                    userInfoSignal: this.userInfoSignal, 
+                    getPersonas: this.getPersonas
+                }
+            });
+
             ko.computed(()=>{
-                this.userInfoSignal.dispatch(self.personaSeleccionada());
+                this.userInfoSignal.dispatch(self.personaSeleccionada(),"catalogoPersona");
             });
 
          }
