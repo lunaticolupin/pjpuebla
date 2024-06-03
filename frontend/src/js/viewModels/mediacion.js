@@ -94,6 +94,21 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 pattern: 'dd/MM/yyyy'
             }));
 
+            this.maxFecha = new Date().toISOString();
+            this.minFecha = ko.computed(()=>{
+                let d = new Date();
+                let numDias = 1;
+
+                if (d.getDay()==1){
+                    numDias = 3;
+                }
+
+                d.setDate(d.getDate()-numDias);
+
+                return d.toISOString().split('T')[0];
+            }, this);
+            
+
             /** Eventos  */
 
             this.firstSelectedRowChangedListener = ((event) => {
@@ -143,7 +158,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 this.filtro(document.getElementById('filtro').rawValue);
             }
 
-            self.moduleInfoPersona = ((tipo)=>{
+            this.moduleInfoPersona = ((tipo)=>{
                 let viewPromise = ModuleElementUtils.createView({
                     viewPath: "views/mediacion/persona.html",
                 });
@@ -158,7 +173,8 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                             valueChangeHandler: this.valueChangeHandler,
                             btnFindPersona: this.btnFindPersona,
                             btnPersonaDetalle: this.btnPersonaDetalle,
-                            groupValid: this.groupValid
+                            groupValid: this.groupValid,
+                            curpValidator: this.curpValidator
                         },
                     };
                 }, (error) => {
@@ -183,6 +199,13 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 new AsyncRegExpValidator({
                     pattern: '^([A-Z][AEIOUX][A-Z]{2}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\\d])(\\d)$',
                     messageDetail: 'Error en la CURP'
+                })
+            ];
+
+            this.rfcValidator = [
+                new AsyncRegExpValidator({
+                    pattern: '([A-ZÑ]|\\&){3,4}[0-9]{2}(0[1-9]|1[0-2])([12][0-9]|0[1-9]|3[01])[A-Z0-9]{3}$',
+                    messageDetail: 'Error en el RFC'
                 })
             ];
 
@@ -549,6 +572,8 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             const usuario = document.getElementById('trackerUsuario');
             const invitado = document.getElementById('trackerInvitado');
 
+            console.log(solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid');
+
             if (solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid') {
                 return true;
             }
@@ -557,7 +582,17 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 usuario.showMessages();
                 invitado.showMessages();
 
-                //tracker.focusOn('@firstInvalidShown');
+                if (solicitud.valid!=='valid'){
+                    solicitud.focusOn('@firstInvalidShown');
+                }
+
+                if (usuario.valid!=='valid'){
+                    usuario.focusOn('@firstInvalidShown');
+                }
+
+                if (invitado.valid!=='valid'){
+                    invitado.focusOn('@firstInvalidShown');
+                }
                 return false;
             }
         }

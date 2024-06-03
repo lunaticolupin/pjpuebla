@@ -60,6 +60,9 @@
                     <oj-c-input-text id="solicitudFolio" value="{{solicitudFolio}}" label-hint="Folio" readonly></oj-c-input-text>
                     <oj-input-date id="fechaSolicitud" value="{{solicitudFecha}}" label-hint="Fecha de Solicitud"
                         converter="[[dateConverterInput]]"
+                        min="[[minFecha]]"
+                        max="[[maxFecha]]"
+                        readonly="[[solicitudId()]]"
                         required></oj-input-date>
                     <oj-c-select-single 
                         id = "selectMateria"
@@ -108,7 +111,7 @@
         <oj-toolbar chroming="outlined">
             <oj-c-button id="btnCancelar" label="Cancelar" on-oj-action="[[btnCancelarSolicitud]]" ><span slot="startIcon" class="oj-ux-ico-cancel"></span></oj-c-button>
             <oj-c-button id="btnGuardar" label="Guardar" on-oj-action="[[btnGuardarSolicitud]]" chroming="callToAction"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
-            <oj-c-button id="btnImprimir" label="Imprimir" on-oj-action="[[btnOpen]]" disabled="[[!solicitudId()]]"><span slot="startIcon" class="oj-ux-ico-save"></span></oj-c-button>
+            <oj-c-button id="btnImprimir" label="Imprimir" on-oj-action="[[btnOpen]]" disabled="[[!solicitudId()]]"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>
         </oj-toolbar>
     </oj-bind-if>
 </div>
@@ -133,7 +136,7 @@
             config="[[moduleDetallePersona]]"></oj-module>
     </div>
     <div slot="footer">
-        <oj-c-button id="cancelButtonPersona" on-oj-action="[[btnClose]]" label="Cancelar"></oj-c-button>
-        <oj-c-button id="okButtonPersona" on-oj-action="[[btnClose]]" label="OK"></oj-c-button>
+        <oj-c-button id="cancelButtonPersona" on-oj-action="[[btnClose]]" label="Cerrar"></oj-c-button>
+        <!--<oj-c-button id="okButtonPersona" on-oj-action="[[btnClose]]" label="OK"></oj-c-button>-->
     </div>
 </oj-dialog>
