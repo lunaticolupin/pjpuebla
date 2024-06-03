@@ -64,9 +64,15 @@ public class SessionController {
 
             return ResponseEntity.ok(response);
         }catch(InternalAuthenticationServiceException | DisabledException | LockedException | BadCredentialsException e){
-            e.printStackTrace();
+            //e.printStackTrace();
+            String error = e.getMessage();
+
             response.setMessage("Error al iniciar sesión");
-            response.setErrors(Arrays.asList(e.getMessage()));
+
+            if (e.getClass()==BadCredentialsException.class){
+                error = "Nombre de Usuario o Password incorrectos";
+            }
+            response.setErrors(Arrays.asList(error));
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
