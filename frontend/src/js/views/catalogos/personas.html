@@ -3,44 +3,47 @@
   <oj-c-button
     label="Agregar"
     on-oj-action="[[agregarPersona]]"
-    data-oj-clickthrough="disabled">
+    data-oj-clickthrough="disabled"
+    disabled="[[personaSeleccionada]]">
       <span slot="startIcon" class="oj-ux-ico-plus"></span>
   </oj-c-button>
   <oj-table id = "personas" data = "[[dataProvider]]" class="tabla oj-sm-margin-2x-bottom"
-  columns-default='{"sortable": "disabled"}'
-  selection-mode.row="none"
-  scroll-policy="loadMoreOnScroll"
-  scroll-policy-options.fetch-size="15"
-  columns='[
-  {"headerText":"ID", "field":"id","minWidth":"50"},
-  {"headerText":"Nombre", "field":"nombre", "minWidth":"200" },
-  {"headerText":"Apellido Paterno", "field":"apellidoPaterno"},
-  {"headerText":"Apellido Materno", "field":"apellidoMaterno"},
-  {"headerText":"CURP", "field":"curp", "minWidth":"100"},
-  {"headerText":"Persona Moral", "field":"personaMoral", "template":"personaMoralTemplate", "id":"pMoral"}, 
-  {"headerText": "Detalle",
-  "maxWidth": "10rem",
-  "sortable": "disabled",
-  "headerStyle": "text-align: center;",
-  "frozenEdge": "end",
-  "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
-  "template": "actionTemplate", "id": "action" }]'>
-  <template slot="actionTemplate" data-oj-as="cell">
-    <oj-c-button
-      chroming="borderless"
-      display="icons"
-      on-oj-action="[[detallePersona]]"
-      data-oj-clickthrough="disabled">
-      <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
-    </oj-c-button>
-  </template>
-  <template slot="personaMoralTemplate" data-oj-as="cell">
-    <oj-c-checkbox value="[[cell.data]]" readonly></oj-c-checkbox>
-  </template>
-</oj-table>
+    columns-default='{"sortable": "disabled"}'
+    selection-mode.row="none"
+    scroll-policy="loadMoreOnScroll"
+    scroll-policy-options.fetch-size="15"
+    columns='[
+    {"headerText":"ID", "field":"id","minWidth":"50"},
+    {"headerText":"Nombre", "field":"nombre", "minWidth":"200" },
+    {"headerText":"Apellido Paterno", "field":"apellidoPaterno"},
+    {"headerText":"Apellido Materno", "field":"apellidoMaterno"},
+    {"headerText":"CURP", "field":"curp", "minWidth":"100"},
+    {"headerText":"Persona Moral", "field":"personaMoral", "template":"personaMoralTemplate", "id":"pMoral"}, 
+    {"headerText": "Detalle",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionTemplate", "id": "action" }]'>
+    <template slot="actionTemplate" data-oj-as="cell">
+      <oj-c-button
+        chroming="borderless"
+        display="icons"
+        on-oj-action="[[detallePersona]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+      </oj-c-button>
+    </template>
+    <template slot="personaMoralTemplate" data-oj-as="cell">
+      <oj-c-checkbox value="[[cell.data]]" readonly></oj-c-checkbox>
+    </template>
+  </oj-table>
 
-<oj-module
-    config="[[moduleDetallePersona]]"></oj-module>
+  <div id="form-persona">
+    <oj-module
+      config="[[moduleDetallePersona]]"></oj-module>
+  </div>
 </div>
 
 

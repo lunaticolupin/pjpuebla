@@ -1,7 +1,7 @@
-define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
+define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyncvalidator-regexp',
 "ojs/ojvalidation-base", "oj-c/input-date-text", "ojs/ojknockout", "oj-c/button", "oj-c/input-text", "oj-c/radioset", "oj-c/checkbox", "oj-c/checkboxset", "oj-c/select-single", 
 "oj-c/form-layout"],
- function(ko, config, utils, ArrayDataProvider) {
+ function(ko, config, utils, ArrayDataProvider, AsyncRegExpValidator) {
     class PersonaDetalleViewModel {
          constructor(params) {
             const userInfoSignal = params.userInfoSignal;
@@ -27,6 +27,11 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
             self.personaMoral = ko.observable(false);
             self.hablanteLenguaDistinta = ko.observable(false);
             self.usuarioCreo = ko.observable("INFOR");
+            self.edad = ko.observable();
+            self.ocupacion = ko.observable();
+            self.escolaridad = ko.observable();
+            self.tipoIdentificacion = ko.observable();
+            self.numIdentificacion = ko.observable();
 
             self.estadoCivilArray = [
                 {value:"S", label:"Soltero"},
@@ -42,6 +47,23 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 {value:"", label:"No aplica"}
             ];
 
+            self.escolaridadArray = [
+                {value: 1, label: "Sin instrucción"},
+                {value: 2, label: "Primaria"},
+                {value: 3, label: "Secundaria"},
+                {value: 4, label: "Media superior"},
+                {value: 5, label: "Licenciatura"},
+                {value: 6, label: "Posgrado"}
+            ];
+
+            self.identificacionArray = [
+                {value: 1, label: "Credencial de elector"},
+                {value: 2, label: "Pasaporte"},
+                {value: 3, label: "Licencia de Conductor"},
+                {value: 4, label: "Cedula Profesional"},
+                {value: 5, label: "Constancia de vecindad"},
+            ];
+
             self.disableEliminar = ko.computed(() =>{
                 if (self.id()){
                     return false;
@@ -54,6 +76,12 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
 
             this.dataProviderEC = new ArrayDataProvider(self.estadoCivilArray,
             {keyAttributes:'value'});
+
+            this.escolaridadDP = new ArrayDataProvider(self.escolaridadArray,
+                {keyAttributes:'value'});
+
+            this.identificacionDP = new ArrayDataProvider(self.identificacionArray,
+                {keyAttributes:'value'});
 
             this.guardar = (()=>{
                 let url = this.serviceURL+"/save";
@@ -94,6 +122,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                             if(response.success){
                                 swal('Persona','El registro fue eliminado','success');
                                 if (this.moduloOrigen()=='catalogoPersona'){
+                                    this.muestraDetalle(false);
                                     this.getPersonas(this.serviceURL);
                                 }
                             }else{
@@ -106,6 +135,14 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     }
                 })
                 
+            });
+
+            // Lee el método desde el Catálogo de Personas
+            this.getPersonas = params.getPersonas;
+            this.muestraDetalle = params.muestraDetalle;
+
+            this.cancelar = (()=>{
+                this.muestraDetalle(false);
             });
 
             this.parsePersona = ((data)=>{
@@ -126,6 +163,11 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     self.usuarioCreo(data.usuarioCreo);
                     self.telefono(data.telefono);
                     self.calle(data.calle);
+                    self.celular(data.celular);
+                    self.ocupacion(data.ocupacion);
+                    self.escolaridad(data.escolaridad);
+                    self.tipoIdentificacion(data.tipoIdentificacion);
+                    self.numIdentificacion(data.numIdentificacion);
                 }
 
             });
@@ -147,6 +189,11 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                     personaMoral: self.personaMoral(),
                     hablanteLenguaDistinta: self.personaMoral(),
                     usuarioCreo: self.usuarioCreo(),
+                    celular: self.celular(),
+                    ocupacion: self.ocupacion(),
+                    escolaridad: self.escolaridad(),
+                    tipoIdentificacion: self.tipoIdentificacion(),
+                    numIdentificacion: self.numIdentificacion()
                 }
             });
 
@@ -162,7 +209,21 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 }
             }, this);
 
-            this.getPersonas = params.getPersonas;
+            this.telefonoValidator = [
+                new AsyncRegExpValidator({
+                    pattern: '[0-9]{3}-[0-9]{3}-[0-9]{4}',
+                    hint: 'Número con el formato 222-222-2222',
+                    messageDetail: 'No es un teléfono válido'
+                })
+            ];
+
+            this.correoValidator = [
+                new AsyncRegExpValidator({
+                    pattern: "[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*",
+                    hint: 'Introduzca un email válido',
+                    messageDetail: 'No es un email válido'
+                })
+            ];
            
          }
      }

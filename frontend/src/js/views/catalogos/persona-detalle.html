@@ -1,5 +1,4 @@
-<div id="form-container">
-    
+   
     <div class="oj-panel oj-bg-info-10">
         <h1 class="oj-typography-heading-xs">Perfil </h1>
         <h2 class="oj-typography-subheading-xs">Información Personal</h2>
@@ -14,52 +13,85 @@
               label-hint="Apellido Paterno"
               required
               value="{{apellidoPaterno}}" autocomplete="off" disabled="[[personaMoral]]"></oj-c-input-text>
-          <oj-c-input-text
+            <oj-c-input-text
               id="lastname"
               label-hint="Apellido Materno"
               required="false"
               value="{{apellidoMaterno}}" autocomplete="off" disabled="[[personaMoral]]"></oj-c-input-text>
-          <oj-c-input-text
+            <oj-c-input-text
               id="curp"
               label-hint="CURP"
               value="{{curp}}" autocomplete="off"
               required="[[!personaMoral()]]"></oj-c-input-text>
-          <oj-c-input-text
+            <oj-c-input-text
               id="zip"
               label-hint="RFC"
               value="{{rfc}}" autocomplete="off"></oj-c-input-text>
               <oj-c-checkbox value="{{personaMoral}}">Persona Moral</oj-c-checkbox>
-          <oj-c-select-single
+            <oj-c-select-single
               id="estadoCivil"
               data="[[dataProviderSexo]]"
               item-text="label"
               label-hint="Sexo"
               value="{{sexo}}" required="true" disabled="[[personaMoral]]"></oj-c-select-single>
-          <oj-c-select-single
+            <oj-c-select-single
               id="estadoCivil"
               data="[[dataProviderEC]]"
               item-text="label"
               label-hint="Estado Civil"
               value="{{estadoCivil}}" required="true" disabled="[[personaMoral]]"></oj-c-select-single>
-          
-          <oj-c-input-text
+            <oj-c-input-text
               id="correo"
               label-hint="Correo"
+              validators="[[correoValidator]]"
               value="{{email}}" autocomplete="off"></oj-c-input-text>
-          <oj-c-input-text
+            <oj-c-input-text
               id="telefono"
-              label-hint="Telefóno"
-              value="{{telefono}}" autocomplete="off"></oj-c-input-text>
-          <oj-c-input-text
+              label-hint="Teléfono"
+              placeholder="222-222-2222"
+              validators="[[telefonoValidator]]"
+              value="{{telefono}}" length.max="12" autocomplete="off" required></oj-c-input-text>
+            <oj-c-input-text
+              id="telefono"
+              label-hint="Celular"
+              placeholder="222-222-2222"
+              value="{{celular}}" length.max="12" autocomplete="off"></oj-c-input-text>
+            <oj-c-checkbox value="{{hablanteLenguaDistinta}}">Habla Lengua distinta al Español</oj-c-checkbox>
+            <oj-c-input-text
               id="address"
               label-hint="Dirección"
-              column-span="2"
+              column-span="3"
               autocomplete="off"
-              value="{{calle}}" autocomplete="off"></oj-c-input-text>
+              value="{{calle}}" autocomplete="off" required></oj-c-input-text>
+            <oj-c-select-single
+              id="escolaridad"
+              data="[[escolaridadDP]]"
+              item-text="label"
+              label-hint="Escolaridad"
+              value="{{escolaridad}}" required="true" disabled="[[personaMoral]]"></oj-c-select-single>
+            <oj-c-select-single
+              id="tipoIdentificacion"
+              data="[[identificacionDP]]"
+              item-text="label"
+              label-hint="Tipo de Identificación"
+              value="{{tipoIdentificacion}}" required="true" disabled="[[personaMoral]]"></oj-c-select-single>
+            <oj-c-input-text
+              id="numIdentificacion"
+              label-hint="Número de Identificación"
+              value="{{numIdentificacion}}" autocomplete="off"></oj-c-input-text>
           </oj-c-form-layout>
     </div>
 
     <oj-toolbar chroming="outlined">
+        <oj-bind-if test="[[moduloOrigen()=='catalogoPersona']]">
+            <oj-c-button
+            label="Cancelar"
+            on-oj-action="[[cancelar]]"
+            data-oj-clickthrough="disabled">
+            <span slot="startIcon" class="oj-ux-ico-cancel"></span>
+            </oj-c-button>
+        </oj-bind-if>
+
         <oj-c-button
         label="Guardar"
         on-oj-action="[[guardar]]"
@@ -78,7 +110,5 @@
             </oj-c-button>
         </oj-bind-if>
     </oj-toolbar>
-    
-</div>
 
 

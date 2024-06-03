@@ -3,7 +3,7 @@ define(['jquery','sweetalert'],
         /**
          * params = {method: 'GET/POST', body: data, headers: headers}
          */
-        getData = async (url, params={}) => {
+        _getData = async (url, params={}) => {
 
             try{
                 const respuesta = await fetch(url, params);
@@ -23,16 +23,14 @@ define(['jquery','sweetalert'],
             }
         }
 
-        postData = async (url, data = {}) => {
+        _postData = async (url, data = {}) => {
             let params = {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: {
                     "Content-Type": "application/json"
                 }
-            };
-
-            
+            };          
 
             $("#overlay").fadeIn(300);
 
@@ -55,7 +53,7 @@ define(['jquery','sweetalert'],
             
         }
 
-        getReporte = async (url, data={})=>{
+        _getReporte = async (url, data={})=>{
             let params ={
                 method: "POST",
                 body: JSON.stringify(data),
@@ -89,12 +87,10 @@ define(['jquery','sweetalert'],
 
             $("#overlay").fadeOut(300);
 
-            return response;
-
-            
+            return response;           
         }
 
-        parseFecha = (fecha)=>{
+        _parseFecha = (fecha)=>{
             const options = {
                 month: '2-digit', day: '2-digit', year: 'numeric', timeZone: 'UTC'
             };
@@ -102,11 +98,11 @@ define(['jquery','sweetalert'],
             return new Date(fecha).toLocaleDateString('es', options);
         }
 
-        parsePDF = (data)=>{
+        _parsePDF = (data)=>{
 
         }
 
-        waiting = (stop=false)=>{
+        _waiting = (stop=false)=>{
             if (stop){
                 $("#overlay").fadeOut(300);
                 return;
@@ -115,26 +111,38 @@ define(['jquery','sweetalert'],
             $("#overlay").fadeIn(300);
         }
 
-        confirmar = ( async(title = "Confirmación", text = "¿Desea guardar la información?")=>
-            {
-                return await swal(
-                    {
-                        title: title,
-                        text: text,
-                        buttons: ["No", "Si"],
-                        dangerMode: true
-                    }
-                );
+        _confirmar = ( async(title = "Confirmación", text = "¿Desea guardar la información?") => {
+            return await swal(
+                {
+                    title: title,
+                    text: text,
+                    buttons: ["No", "Si"],
+                    dangerMode: true
+                }
+            );
+        });
+
+        _checkValidationGroup = ((idValigGroup) => {
+            const validGroup = document.getElementById(idValigGroup);
+
+            if (validGroup.valid === 'valid') {
+                return true;
             }
-        );
+            else {
+                validGroup.showMessages();
+                validGroup.focusOn('@firstInvalidShown');
+                return false;
+            }
+        });
 
         return {
-            getData: getData,
-            postData: postData,
-            getReporte: getReporte,
-            parseFecha: parseFecha,
-            waiting: waiting,
-            confirmar: confirmar
+            getData: _getData,
+            postData: _postData,
+            getReporte: _getReporte,
+            parseFecha: _parseFecha,
+            waiting: _waiting,
+            confirmar: _confirmar,
+            checkValidationGroup: _checkValidationGroup
         }
     }
 );
