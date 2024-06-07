@@ -7,10 +7,12 @@ import mx.pjpuebla.backend.reporteador.config.JasperReportConfig;
 import mx.pjpuebla.backend.reporteador.models.Reportes;
 import mx.pjpuebla.backend.reporteador.models.ReportesExporter;
 import mx.pjpuebla.backend.response.GenericResponse;
+import net.sf.jasperreports.engine.JRParameter;
 
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +31,13 @@ public class ReportesController {
     @Autowired
     private JasperReportConfig config;
 
-    @PostMapping(value="/{reporte}",
+    @PostMapping(value="/{modulo}/{reporte}",
     produces = {"application/pdf"})
-    public ResponseEntity<Object> descargarReporte(@PathVariable("reporte") String reporte, @RequestBody Map<String,Object> parametros) {
+    public ResponseEntity<?> descargarReporte(@PathVariable("modulo") String modulo, @PathVariable("reporte") String nombreReporte, @RequestBody Map<String,Object> parametros) {
         InputStream reporteStream = null;
-        String nombrePdf = reporte.concat(".pdf");
+        String nombrePdf = nombreReporte.concat(".pdf");
         Reportes reportes = null;
+        String reporte = String.format("%s/%s", modulo, nombreReporte);
 
         try{
             ReportesExporter exportaReporte = config.reportesExporter();
@@ -49,6 +52,8 @@ public class ReportesController {
             if (reportes.getReporteJasper()==null){
                 throw new java.io.IOException(String.format("El reporte: %s,  no existe", reporte));
             }
+
+            //parametros.put(JRParameter.REPORT_LOCALE, new Locale("es","MX"));
 
             reportes.setParametros(parametros);
 

@@ -135,14 +135,49 @@ header[role="banner"]{
 
 .swal-title{
   font-family: var(--oj-html-font-family);
+  font-weight: var(--oj-collection-header-font-weight);
 }
 
 .swal-content input{
   font-family: var(--oj-html-font-family);
-  background-color:  rgb(var(--oj-palette-info-rgb-10));
-  border-color: (var(--oj-palette-info-rgb-100));
+  font-size: var(--oj-text-field-font-size);
+  height: var(--oj-text-field-height);
+  color: var(--oj-text-field-text-color);
+  background-color: var(--oj-text-field-bg-color);
+  border-color: var(--oj-text-field-border-color);
+  border-radius: var(--oj-text-field-border-radius);
+  border-width: var(--oj-text-field-border-width);
+}
 
-  color: rgb(var(--oj-palette-info-rgb-110));
+.swal-content input:focus{
+  border-color: var(--oj-text-field-border-color-focus);
+  box-shadow: var(--oj-text-field-box-shadow-focus);
+}
+
+.swal-button {
+  border: 1px solid;
+  border-radius: var(--oj-button-border-radius);
+  border-color: var(--oj-button-outlined-chrome-border-color);
+  background-color: var(--oj-button-outlined-chrome-bg-color);
+  font-family: var(--oj-html-font-family);
+  font-size: var(--oj-button-font-size);
+  font-weight: var(--oj-button-font-weight);
+  height: var(--oj-button-height);
+  color: var(--oj-button-outlined-chrome-text-color);
+}
+
+.swal-button--confirm{
+    background-color: var(--oj-button-call-to-action-chrome-bg-color);
+    border-color: var(--oj-button-call-to-action-chrome-border-color);
+    color: var(--oj-button-call-to-action-chrome-text-color);
+}
+
+.swal-button:not([disabled]):hover{
+  background-color: var(--oj-button-outlined-chrome-bg-color-hover);
+}
+
+.swal-button--confirm:not([disabled]):hover{
+  background-color: var(--oj-button-call-to-action-chrome-bg-color);
 }
 
 .tabla{

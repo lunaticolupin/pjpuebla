@@ -1,7 +1,7 @@
 define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime', 
     'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider',
     'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'ojs/ojvalidationgroup', 'sweetalert',
-    'oj-c/text-area', 'ojs/ojtoolbar'
+    'oj-c/text-area', 'ojs/ojtoolbar', 'oj-c/radioset','ojs/ojradioset','ojs/ojtoolbar', "oj-c/list-item-layout", "oj-c/list-view", "ojs/ojswitch"
 ],
  function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator, 
     signals, ListDataProviderView, ojdataprovider_1) {
@@ -33,11 +33,29 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.solicitudTipoApertura = ko.observable();
             self.solicitudTipoAperturaId = ko.observable();
             self.solicitudDetalle = ko.observable(false);
+            self.solicitudMediable = ko.observable();
+            self.solicitudCanalizada = ko.observable();
             self.usuarioPM = ko.observable(false);
             self.invitadoPM = ko.observable(false);
             self.tipoPersonaSeleccionada=ko.observable();
             self.personaSeleccionada = ko.observable();
-            this.filtro = ko.observable();
+            self.solicitudProtocoloViolencia =ko.observable();
+            self.mostrarForm = ko.computed(()=>{
+                if (self.solicitudSeleccionada() || self.solicitudDetalle())
+                    return true;
+            });
+
+            self.mostrarDocMed=ko.computed(()=>{
+                return !self.solicitudMediable();
+            });
+
+            self.mostrarDocNoMed=ko.computed(()=>{
+                if (self.solicitudMediable()==undefined || self.solicitudMediable==null || self.solicitudMediable()){
+                    return true;
+                }
+
+                return false;
+            });
 
             /** Catalogos */
             self.materias = ko.observableArray();
@@ -55,11 +73,46 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 {value: 3, label: "No Mediable"}
             ]);
 
+            self.esMediableArray = [
+                {value: 0, label: "No"},
+                {value: 1, label: "Si"}
+            ];
+
+
+            self.documentos = ko.observableArray([
+                {value: 1, label: "Solicitud", disabled: ko.observable(false), filename: ko.observable(), printEnabled: ko.observable(true)},
+                {value: 2, label: "1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 3, label: "Acuse 1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 4, label: "Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 5, label: "Acuse Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 6, label: "Canalización", disabled: self.mostrarDocNoMed, filename: ko.observable(),printEnabled: ko.observable()}
+            ]);
+
+            self.protocoloViolencia = [
+                {value: null, label: "N/A"},
+                {value: "DV", label: "De violencia"},
+                {value: "CV", label: "Con violencia"}
+            ]
+
+            /** variables y funciones Knockout */
+            this.userInfoSignal = new signals.Signal();
+            this.dataPDF = ko.observable();
+            this.groupValid = ko.observable();
+            this.frameHabilitado = rootViewModel.pdfViewerEnable;
+            this.filtro = ko.observable();
+
             /** Data Providers */
             // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
             this.materiasDP = new ArrayDataProvider(self.materias, {keyAttributes:'id'});
             this.tipoAperturaDP = new ArrayDataProvider(self.tipoAperturas, {keyAttributes: 'id'});
             this.estadoSolicitudDP = new ArrayDataProvider(self.estadoSolicitud, {keyAttributes: 'value'});
+            this.esMediableDP = new ArrayDataProvider(self.esMediableArray, {keyAttributes: 'value'});
+            this.protocoloViolenciaDP = new ArrayDataProvider(self.protocoloViolencia, {keyAttributes: 'value'});
+            this.documentosDP = ko.computed(()=>{
+                let documentosEnabled = self.documentos().filter((item)=>item.disabled()==false);
+
+                return new ArrayDataProvider(documentosEnabled, {keyAttributes: 'value'});
+            });
 
             this.dataProvider = ko.computed(()=>{
                 let criterio = null;
@@ -75,16 +128,6 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 return new ListDataProviderView(dataProvider, {filterCriterion: criterio});
             }, this);
 
-            /** variables y funciones Knockout */
-            this.userInfoSignal = new signals.Signal();
-            this.dataPDF = ko.observable();
-            this.groupValid = ko.observable();
-
-            self.mostrarForm = ko.computed(()=>{
-                if (self.solicitudSeleccionada() || self.solicitudDetalle())
-                    return true;
-            });
-
             this.dateConverter = ((fecha)=>{
                 return utils.parseFecha(fecha);
             });
@@ -92,6 +135,11 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             this.dateConverterInput = ko.observable(new ojconverter_datetime_1.IntlDateTimeConverter({
                 timeZone: 'America/Mexico_City',
                 pattern: 'dd/MM/yyyy'
+            }));
+
+            this.dateTimeConverterInput = ko.observable(new ojconverter_datetime_1.IntlDateTimeConverter({
+                timeZone: 'America/Mexico_City',
+                pattern: 'dd/MM/yyyy hh:mm'
             }));
 
             this.maxFecha = new Date().toISOString();
@@ -225,8 +273,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     self.getSolicitudes()
                 ]).finally(()=>{
                     utils.waiting(true);
-                })
-
+                });
             };
 
             /**
@@ -248,7 +295,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 self.solicitudId(solicitud.id);
                 self.solicitudFolio(solicitud.folio);
                 self.solicitudFecha(solicitud.fechaSolicitud);
-                self.solicitudEsMediable(solicitud.esMediable);
+                self.solicitudMediable(solicitud.esMediable);
                 self.solicitudCanalizada(solicitud.canalizado);
                 self.solicitudUsuario(solicitud.usuarioPersona);
                 self.usuarioPM(solicitud.usuarioPersona.personaMoral);
@@ -256,18 +303,24 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 self.invitadoPM(solicitud.invitadoPersona.personaMoral);
                 self.solicitudMateria(solicitud.materia);
                 self.solicitudMateriaId(solicitud.materia.id);
-                self.solicitudFechaSesion(solicitud.fechaSesion);
+                self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
                 self.solicitudDescripcion(solicitud.descripcionConflicto);
                 self.solicitudEstatus(solicitud.estatus);
                 self.solicitudTipoApertura(solicitud.tipoApertura);
                 self.solicitudTipoAperturaId(solicitud.tipoApertura.id);
+
+                if (self.solicitudFechaSesion()){
+                    let doc= this.documentos().find((element)=>element.value==2);
+
+                    doc.printEnabled(true);
+                }
             });
 
             self.fromSolicitud = (()=>{
                 let solicitud = {
                     folio: 'NUEVA',
                     fechaSolicitud: self.solicitudFecha(),
-                    esMediable: self.solicitudEsMediable(),
+                    esMediable: self.solicitudMediable(),
                     canalizado: self.solicitudCanalizada(),
                     usuarioPersona: self.solicitudUsuario(),
                     invitadoPersona: self.solicitudInvitado(),
@@ -288,6 +341,15 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 $('#solicitudes').show();
             });
+
+            self.solicitudProtocoloViolencia.subscribe((data)=>{
+
+                switch(data){
+                    case "CV": self.solicitudMediable(0); break;
+                    case "DV": self.solicitudMediable(1); break;
+                    default: self.solicitudMediable(1);
+                }
+            })
 
             /** Botones */
 
@@ -383,18 +445,27 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
             this.btnOpen= (event, detail) => {
                 let solicitud;
+                const element = event.srcElement.id;
 
-                if (event.srcElement.id == "btnImprimir"){
+                if (element == "btnImprimir"){
                     solicitud = self.solicitudSeleccionada().data;
                 }else{
                     solicitud = detail.item.data;
-                }
+                }               
 
-                self.getReporte(solicitud).then(result => {
-                    document.getElementById("modalPDF").open();
+                self.getReporte(solicitud).then(response => {
+                    this.dataPDF(response);
+
+                    if (this.frameHabilitado()){
+                        document.getElementById("modalPDF").open();
+                        return true;
+                    }
+
+                    document.getElementById("btnDescargarPdf").click();
                 })
-                .catch(response => {
-                    swal(response.message, JSON.stringify(response.errors), "error");
+                .catch(error => {
+                    console.log(error);
+                    swal(error.message, JSON.stringify(error.errors), "error");
                 });
             }
 
@@ -477,7 +548,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 utils.getData(url,{}).then((response)=>{
                     if (response.success){
-                        self.solicitudSeleccionada(response.data);
+                        self.solicitudSeleccionada(response);
                         self.parseSolicitud(response.data);
                     }
                 })
@@ -494,7 +565,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                                 const folio = response.data.folio;
         
                                 self.getSolicitudes();
-                                self.solicitudId(response.data.id);
+                                self.solicitudSeleccionada(response);
+                                self.parseSolicitud(response.data);
+                                
                                 swal("Solicitud Registrada","Folio: " + folio, "success");
         
                                 return true;
@@ -516,7 +589,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     "p_solicitud_id": data.id
                 };
 
-                const url = config.baseEndPoint + '/reportes/MediacionSolicitud';
+                const url = config.baseEndPoint + '/reportes/mediacion/Solicitud';
 
                 this.dataPDF(null);
 
@@ -526,14 +599,24 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                         if (response.hasOwnProperty("error")){    
                             reject(response);
                         }
+
+                        const reader = new FileReader();
+
+                        reader.readAsArrayBuffer(response);
+                        reader.onload = ((e)=>{
+                            const buffer = e.target.result;
+                            const fileBlob = new Blob([new Uint8Array(buffer)],{
+                                type: "application/pdf"
+                            })
+
+                            resolve(window.URL.createObjectURL(fileBlob));
+                        });
+
     
-                        const blobUrl = URL.createObjectURL(response);
-    
-                        this.dataPDF(blobUrl+"#view=FitH");
-    
-                        resolve(true);
+                        //resolve(true);
     
                     }).catch(errors =>{
+                        console.log(errors);
                         swal("Error", JSON.stringify(errors), "error")
                     });
                 });

@@ -32,6 +32,7 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       this.smScreen = ResponsiveKnockoutUtils.createMediaQueryObservable(smQuery);
       const mdQuery = ResponsiveUtils.getFrameworkQuery(ResponsiveUtils.FRAMEWORK_QUERY_KEY.MD_UP);
       this.mdScreen = ResponsiveKnockoutUtils.createMediaQueryObservable(mdQuery);
+      this.pdfViewerEnable = ko.observable(window.navigator.pdfViewerEnabled);
 
       let navData = [
         { path: '', redirect: 'login' },
@@ -110,6 +111,10 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       });
 
       this.startToggle = () => this.startOpened(!this.startOpened());
+
+      window.addEventListener("resize", (e)=>{
+        this.pdfViewerEnable(window.navigator.pdfViewerEnabled);
+      });
 
      }
      // release the application bootstrap busy state
