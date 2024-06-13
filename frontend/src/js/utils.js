@@ -45,9 +45,7 @@ define([],
                     success: false,
                     error: error
                 }
-            }
-
-            
+            }            
         }
 
         getReporte = async (url, data={})=>{

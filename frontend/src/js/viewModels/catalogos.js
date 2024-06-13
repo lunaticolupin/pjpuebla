@@ -10,6 +10,10 @@ define(['../accUtils', 'require', 'knockout', 'ojs/ojarraydataprovider', 'ojs/oj
             let data = [
                 { name: "Personas", id: "personas", icons: "oj-ux-ico-home" },
                 { name: "Usuarios", id: "usuarios", icons: "oj-ux-ico-book" },
+                { name: "Materias", id: "materias", icons: "oj-ux-ico-book" },
+                { name: "Roles", id: "roles", icons: "oj-ux-ico-book" },
+                { name: "Modulos", id: "modulos", icons: "oj-ux-ico-book" },
+                { name: "Permisos", id: "permisos", icons: "oj-ux-ico-book" },
             ];
 
             self.catalogos = ko.observableArray(data);
@@ -20,7 +24,7 @@ define(['../accUtils', 'require', 'knockout', 'ojs/ojarraydataprovider', 'ojs/oj
 
             this.ModuleElementUtils = ModuleElementUtils;
             
-            this.selectedItem = ko.observable("personas");
+            this.selectedItem = ko.observable("roles");
 
             rootViewModel.validaSesion();
 

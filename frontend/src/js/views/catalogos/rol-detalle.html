@@ -1,0 +1,53 @@
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Rol</h1>
+    <h2 class="oj typography-subheading-xs">Información rol</h2>
+
+    <oj-c-form-layout id="rol-information" direction="row" max-columns="3">
+        <oj-c-input-text
+            id="clave"
+            label-hint="Clave"
+            required="true"
+            value="{{clave}}" autocomplete="off"
+        >
+        </oj-c-input-text>
+
+        <oj-c-input-text
+            id="descripcion"
+            label-hint="Descripción"
+            required="true"
+            value="{{descripcion}}" autocomplete="off">
+        </oj-c-input-text>
+                
+        <!-- <oj-c-select-single 
+            id="modulo"
+            data="[[dataProviderModulos]]"
+            item-text="descripcion"
+            label-hint="Modulo"
+            value="{{id}}" required="true" >
+        </oj-c-select-single>
+
+        <oj-c-select-multiple
+            id="permisos"
+            data="[[dataProviderPermisos]]"
+            item-text="descripcion"
+            label-hint="Permisos"
+            value="{{id}}" 
+            required="true">
+        </oj-c-select-multiple> -->
+    </oj-c-form-layout>
+</div>
+
+<oj-c-button
+label="Guardar"
+on-oj-action="[[guardar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-save"></span>
+</oj-c-button>
+
+<oj-c-button
+label="Cerrar"
+on-oj-action="[[closeModalAgregar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-close-all"></span>
+</oj-c-button>
+

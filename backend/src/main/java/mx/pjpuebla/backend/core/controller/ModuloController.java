@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class ModuloController {
      private final ModuloService modulos;
 
-    @GetMapping("all")
+    @GetMapping("")
     public ResponseEntity<GenericResponse> getModulosAll(){
         GenericResponse response = new GenericResponse();
         
@@ -110,22 +110,12 @@ public class ModuloController {
             modulo.setActivo(false);
             modulos.save(modulo);
 
-            String mensaje = String.format("El modulo con el ID %d fue eliminada", id);
+            String mensaje = String.format("El modulo con el ID %d fue dado de baja con éxito", id);
             response.setSuccess(true);
             response.setMessage(mensaje);
             response.setData(modulo);
 
             return ResponseEntity.ok(response);
-            // boolean result = modulos.delete(modulo);
-            // if(result){
-            //     String mensaje = String.format("El modulo con el ID %d fue eliminada", id);
-            //     response.setSuccess(result);
-            //     response.setMessage(mensaje);
-
-            //     return ResponseEntity.ok(response);
-            // }
-
-            // throw new SQLException("No se pudo eliminar el ID");
 
         } catch (Exception e) {
             response.setMessage(e.getCause().getCause().getLocalizedMessage());

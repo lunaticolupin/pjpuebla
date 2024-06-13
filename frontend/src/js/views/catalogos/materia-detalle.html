@@ -1,0 +1,24 @@
+<div id="dialogWrapper">
+    <oj-dialog id="modalDialog1" dialog-title="Modal Dialog" aria-describedby="desc">
+      <div slot="body">
+        <h1 class="oj-typography-heading-xs">Información de las Materias </h1>
+      <oj-c-form-layout id="materia-information" direction="row" max-columns="3">
+          <oj-c-input-text
+              id="clave"
+              label-hint="Clave"
+              required="true"
+              autocomplete="off"></oj-c-input-text>
+          <oj-c-input-text
+              id="descripcion"
+              label-hint="Descripción"
+              required="true"
+              autocomplete="off"></oj-c-input-text>    
+      </oj-c-form-layout>
+      </div>
+      <div slot="footer">
+        <oj-button id="okButton" on-oj-action="[[guardar]]">Guardar</oj-button>
+        <oj-button id="okButton" on-oj-action="[[close]]">Cancelar</oj-button>
+
+      </div>
+      
+    </oj-dialog>

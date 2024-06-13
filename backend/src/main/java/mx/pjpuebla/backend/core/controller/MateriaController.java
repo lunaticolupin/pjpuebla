@@ -1,16 +1,15 @@
 package mx.pjpuebla.backend.core.controller;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import mx.pjpuebla.backend.core.entitiy.Rol;
-import mx.pjpuebla.backend.core.service.RolService;
+import mx.pjpuebla.backend.core.entitiy.Materia;
+import mx.pjpuebla.backend.core.service.MateriaService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.sql.SQLException;
-import java.util.Date;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 
@@ -21,113 +20,98 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
 
-
 @RestController
-@RequestMapping("roles")
+@RequestMapping("materias")
 @RequiredArgsConstructor
 
-public class RolController {
-    private final RolService roles;
+public class MateriaController {
+    private final MateriaService materias;
 
     @GetMapping("")
-    public ResponseEntity<GenericResponse> getRolesAll() {
+    public ResponseEntity<GenericResponse> getMaterias(){
         GenericResponse response = new GenericResponse();
 
-        response.setSuccess(true);
-        response.setData(roles.findAll());
-        
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("activos")
-    public ResponseEntity<GenericResponse> getRolesActivos() {
-        GenericResponse response = new GenericResponse();
-
-        response.setSuccess(true);
-        response.setData(roles.findByActivo(true));
+        response.setSuccess(true);;
+        response.setData(materias.findAll());
 
         return ResponseEntity.ok(response);
     }
-
+    
     @GetMapping("/{id}")
-    public ResponseEntity<GenericResponse> GetRol(@PathVariable("id") Integer id) {
+    public ResponseEntity<GenericResponse> getMateria(@PathVariable("id") Integer id) {
         GenericResponse response = new GenericResponse();
-        Rol rol = roles.findById(id);
+        Materia materia = materias.findById(id);
 
-        if(rol == null) {
-            response.setMessage("El rol no existe");
+        if(materia==null){
+            response.setMessage("la materia no existe");;
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
 
+        }
+        
         response.setSuccess(true);
-        response.setData(rol);
+        response.setData(materia);
 
         return ResponseEntity.ok(response);
     }
-
+    
     @PostMapping("/save")
-    public ResponseEntity<GenericResponse> guardarRol(@Valid @RequestBody Rol entity, Errors errors) {    
+    public ResponseEntity<GenericResponse> guardarMateria(@Valid @RequestBody Materia entity, Errors errors){
         GenericResponse response = new GenericResponse();
-        try {
-            if(errors.hasErrors()) {
-                response.setMessage("Rol no valido");
+        try{
+            if(errors.hasErrors()){
+                response.setMessage("Materia no valida");
                 response.setErrors(errors.getAllErrors());
-
                 return ResponseEntity.internalServerError().body(response);
+
             }
 
-            Rol rol = roles.save(entity);
+            Materia materia = materias.save(entity);
 
-            if(rol == null) {
-                response.setMessage("no se pudo guardar el rol");
+            if (materia == null){
+                response.setMessage("No se pudo guardar la materia");
                 response.setData(entity);
-
                 throw new SQLException(response.getMessage());
             }
 
             response.setSuccess(true);
-            response.setMessage("ok");
-            response.setData(rol);
+            response.setMessage("OK");
+            response.setData(materia);
+
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            e.printStackTrace();
+            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/delete/{id}")
+    public ResponseEntity<GenericResponse> eliminarMateria(@PathVariable("id") Integer id) {
+        Materia materia = materias.findById(id);
+        GenericResponse response = new GenericResponse();
+
+        if(materia == null){
+            response.setMessage("La materia no existe");
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        try{
+            materia.setActivo(false);
+
+            materias.save(materia);
+            String mensaje = String.format("la materia con ID %d fue eliminada", id);
+            response.setSuccess(true);
+            response.setMessage(mensaje);
+            response.setData(materia);
 
             return ResponseEntity.ok(response);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-
+        }catch (Exception e){
+            response.setMessage(e.getCause().getCause().getLocalizedMessage());
             return ResponseEntity.internalServerError().body(response);
         }
         
     }
-
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<GenericResponse> borrarRol(@PathVariable("id") Integer id) {
-        Rol rol = roles.findById(id);
-
-        GenericResponse response = new GenericResponse();
-
-        if(rol ==  null) {
-            response.setMessage("El rol no existe");
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-
-        try {
-            rol.setActivo(false);
-            roles.save(rol);
-
-            String mensaje = String.format("Rol %d fue dado de baja con éxito",id);
-            response.setSuccess(true);
-            response.setMessage(mensaje);
-            response.setData(rol);
-
-            return ResponseEntity.ok(response);
-
-        }catch (Exception e) {
-            return ResponseEntity.internalServerError().body(response);
-        }
-    }
-    
-    
-    
     
 }

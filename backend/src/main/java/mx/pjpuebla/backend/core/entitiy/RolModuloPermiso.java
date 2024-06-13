@@ -32,5 +32,4 @@ public class RolModuloPermiso implements Serializable{
 
     @Column(name = "activo", nullable = false)
     private Boolean activo = Boolean.valueOf(true);
-    
 }

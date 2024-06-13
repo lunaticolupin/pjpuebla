@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 public class PermisoController {
      private final PermisoService permisos;
 
-    @GetMapping("all")
+    @GetMapping("")
     public ResponseEntity<GenericResponse> getPermisos() {
         GenericResponse response = new GenericResponse();
         
@@ -114,7 +114,7 @@ public class PermisoController {
             permiso.setActivo(false);
             permisos.save(permiso);
 
-            String mensaje = String.format("permiso %d fue eliminado con éxito");
+            String mensaje = String.format("permiso %d fue dado de baja con éxito",id);
             response.setSuccess(true);
             response.setMessage(mensaje);
             response.setData(permiso);

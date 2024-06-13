@@ -1,0 +1,70 @@
+<h4>Modulos</h4>
+
+<oj-table
+    id="modulos"
+    data="[[dataProvider]]"
+    columns-default='{"sortable":"disabled"}'
+    selection-mode.row = "none"
+    scroll-policy="loadMoreOnScroll"
+    scroll-policy-options.fetch-size="10"
+    scroll-policy-options.scroller="#samplePage"
+    scroll-policy-options.scroller-offset-top="0"
+    scroll-policy-options.scroller-offset-bottom="100"
+    scroll-policy-options.scroller-offset-start="0"
+    scroll-policy-options.scroller-offset-end="100"
+    columns='[
+    {"headerText":"ID", "field":"id","minWidth":"50"},
+    {"headerText":"Clave", "field":"clave", "minWidth":"200" },
+    {"headerText":"Descripción", "field":"descripcion"},
+    {"headerText":"Activo", "field":"activo", "template":"showActivo", "id":"moduloActivo"}, 
+    {"headerText": "Detalle",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionTemplate", "id": "action" },
+    {"headerText": "Eliminar",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionDeleteTemplate", "id": "action" }]'
+    style="width: 100%;">
+
+    <template slot="actionTemplate" data-oj-as="cell">
+        <oj-c-button
+          chroming="borderless"
+          display="icons"
+          on-oj-action="[[detalleModulo]]"
+          data-oj-clickthrough="disabled">
+          <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+        </oj-c-button>
+    </template>
+    <template slot="actionDeleteTemplate" data-oj-as="cell">
+        <oj-c-button
+            chroming="borderless"
+            tooltip="eliminar"
+            display="icons"
+            on-oj-action="[[eliminar]]"
+            data-oj-clickthrough="disabled">
+            <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
+        </oj-c-button>
+    </template>
+
+    <template slot="showActivo" data-oj-as="cell">
+      <oj-c-checkbox value="[[cell.data]]" readonly></oj-c-checkbox>
+  </template>
+
+</oj-table>
+
+<oj-button id="buttonOpener" on-oj-action="[[openModalAgregar]]">Agregar Modulo</oj-button>
+
+<oj-dialog id="modalAgregar" dialog-title="Nuevo registro" aria-describedby="desc">
+  <oj-module
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/modulo-detalle', params: {userInfoSignal: userInfoSignal}})]]"
+    class="oj-bg-info-20">
+    <input type="text" id="clave">
+  </oj-module>
+</oj-dialog>

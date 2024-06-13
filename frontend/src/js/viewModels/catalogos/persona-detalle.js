@@ -59,7 +59,6 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 let data = self.parsePersonaSave();
 
                 utils.postData(url, data).then((response)=>{
-                    console.log(response);
                     if (response.success){
                         alert(response.message);
                     }else{
@@ -75,16 +74,10 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 if (id==undefined || id==null){
                     return false;
                 }
-
                 let url = this.serviceURL+"/delete/"+id;
-            
-
                 utils.postData(url,{}).then((response)=>{
-                    console.log(response);
-                    
+                    console.log(response);                    
                     alert(response.message);
-
-                    //window.location.reload();
                 }).catch(error => console.log(error));
             });
 
@@ -136,9 +129,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider',
                 this.parsePersona(persona);
             }, this);
            
-         }
-     }
-
+        }
+    }
     return PersonaDetalleViewModel;
   }
 );

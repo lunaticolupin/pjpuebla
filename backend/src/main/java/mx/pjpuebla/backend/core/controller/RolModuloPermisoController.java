@@ -97,7 +97,7 @@ public class RolModuloPermisoController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
-            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            // response.setMessage(e.getCause().getCause().getLocalizedMessage());
 
             return ResponseEntity.internalServerError().body(response);
         }
