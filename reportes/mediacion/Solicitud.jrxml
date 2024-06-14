@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MediacionSolicitud" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="cbb3c251-df00-429e-9c98-cbc892b5a190">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PostgresLocal"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="cm"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="p_solicitud_id" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select * from mediacion.qry_solicitud where id = $P{p_solicitud_id}]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id"/>
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="folio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="folio"/>
+		<property name="com.jaspersoft.studio.field.label" value="folio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="fecha_solicitud" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="materia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="materia"/>
+		<property name="com.jaspersoft.studio.field.label" value="materia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_apaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_apaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_apaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_amaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_amaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_amaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_apaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_apaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_apaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_amaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_amaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_amaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="descripcion_conflicto" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="descripcion_conflicto"/>
+		<property name="com.jaspersoft.studio.field.label" value="descripcion_conflicto"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_nombre_completo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_nombre_completo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="-10" y="-2" width="518" height="25" uuid="c52a6656-314f-4cb4-b72b-d5d4b7a3046f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CENTRO DE JUSTICIA ALTERNATIVA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-10" y="23" width="518" height="18" uuid="6d65b073-fe6d-4665-9400-19a6f0ec8e14">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Solicitud]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="2" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="71" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement mode="Transparent" x="-10" y="3" width="518" height="60" uuid="a035c1fc-6e86-43fe-b1e8-6688af94c509">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="7" width="290" height="20" uuid="e2f7b85b-e873-412e-a562-06d1ada15de0"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Datos de Registro e identificación]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="44" width="100" height="15" uuid="1b36635d-b015-4561-9545-c69e417b896e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Materia]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="100" height="15" uuid="34b9f7da-32c3-419f-baf9-c2ffd444ce0f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Solicitud]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="12" width="100" height="15" uuid="ebe690ce-fbeb-484c-82b4-7bd5123f5220">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="28" width="100" height="15" uuid="7c1b87cd-48b0-41c0-8a40-6ff1074c960b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<text><![CDATA[Expediente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="44" width="100" height="15" uuid="2608f506-7be7-43f8-9bfd-a5cbccdd19c7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<text><![CDATA[Mediador]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="100" y="28" width="100" height="15" uuid="190c8e8c-db4f-4edd-a7ee-5c2c840979da">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{folio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="44" width="100" height="15" uuid="0cfe428e-a6b6-4ef0-87d3-c8dbc2e3caf2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{materia}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="400" y="12" width="100" height="15" uuid="eab42230-5351-4f7a-ba67-3f97be6fbcb2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{fecha_solicitud}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="424" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement mode="Transparent" x="-10" y="342" width="518" height="75" uuid="863fa351-3f91-4482-8f0a-40f597867cd7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement mode="Transparent" x="-10" y="0" width="518" height="137" uuid="43033d53-326c-46ba-b060-698e9bf43df6"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="7" width="495" height="15" uuid="80ed488c-2b82-4a4c-b95e-45531f63b71e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Datos del usuario (persona física, moral o representante legal que solicita el servicio):]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="27" width="494" height="15" uuid="408fab7b-8f18-4a39-b513-1a14a7497b7e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Nombre y apellidos: "+$F{usuario_nombre_completo}]]></textFieldExpression>
+			</textField>
+			<rectangle radius="10">
+				<reportElement mode="Transparent" x="-10" y="141" width="518" height="118" uuid="498f9fc7-dc08-4f6b-adb5-313285fd32f0"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="149" width="495" height="20" uuid="68540f7c-e7de-4df4-89bd-d244309572f2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Datos del invitado (persona física, moral o representante legal que solicita el servicio):]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="171" width="494" height="15" uuid="942730d7-ac22-4aa0-95d0-0ffc5b08bd13">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Nombre y apellidos: "+$F{invitado_nombre_completo}]]></textFieldExpression>
+			</textField>
+			<rectangle radius="10">
+				<reportElement mode="Transparent" x="-12" y="263" width="518" height="75" uuid="fc97812f-a265-474b-8907-c2dd97c97e76">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</rectangle>
+			<textField>
+				<reportElement x="-2" y="293" width="494" height="40" uuid="5ee81abc-12e5-489e-befa-85b63f3b08dc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Bajo protesta de decir verdad manifieste si respecto de este mismo asunto ha iniciado usted o su invitado juicio alguno, denuncia, trámite notSansSerif, administrativo, u otro procedimiento de esta en otra dependencia como el DIF estatal o municipal. "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-2" y="271" width="495" height="20" uuid="3ef33048-7366-4c66-9716-40c199a7d3fa">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Información de procedimientos previos o en curso:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="350" width="495" height="30" uuid="df3bcb24-99f4-425f-acfa-ebd1c23f1f69">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement markup="html">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[<b>Relato breve del conflicto:</b> <sub>(es importante anotar la realidad del asunto propuesto; lo anterior con fundamento en lo dispuesto por el artículo 846 del Código de Procedimientos Civiles del Estado de Puebla que a la letra señala: Será sancionado civil y penalmente quien utilice la mediación con el hábito de engañar a una o a ambas partes). </sub>]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="380" width="494" height="31" uuid="92c93907-cc63-44ee-b5c0-eb656c86d4de">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{descripcion_conflicto}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="80" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="10" width="180" height="70" uuid="b8f1d975-99af-4de7-8492-1668eb58c12b"/>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Nombre y Firma del Usuario:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="300" y="10" width="180" height="70" uuid="c4d2eba1-d233-4e61-884f-bdc08b7d2060"/>
+				<box>
+					<bottomPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[OBSERVACIONES:]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="12" width="530" height="38" uuid="b4adf25a-989f-4709-b78f-d72fbfa8f398"/>
+				<textElement markup="html">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Manifiesto que tuve a la vista el Aviso de Privacidad de Medición Integral y Simplificado; que el tratamiento que se le dará datos personales será de conformidad con lo que establece la Ley de Protección de Datos Personales en Posesión de Sujetos Obligados del Estado de Puebla, los cuales también se publican en la página de Poder Judicial del Estado <a href="www.pjpuebla.gob.mx">www.pjpuebla.gob.mx</a> ]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="11" splitType="Stretch"/>
+	</summary>
+</jasperReport>
