@@ -1,0 +1,31 @@
+<h2>Solicitud de Mediación</h2>
+
+<oj-bind-if test="[[solicitud()]]">
+    <div id="solicitud" class="oj-panel oj-sm-margin-2x-top">
+        <h4 class="oj-typography-subheading-xs">Datos generales</h4>
+        <oj-c-form-layout max-columns="3" direction="row" >
+            <!--<oj-c-input-text id="solicitudId" value="{{solicitud().id}}" label-hint="ID" readonly></oj-c-input-text>-->
+            <oj-c-input-text id="solicitudFolio" value="{{solicitud().folio}}" label-hint="Folio de Solicitud" readonly></oj-c-input-text>
+            <oj-input-date id="fechaSolicitud" value="{{solicitud().fechaSolicitud}}" label-hint="Fecha de Solicitud" readonly></oj-input-date>
+            <!-- <oj-c-input-text id="materia" value="{{solicitud().materia.descripcion}}" label-hint="Materia" readonly></oj-c-input-text> -->
+            <!-- <oj-input-date-time id="fechaSesion" value="{{solicitud().fechaSesion}}" label-hint="Fecha de Sesión" readonly></oj-input-date-time> -->
+            <oj-c-input-text id="usuario" value="{{solicitud().usuarioPersona.nombreCompleto}}" label-hint="Usuario" readonly></oj-c-input-text>
+            <oj-c-input-text id="invitado" value="{{solicitud().invitadoPersona.nombreCompleto}}" label-hint="Invitado" readonly></oj-c-input-text>
+            <oj-c-text-area 
+                id="descripcion"
+                column-span="3" value="{{solicitud().descripcionConflicto}}" 
+                label-hint="Descripción del Conflicto" 
+                rows="4"
+                readonly>-->
+            </oj-c-text-area>
+        </oj-c-form-layout>
+    </div>
+
+    <!--<div class="oj-panel oj-sm-margin-2x-vertical">
+        <h4 class="oj-typography-subheading-xs">Datos del Usuario</h4>
+            <oj-module id="usuario" config="[[moduleInfoPersona('Usuario')]]"></oj-module>
+
+        <h4 class="oj-typography-subheading-xs">Datos del Invitado</h4>
+            <oj-module id="invitado" config="[[moduleInfoPersona('Invitado')]]"></oj-module>
+    </div>-->
+</oj-bind-if>
