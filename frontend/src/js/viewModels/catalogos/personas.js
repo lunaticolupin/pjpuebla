@@ -55,6 +55,9 @@ function (accUtils, $, config, utils, ko, ArrayDataProvider, ModuleElementUtils,
 
             this.detallePersona = (event, data) =>{
                 if(data.item.data){
+
+                    document.getElementById("clave").val(data.item.data.clave)
+                    getEleme
                     self.personaSeleccionada(data.item.data);
                     //this.muestraDetalle();
                 }

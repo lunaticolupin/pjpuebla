@@ -104,7 +104,6 @@ public class Usuario implements Serializable{
 			passwdCifrado=null;
             e.printStackTrace();
         }
-
 		return passwdCifrado;
 	}
 
