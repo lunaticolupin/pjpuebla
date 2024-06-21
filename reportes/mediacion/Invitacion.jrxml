@@ -12,6 +12,9 @@
 	<parameter name="p_url_check" class="java.lang.String">
 		<defaultValueExpression><![CDATA["http://www.pjpuebla.gob.mx/validaDocumento"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="p_image_path" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["images"]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[select q.*, sa.id doc_id, sa.fecha_creacion, qar.*  
  from mediacion.qry_solicitud q
@@ -231,7 +234,7 @@
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<image scaleImage="RealSize">
 				<reportElement x="-8" y="4" width="502" height="656" uuid="f6d88f18-fa64-4a1f-9b17-c8b462420cf4"/>
-				<imageExpression><![CDATA["images/fondo_centro_justicia.png"]]></imageExpression>
+				<imageExpression><![CDATA[$P{p_image_path}+"/fondo_centro_justicia.png"]]></imageExpression>
 			</image>
 		</band>
 	</background>

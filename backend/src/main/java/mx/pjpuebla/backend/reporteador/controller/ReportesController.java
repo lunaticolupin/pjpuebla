@@ -53,7 +53,7 @@ public class ReportesController {
                 throw new java.io.IOException(String.format("El reporte: %s,  no existe", reporte));
             }
 
-            //parametros.put(JRParameter.REPORT_LOCALE, new Locale("es","MX"));
+            parametros.put("p_image_path", reportes.getJasperImages() );
 
             reportes.setParametros(parametros);
 
