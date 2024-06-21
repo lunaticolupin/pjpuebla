@@ -22,7 +22,6 @@ public class PersonaService {
     public Persona save(Persona p){
         return this.repo.save(p);
     }
-
     
     public Persona findById(Integer id){
         Optional<Persona> persona = this.repo.findById(id);
@@ -37,9 +36,10 @@ public class PersonaService {
     public boolean delete(Persona p){
         try{
             this.repo.delete(p);
+            
             return true;
         }catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
         
@@ -48,5 +48,18 @@ public class PersonaService {
     public boolean existsByID(Integer id){
         return this.repo.existsById(id);
     }
+
+    public Persona findByCurpOrRfc(String valor){
+        
+        if(this.repo.existsByCurp(valor)){
+            return this.repo.findByCurp(valor);
+        }
+
+        if(this.repo.existsByRfc(valor)){
+            return this.repo.findByRfc(valor);
+        }
+
+        return null;
+    }   
 
 }

@@ -1,8 +1,10 @@
-define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
-    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'sweetalert',
-    'oj-c/text-area', 'ojs/ojtoolbar'
+define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime', 
+    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider',
+    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker','oj-c/select-single', 'oj-c/checkbox', 'ojs/ojvalidationgroup', 'sweetalert',
+    'oj-c/text-area', 'ojs/ojtoolbar', 'oj-c/radioset','ojs/ojradioset','ojs/ojtoolbar', "oj-c/list-item-layout", "oj-c/list-view", "ojs/ojswitch"
 ],
- function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1) {
+ function(accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator, 
+    signals, ListDataProviderView, ojdataprovider_1) {
     class MediacionViewModel {
          constructor() {
             var self = this;
@@ -30,9 +32,30 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.solicitudEstatus = ko.observable();
             self.solicitudTipoApertura = ko.observable();
             self.solicitudTipoAperturaId = ko.observable();
-            self.solicitudNueva = ko.observable(false);
+            self.solicitudDetalle = ko.observable(false);
+            self.solicitudMediable = ko.observable();
+            self.solicitudCanalizada = ko.observable();
             self.usuarioPM = ko.observable(false);
             self.invitadoPM = ko.observable(false);
+            self.tipoPersonaSeleccionada=ko.observable();
+            self.personaSeleccionada = ko.observable();
+            self.solicitudProtocoloViolencia =ko.observable();
+            self.mostrarForm = ko.computed(()=>{
+                if (self.solicitudSeleccionada() || self.solicitudDetalle())
+                    return true;
+            });
+
+            self.mostrarDocMed=ko.computed(()=>{
+                return !self.solicitudMediable();
+            });
+
+            self.mostrarDocNoMed=ko.computed(()=>{
+                if (self.solicitudMediable()==undefined || self.solicitudMediable==null || self.solicitudMediable()){
+                    return true;
+                }
+
+                return false;
+            });
 
             /** Catalogos */
             self.materias = ko.observableArray();
@@ -43,16 +66,67 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 ]
             );
 
+            self.estadoSolicitud = ko.observableArray([
+                {value: 0, label: 'En Recepción'},
+                {value: 1, label: "Por Determinar"}, 
+                {value: 2, label: "Mediable"},
+                {value: 3, label: "No Mediable"}
+            ]);
+
+            self.esMediableArray = [
+                {value: 0, label: "No"},
+                {value: 1, label: "Si"}
+            ];
+
+
+            self.documentos = ko.observableArray([
+                {value: 1, label: "Solicitud", disabled: ko.observable(false), filename: ko.observable(), printEnabled: ko.observable(true)},
+                {value: 2, label: "1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 3, label: "Acuse 1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 4, label: "Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 5, label: "Acuse Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable()},
+                {value: 6, label: "Canalización", disabled: self.mostrarDocNoMed, filename: ko.observable(),printEnabled: ko.observable()}
+            ]);
+
+            self.protocoloViolencia = [
+                {value: null, label: "N/A"},
+                {value: "DV", label: "De violencia"},
+                {value: "CV", label: "Con violencia"}
+            ]
+
+            /** variables y funciones Knockout */
+            this.userInfoSignal = new signals.Signal();
+            this.dataPDF = ko.observable();
+            this.groupValid = ko.observable();
+            this.frameHabilitado = rootViewModel.pdfViewerEnable;
+            this.filtro = ko.observable();
+
             /** Data Providers */
-            self.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
+            // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
             this.materiasDP = new ArrayDataProvider(self.materias, {keyAttributes:'id'});
             this.tipoAperturaDP = new ArrayDataProvider(self.tipoAperturas, {keyAttributes: 'id'});
-            
+            this.estadoSolicitudDP = new ArrayDataProvider(self.estadoSolicitud, {keyAttributes: 'value'});
+            this.esMediableDP = new ArrayDataProvider(self.esMediableArray, {keyAttributes: 'value'});
+            this.protocoloViolenciaDP = new ArrayDataProvider(self.protocoloViolencia, {keyAttributes: 'value'});
+            this.documentosDP = ko.computed(()=>{
+                let documentosEnabled = self.documentos().filter((item)=>item.disabled()==false);
 
-            self.mostrarForm = ko.computed(()=>{
-                if (self.solicitudSeleccionada() || self.solicitudNueva())
-                    return true;
+                return new ArrayDataProvider(documentosEnabled, {keyAttributes: 'value'});
             });
+
+            this.dataProvider = ko.computed(()=>{
+                let criterio = null;
+
+                if (this.filtro() && this.filtro()!=''){
+                    criterio = ojdataprovider_1.FilterFactory.getFilter({
+                        filterDef: {text: this.filtro()}
+                    })
+                }
+
+                const dataProvider = new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'});
+
+                return new ListDataProviderView(dataProvider, {filterCriterion: criterio});
+            }, this);
 
             this.dateConverter = ((fecha)=>{
                 return utils.parseFecha(fecha);
@@ -63,6 +137,26 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 pattern: 'dd/MM/yyyy'
             }));
 
+            this.dateTimeConverterInput = ko.observable(new ojconverter_datetime_1.IntlDateTimeConverter({
+                timeZone: 'America/Mexico_City',
+                pattern: 'dd/MM/yyyy hh:mm'
+            }));
+
+            this.maxFecha = new Date().toISOString();
+            this.minFecha = ko.computed(()=>{
+                let d = new Date();
+                let numDias = 1;
+
+                if (d.getDay()==1){
+                    numDias = 3;
+                }
+
+                d.setDate(d.getDate()-numDias);
+
+                return d.toISOString().split('T')[0];
+            }, this);
+            
+
             /** Eventos  */
 
             this.firstSelectedRowChangedListener = ((event) => {
@@ -72,6 +166,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     const solicitud = itemContext.data;
 
                     self.parseSolicitud(solicitud);
+                    self.solicitudDetalle(true);
                 }
             });
 
@@ -101,19 +196,84 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 if (itemContext){
                     switch (id) {
-                        case 'usuarioPM': self.usuarioPM(itemContext.value); break;
-                        case 'invitadoPM': self.invitadoPM(itemContext.value); break;
+                        case 'UsuarioPM': self.usuarioPM(itemContext.value); break;
+                        case 'InvitadoPM': self.invitadoPM(itemContext.value); break;
                     }
                 }
             }
+
+            this.handleValueChanged = () =>{
+                this.filtro(document.getElementById('filtro').rawValue);
+            }
+
+            this.moduleInfoPersona = ((tipo)=>{
+                let viewPromise = ModuleElementUtils.createView({
+                    viewPath: "views/mediacion/persona.html",
+                });
+
+                return viewPromise.then((personaView) => {
+                    return {
+                        view: personaView,
+                        viewModel: {
+                            persona: (tipo=='Usuario') ? self.solicitudUsuario : self.solicitudInvitado,
+                            moral: (tipo=='Usuario') ? self.usuarioPM : self.invitadoPM,
+                            tipoPersona: tipo,
+                            valueChangeHandler: this.valueChangeHandler,
+                            btnFindPersona: this.btnFindPersona,
+                            btnPersonaDetalle: this.btnPersonaDetalle,
+                            groupValid: this.groupValid,
+                            curpValidator: this.curpValidator
+                        },
+                    };
+                }, (error) => {
+                    Logger.error("Error during loading view: " + error.message);
+                    return {
+                        view: [],
+                    };
+                });
+            });
+
+            this.moduleDetallePersona = ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: this.userInfoSignal}})
+
+            this.requeridoValidator = [
+                new RequiredValidator({
+                    hint: "Dato Requerido",
+                    messageDetail: "Proporcione el dato para el campo '{label}'",
+                    messageSummary: "'{label}' es requerido",
+                })
+            ];
+
+            this.curpValidator = [
+                new AsyncRegExpValidator({
+                    pattern: '^([A-Z][AEIOUX][A-Z]{2}\\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\\d])(\\d)$',
+                    messageDetail: 'Error en la CURP'
+                })
+            ];
+
+            this.rfcValidator = [
+                new AsyncRegExpValidator({
+                    pattern: '([A-ZÑ]|\\&){3,4}[0-9]{2}(0[1-9]|1[0-2])([12][0-9]|0[1-9]|3[01])[A-Z0-9]{3}$',
+                    messageDetail: 'Error en el RFC'
+                })
+            ];
+
+            ko.computed(() => {
+                this.userInfoSignal.dispatch(self.personaSeleccionada(),"mediacionSolicitud");
+            }, this);
+
 
             this.connected = () => {
                 accUtils.announce('Mediacion page loaded.', 'assertive');
                 document.title = "Mediación";
 
-                self.getMaterias();
-                self.getSolicitudes();
-                // Implement further logic if needed
+                utils.waiting();
+
+                Promise.all([
+                    self.getMaterias(),
+                    self.getSolicitudes()
+                ]).finally(()=>{
+                    utils.waiting(true);
+                });
             };
 
             /**
@@ -131,15 +291,11 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 // Implement if needed
             };
 
-            self.detalleSolicitud = ((event, context)=>{
-                this.editRow({ rowKey: context.key });
-            });
-
             self.parseSolicitud =((solicitud)=>{
                 self.solicitudId(solicitud.id);
                 self.solicitudFolio(solicitud.folio);
                 self.solicitudFecha(solicitud.fechaSolicitud);
-                self.solicitudEsMediable(solicitud.esMediable);
+                self.solicitudMediable(solicitud.esMediable);
                 self.solicitudCanalizada(solicitud.canalizado);
                 self.solicitudUsuario(solicitud.usuarioPersona);
                 self.usuarioPM(solicitud.usuarioPersona.personaMoral);
@@ -147,18 +303,24 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 self.invitadoPM(solicitud.invitadoPersona.personaMoral);
                 self.solicitudMateria(solicitud.materia);
                 self.solicitudMateriaId(solicitud.materia.id);
-                self.solicitudFechaSesion(solicitud.fechaSesion);
+                self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
                 self.solicitudDescripcion(solicitud.descripcionConflicto);
                 self.solicitudEstatus(solicitud.estatus);
                 self.solicitudTipoApertura(solicitud.tipoApertura);
                 self.solicitudTipoAperturaId(solicitud.tipoApertura.id);
+
+                if (self.solicitudFechaSesion()){
+                    let doc= this.documentos().find((element)=>element.value==2);
+
+                    doc.printEnabled(true);
+                }
             });
 
             self.fromSolicitud = (()=>{
                 let solicitud = {
                     folio: 'NUEVA',
                     fechaSolicitud: self.solicitudFecha(),
-                    esMediable: self.solicitudEsMediable(),
+                    esMediable: self.solicitudMediable(),
                     canalizado: self.solicitudCanalizada(),
                     usuarioPersona: self.solicitudUsuario(),
                     invitadoPersona: self.solicitudInvitado(),
@@ -171,18 +333,66 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 return solicitud;
             });
 
-            self.nuevaSolicitud = ((event)=>{
-                self.solicitudNueva(true);
-                self.getJSONTemp();
+            self.solicitudDetalle.subscribe((data)=>{
+                if (data){
+                    $('#solicitudes').hide();
+                    return;
+                }
 
-                $('#solicitudes').hide();
+                $('#solicitudes').show();
             });
 
-            self.guardarSolicitud = ((event)=>{
+            self.solicitudProtocoloViolencia.subscribe((data)=>{
+
+                switch(data){
+                    case "CV": self.solicitudMediable(0); break;
+                    case "DV": self.solicitudMediable(1); break;
+                    default: self.solicitudMediable(1);
+                }
+            })
+
+            /** Botones */
+
+            self.btnNuevaSolicitud = ((event)=>{
+                self.solicitudDetalle(true);
+                self.getJSONTemp();
+            });
+            
+            self.btnPersonaDetalle= ((event)=>{
+
+                const target = event.srcElement.id;
+
+                if (!target){
+                    return false;
+                }
+
+                const tipoPersona = target.replace("detalle","");
+
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(tipoPersona);
+
+                if (tipoPersona=='Usuario'){
+                    self.personaSeleccionada(self.solicitudUsuario());
+                }
+
+                if (tipoPersona=='Invitado'){
+                    self.personaSeleccionada(self.solicitudInvitado());
+                }
+
+                document.getElementById("modalPersona").open();
+            });
+
+            self.btnGuardarSolicitud = ((event)=>{
+                const valid = this._checkValidationGroup();
+
+                if (!valid) {
+                    return false;
+                }
+
                 self.postSolicitud();
             });
 
-            self.cancelarSolicitud = (()=>{
+            self.btnCancelarSolicitud = (()=>{
                 const element = document.getElementById('solicitudes');
                 const currentRow = element.currentRow;
 
@@ -191,12 +401,14 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 }
                 
                 self.solicitudSeleccionada(null);
-
-                $('#solicitudes').show();
+                self.solicitudDetalle(false);
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(null);
             });
 
-            self.editarSolicitud = ((event, detail)=>{
+            self.btnEditarSolicitud = ((event, detail)=>{
 
+                self.solicitudDetalle(true);
                 self.solicitudSeleccionada({key: detail.item.key, data:detail.item.data});
                 self.parseSolicitud(detail.item.data);              
 
@@ -208,30 +420,113 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 element.selected = seleccion;
             });
 
-            
+            this.btnClose=(event, detail)=> {
+                const modalId = event.srcElement.offsetParent.id;
 
-            this.close=(event)=> {
-                document.getElementById("modalDialog1").close();
+                if (modalId){
+                    if (modalId == 'modalPersona'){
+                        const url = config.baseEndPoint + '/personas/' + self.personaSeleccionada().id;
+
+                        self.getPersona(url).then((response)=>{
+                            if (self.tipoPersonaSeleccionada()=='Usuario'){
+                                self.solicitudUsuario(response);
+                            }
+
+                            if (self.tipoPersonaSeleccionada()=='Invitado'){
+                                self.solicitudInvitado(response);
+                            }
+                        }).catch((errors)=>{
+                            console.log(errors);
+                        });
+                    }
+                    document.getElementById(modalId).close();
+                }
             }
 
-            this.open= (event, detail) => {
-                self.getReporte(detail.item.data).then(result => {
-                    document.getElementById("modalDialog1").open();
+            this.btnOpen= (event, detail) => {
+                let solicitud;
+                const element = event.srcElement.id;
+
+                if (element == "btnImprimir"){
+                    solicitud = self.solicitudSeleccionada().data;
+                }else{
+                    solicitud = detail.item.data;
+                }               
+
+                self.getReporte(solicitud).then(response => {
+                    this.dataPDF(response);
+
+                    if (this.frameHabilitado()){
+                        document.getElementById("modalPDF").open();
+                        return true;
+                    }
+
+                    document.getElementById("btnDescargarPdf").click();
                 })
-                .catch(response => {
-                    console.log(response);
-                    swal(response.message, JSON.stringify(response.errors), "error");
+                .catch(error => {
+                    console.log(error);
+                    swal(error.message, JSON.stringify(error.errors), "error");
                 });
             }
 
-            this.dataPDF = ko.observable();
+            self.btnFindPersona = ((event)=>{
+
+                const tipoPersona = event.srcElement.id;
+
+                self.personaSeleccionada(null);
+                self.tipoPersonaSeleccionada(tipoPersona.replace("busca",""));
+
+                const inputValor = new Promise((resolve, reject )=>{
+                    swal({
+                        title:"Buscar Persona",
+                        content:{
+                            element: "input",
+                            attributes: {
+                                placeholder:"CURP o RFC",
+                                type: "text"
+                            },
+                        },
+                    }).then((respuesta)=>{
+                        if (respuesta && respuesta.length>0){
+                            resolve(respuesta);
+                        }else{
+                            reject(null);
+                        }
+                    });
+                });
+                
+                inputValor.then((data)=>{
+                    const url = config.baseEndPoint + "/personas/find?value="+data;
+
+                    self.getPersona(url).then((resolve, reject)=>{
+                        utils.confirmar('Persona encontrada', `¿Selecciona a ${data} - ${resolve.nombreCompleto} como - ${self.tipoPersonaSeleccionada()}?`)
+                            .then((confirmacion)=>{
+                                if(confirmacion){
+                                    if (this.tipoPersonaSeleccionada()=='Usuario'){
+                                        self.solicitudUsuario(resolve);
+                                    }
+                                    
+                                    if (this.tipoPersonaSeleccionada()=='Invitado'){
+                                        self.solicitudInvitado(resolve);
+                                    }
+                                }
+                            })
+                            .catch((errors)=>{
+                                swal('Persona', JSON.stringify(errors), 'error');
+                            });
+                    }).catch((errors)=>{
+                        console.log(errors);
+                    });
+                });
+                
+            });
 
             /** REST */
             self.getSolicitudes = (()=>{
                 const url = self.urlBase + '/solicitud';
                 self.solicitudes([]);
 
-                utils.getData(url, {}).then((response) => {
+                return utils.getData(url, {}).then((response) => {
                     if (response.success){
                         self.solicitudes(response.data);
                     }
@@ -241,7 +536,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.getMaterias = (()=>{
                 const url = config.baseEndPoint + '/materias';
                 
-                utils.getData(url, {}).then((response)=>{
+                return utils.getData(url, {}).then((response)=>{
                     if (response.success){
                         self.materias(response.data);
                     }
@@ -253,7 +548,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 utils.getData(url,{}).then((response)=>{
                     if (response.success){
-                        self.solicitudSeleccionada(response.data);
+                        self.solicitudSeleccionada(response);
                         self.parseSolicitud(response.data);
                     }
                 })
@@ -263,22 +558,29 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
 
-                utils.postData(url, data).then((response)=>{                    
-                    if (response.success){
-                        const folio = response.data.folio;
-
-                        self.getSolicitudes();
-                        swal("Solicitud Registrada","Folio: " + folio, "success");
-                        
-                        return true;
+                utils.confirmar('Solicitud').then((confirmacion)=>{
+                    if (confirmacion){
+                        utils.postData(url, data).then((response)=>{                    
+                            if (response.success){
+                                const folio = response.data.folio;
+        
+                                self.getSolicitudes();
+                                self.solicitudSeleccionada(response);
+                                self.parseSolicitud(response.data);
+                                
+                                swal("Solicitud Registrada","Folio: " + folio, "success");
+        
+                                return true;
+                            }
+        
+                            const errores = JSON.stringify(response.errors);
+                            swal(response.message, errores, "error");
+                        }).catch((response)=>{
+                            const errores = JSON.stringify(response);
+                            
+                            swal("Error al procesar la petición", errores, "error");
+                        });
                     }
-
-                    const errores = JSON.stringify(response.errors);
-                    swal(response.message, errores, "error");
-                }).catch((response)=>{
-                    const errores = JSON.stringify(response);
-                    
-                    swal("Error al procesar la petición", errores, "error");
                 });
             });
 
@@ -287,22 +589,31 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     "p_solicitud_id": data.id
                 };
 
-                const url = config.baseEndPoint + '/reportes/MediacionSolicitud';
+                const url = config.baseEndPoint + '/reportes/mediacion/Solicitud';
 
                 this.dataPDF(null);
 
                 return new Promise ((resolve, reject)=>{
                     utils.getReporte(url, params).then((response)=>{
 
-                        if (response.success!=undefined && response.success==false){    
+                        if (response.hasOwnProperty("error")){    
                             reject(response);
                         }
+
+                        const reader = new FileReader();
+
+                        reader.readAsArrayBuffer(response);
+                        reader.onload = ((e)=>{
+                            const buffer = e.target.result;
+                            const fileBlob = new Blob([new Uint8Array(buffer)],{
+                                type: "application/pdf"
+                            })
+
+                            resolve(window.URL.createObjectURL(fileBlob));
+                        });
+
     
-                        const blobUrl = URL.createObjectURL(response);
-    
-                        this.dataPDF(blobUrl+"#view=FitH");
-    
-                        resolve(true);
+                        //resolve(true);
     
                     }).catch(errors =>{
                         console.log(errors);
@@ -311,7 +622,63 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 });
 
             });
-         }
+
+            self.getPersona=((url)=>{
+
+                if (url){
+                    utils.waiting();
+
+                    return new Promise((resolve, reject) => {
+                        utils.getData(url, {})
+                        .then((response)=>{
+                            utils.waiting(true);
+
+                            if (response.success){
+                                resolve(response.data);
+                            }else{
+                                swal('Persona', JSON.stringify(response.message), 'error');
+                                reject(response.errors);
+                            }
+                        })
+                        .catch((errors)=>{
+                            utils.waiting(true);
+                            swal('Persona', JSON.stringify(errors), 'error');
+                        });
+                    });
+                }
+            });
+
+        }
+
+        _checkValidationGroup() {
+            const solicitud = document.getElementById('trackerSolicitud');
+            const usuario = document.getElementById('trackerUsuario');
+            const invitado = document.getElementById('trackerInvitado');
+
+            console.log(solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid');
+
+            if (solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid') {
+                return true;
+            }
+            else {
+                solicitud.showMessages();
+                usuario.showMessages();
+                invitado.showMessages();
+
+                if (solicitud.valid!=='valid'){
+                    solicitud.focusOn('@firstInvalidShown');
+                }
+
+                if (usuario.valid!=='valid'){
+                    usuario.focusOn('@firstInvalidShown');
+                }
+
+                if (invitado.valid!=='valid'){
+                    invitado.focusOn('@firstInvalidShown');
+                }
+                return false;
+            }
+        }
      }
 
     /*

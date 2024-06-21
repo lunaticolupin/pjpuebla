@@ -1,7 +1,12 @@
 <div id="formLogin" class="oj-panel">
-    <oj-c-form-layout max-columns="1" direction="row">
-        <oj-c-input-text label-hint="Nombre de Usuario" value="{{userName}}" required autofocus="true" ></oj-c-input-text>
-        <oj-c-input-password id="passwd" label-hint="Password" clear-icon="conditional" value="{{passwd}}" required></oj-c-input-password>
-        <oj-c-button label="Ingresar" chroming="callToAction" on-oj-action="[[iniciarSesion]]"><span slot="startIcon" class="oj-ux-ico-log-in"></span></oj-c-button>
-    </oj-c-form-layout>
+    <oj-validation-group
+            id="trackerLogin"
+            valid="{{groupValid}}"
+            role="group">
+        <oj-c-form-layout max-columns="1" direction="row">
+            <oj-c-input-text id="nombreUsuario" label-hint="Nombre de Usuario" value="{{userName}}" required required-message-detail="Dato requerido" ></oj-c-input-text>
+            <oj-c-input-password id="passwd" label-hint="Password" clear-icon="conditional" value="{{passwd}}" required on-keypress="[[keyPress]]" required-message-detail="Dato requerido"></oj-c-input-password>
+            <oj-c-button label="Ingresar" chroming="callToAction" on-oj-action="[[iniciarSesion]]"><span slot="startIcon" class="oj-ux-ico-log-in"></span></oj-c-button>
+        </oj-c-form-layout>
+    </oj-validation-group>
 </div>

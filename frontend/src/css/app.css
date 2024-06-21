@@ -72,6 +72,24 @@ html[dir="rtl"] .logo-pjpuebla {
       -webkit-transform:translate(-25%, -25%) scale(0.5);
       transform:translate(-25%, -25%) scale(0.5)
   }
+
+  .app-logo.op-gestion:before {
+    content:url("images/gestion.png");
+    -webkit-transform:translate(-25%, -25%) scale(0.5);
+      transform:translate(-25%, -25%) scale(0.5)
+  }
+  
+  .app-logo.op-estadistica:before {
+    content:url("images/estadistica.png");
+    -webkit-transform:translate(-25%, -25%) scale(0.5);
+      transform:translate(-25%, -25%) scale(0.5)
+  }
+  
+  .app-logo.op-transparencia:before {
+    content:url("images/avatar_24px.png");
+    -webkit-transform:translate(-25%, -25%) scale(0.5);
+      transform:translate(-25%, -25%) scale(0.5)
+  }
 }
 
 #formLogin{
@@ -80,7 +98,7 @@ html[dir="rtl"] .logo-pjpuebla {
 }
 
 header[role="banner"]{
-  min-height: 100px;
+  min-height: 50px;
 }
 
 #overlay{	
@@ -113,4 +131,89 @@ header[role="banner"]{
 }
 .is-hide{
   display:none;
+}
+
+.swal-title{
+  font-family: var(--oj-html-font-family);
+  font-weight: var(--oj-collection-header-font-weight);
+}
+
+.swal-content input{
+  font-family: var(--oj-html-font-family);
+  font-size: var(--oj-text-field-font-size);
+  height: var(--oj-text-field-height);
+  color: var(--oj-text-field-text-color);
+  background-color: var(--oj-text-field-bg-color);
+  border-color: var(--oj-text-field-border-color);
+  border-radius: var(--oj-text-field-border-radius);
+  border-width: var(--oj-text-field-border-width);
+}
+
+.swal-content input:focus{
+  border-color: var(--oj-text-field-border-color-focus);
+  box-shadow: var(--oj-text-field-box-shadow-focus);
+}
+
+.swal-button {
+  border: 1px solid;
+  border-radius: var(--oj-button-border-radius);
+  border-color: var(--oj-button-outlined-chrome-border-color);
+  background-color: var(--oj-button-outlined-chrome-bg-color);
+  font-family: var(--oj-html-font-family);
+  font-size: var(--oj-button-font-size);
+  font-weight: var(--oj-button-font-weight);
+  height: var(--oj-button-height);
+  color: var(--oj-button-outlined-chrome-text-color);
+}
+
+.swal-button--confirm{
+    background-color: var(--oj-button-call-to-action-chrome-bg-color);
+    border-color: var(--oj-button-call-to-action-chrome-border-color);
+    color: var(--oj-button-call-to-action-chrome-text-color);
+}
+
+.swal-button:not([disabled]):hover{
+  background-color: var(--oj-button-outlined-chrome-bg-color-hover);
+}
+
+.swal-button--confirm:not([disabled]):hover{
+  background-color: var(--oj-button-call-to-action-chrome-bg-color);
+}
+
+.tabla{
+  width: 100%; 
+  height: 27rem;
+}
+
+/*Drawers*/
+.pjpue-drawer-header {
+  display: flex;
+  padding: 0.3rem 1rem 0 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pjpue-card-content {
+  width: 9rem;
+  height: 9rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.app-logo {
+  width:64px;
+  height:64px;
+  text-align: center;
+}
+
+.app-logo.op-gestion:before {
+  content:url("images/gestion.png");
+}
+
+.app-logo.op-estadistica:before {
+  content:url("images/estadistica.png");
+}
+
+.app-logo.op-transparencia:before {
+  content:url("images/transparencia.png");
 }

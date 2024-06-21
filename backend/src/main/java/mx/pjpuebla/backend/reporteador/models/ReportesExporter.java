@@ -60,6 +60,13 @@ public class ReportesExporter {
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
         exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(out));
 
+        SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+        exportConfig.setMetadataAuthor("PJPuebla");
+        exportConfig.setEncrypted(true);
+        exportConfig.setAllowedPermissionsHint("PRINTING");
+
+        exporter.setConfiguration(exportConfig);
+
         try{
             exporter.exportReport();
 
@@ -70,20 +77,13 @@ public class ReportesExporter {
 
             return null;
         }
-        
     }
-
-
 
     public JasperPrint getJasperPrint() {
         return jasperPrint;
     }
 
-
-
     public void setJasperPrint(JasperPrint jasperPrint) {
         this.jasperPrint = jasperPrint;
     }
-
-
 }

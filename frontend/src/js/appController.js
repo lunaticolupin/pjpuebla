@@ -9,7 +9,7 @@
  * Your application specific code will go here
  */
 define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknockouttemplateutils', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojknockoutrouteradapter', 'ojs/ojurlparamadapter', 'ojs/ojresponsiveutils', 'ojs/ojresponsiveknockoututils', 'ojs/ojarraydataprovider','sesion',
-        'ojs/ojdrawerpopup', 'ojs/ojmodule-element', 'ojs/ojknockout'],
+        'ojs/ojdrawerpopup', 'ojs/ojmodule-element', 'ojs/ojknockout','ojs/ojactioncard'],
   function(ko, Context, moduleUtils, KnockoutTemplateUtils, CoreRouter, ModuleRouterAdapter, KnockoutRouterAdapter, UrlParamAdapter, ResponsiveUtils, ResponsiveKnockoutUtils, ArrayDataProvider, Sesion) {
 
      function ControllerViewModel() {
@@ -32,6 +32,7 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       this.smScreen = ResponsiveKnockoutUtils.createMediaQueryObservable(smQuery);
       const mdQuery = ResponsiveUtils.getFrameworkQuery(ResponsiveUtils.FRAMEWORK_QUERY_KEY.MD_UP);
       this.mdScreen = ResponsiveKnockoutUtils.createMediaQueryObservable(mdQuery);
+      this.pdfViewerEnable = ko.observable(window.navigator.pdfViewerEnabled);
 
       let navData = [
         { path: '', redirect: 'login' },
@@ -63,6 +64,7 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
 
       // Drawer
       self.sideDrawerOn = ko.observable(false);
+      self.sideDrawerOnApps = ko.observable(false);
 
       // Close drawer on medium and larger screens
       this.mdScreen.subscribe(() => { self.sideDrawerOn(false) });
@@ -70,6 +72,10 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
       // Called by navigation drawer toggle button and after selection of nav drawer item
       this.toggleDrawer = () => {
         self.sideDrawerOn(!self.sideDrawerOn());
+      }
+
+      this.toggleDrawerApps = () => {
+        self.sideDrawerOnApps(!self.sideDrawerOnApps());
       }
 
       // Header
@@ -102,6 +108,12 @@ define(['knockout', 'ojs/ojcontext', 'ojs/ojmodule-element-utils', 'ojs/ojknocko
           this.router.go({path: 'login'});
         }
 
+      });
+
+      this.startToggle = () => this.startOpened(!this.startOpened());
+
+      window.addEventListener("resize", (e)=>{
+        this.pdfViewerEnable(window.navigator.pdfViewerEnabled);
       });
 
      }

@@ -71,6 +71,36 @@
 			<version>6.21.2</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcutil-jdk18on -->
+		<!-- Funciones de Fecha para JasperReports-->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcutil-jdk18on</artifactId>
+			<version>1.78</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/com.singingbush/barcode4j -->
+		<!-- QR JasperReports -->
+		<dependency>
+			<groupId>com.singingbush</groupId>
+			<artifactId>barcode4j</artifactId>
+			<version>2.2.3</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-bridge -->
+		<!-- QR JasperReports -->
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-bridge</artifactId>
+			<version>1.17</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>75.1</version>
+		</dependency>
 
 		<!--<dependency>
 			<groupId>org.springframework.security</groupId>

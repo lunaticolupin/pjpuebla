@@ -87,6 +87,14 @@ public class Persona implements Serializable {
 		return fullName();
 	}
 
+	private String celular;
+	private String ocupacion;
+	private Integer escolaridad;
+	private String numIdentificacion;
+
+	@Column(name="identificacion_id")
+	private Integer tipoIdentificacion;
+
 	public String fullName(){
 		if (personaMoral){
 			return nombre;

@@ -1,5 +1,5 @@
 define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
-    'oj-c/form-layout', 'oj-c/input-text', 'oj-c/button', 'oj-c/input-password', ], 
+    'oj-c/form-layout', 'oj-c/input-text', 'oj-c/button', 'oj-c/input-password', 'ojs/ojvalidationgroup' ], 
 (accUtils, config, utils, ko, Sesion) =>{
     class LoginViewModel{
         constructor (params){
@@ -9,7 +9,7 @@ define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
 
             self.userName = ko.observable();
             self.passwd = ko.observable();
-            
+            this.groupValid = ko.observable();           
 
             self.login = ((loginData)=>{
                 const url = config.baseEndPoint + '/session/login';
@@ -19,6 +19,7 @@ define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
                 utils.postData(url, loginData).then((response)=>{
                     let mensaje = response.message;
                     const evento = response.success?'success':'warning';
+                    const errores = response.success?'':JSON.stringify(response.errors);
 
                     if (response.success){
                         Sesion.setData('credenciales', response.data);
@@ -30,11 +31,7 @@ define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
                         }
                     }
 
-                    if (response.errors){
-                        mensaje += '. ' + response.errors
-                    }
-
-                    swal('Inicio de sesión', mensaje, evento);
+                    swal(mensaje, errores, evento);
 
                     this.validaSesion();
                 }).catch((error)=>{
@@ -50,15 +47,21 @@ define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
                     rootViewModel.userName(email);
                     router.go({path: 'dashboard'});
                 }
+
+                document.getElementById('trackerLogin').focusOn('nombreUsuario');
             })
 
             this.iniciarSesion = ((event)=>{
+                const valid = utils.checkValidationGroup('trackerLogin');
+
                 const loginData = {
                     username: self.userName(),
                     password: self.passwd()
                 }
 
-                self.login(loginData);
+                if (valid){
+                    self.login(loginData);
+                }                
             });
 
             this.connected  = (()=>{
@@ -66,7 +69,13 @@ define(['accUtils', 'webConfig', 'utils', 'knockout', 'sesion','sweetalert',
                 document.title = "Inicio de Sesión";
 
                 this.validaSesion();
-            })
+            });
+
+            this.keyPress = ((event)=>{
+                if (event.charCode == 13){
+                    this.iniciarSesion();
+                }
+            });
         }
     }
 

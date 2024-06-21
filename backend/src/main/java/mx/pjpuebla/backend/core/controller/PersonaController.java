@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -115,14 +117,34 @@ public class PersonaController {
             }
 
             throw new SQLException("No se pudo eliminar el ID");
-    
             
         }catch (Exception e){
-            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+            response.setMessage(e.getMessage());
+            //response.setErrors(personas.getErrores());
             return ResponseEntity.internalServerError().body(response);
         }
         
     }
+
+    @GetMapping("/find")
+    public ResponseEntity<GenericResponse> buscarPersona(@RequestParam("value") String param) {
+        GenericResponse response = new GenericResponse();
+
+        Persona persona = personas.findByCurpOrRfc(param);
+
+        if (persona==null){
+
+            response.setMessage("No existe la entidad");
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.setSuccess(true);
+        response.setMessage("OK");
+        response.setData(persona);
+        return ResponseEntity.ok(response);
+    }
+    
 
 
 }

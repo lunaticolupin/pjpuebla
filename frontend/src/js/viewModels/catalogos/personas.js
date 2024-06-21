@@ -1,6 +1,6 @@
-define(['../../accUtils', 'webConfig', 'utils',  'knockout', 'ojs/ojarraydataprovider', 'ojs/ojmodule-element-utils', 'signals', 'text!models/persona.json',
+define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojarraydataprovider', 'ojs/ojmodule-element-utils', 'signals', 'text!models/persona.json',
 "ojs/ojknockout", "oj-c/button", "oj-c/checkbox",  'ojs/ojtable', 'ojs/ojmodule-element'], 
-function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, signals, PersonaModel ) {
+function (accUtils, $, config, utils, ko, ArrayDataProvider, ModuleElementUtils, signals, PersonaModel ) {
     class PersonalViewModel {
          constructor() {
             var self = this;
@@ -16,8 +16,8 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
             this.connected = () => {
                 accUtils.announce('Catalogos page loaded.', 'assertive');
                 document.title = "Catálogos / Personas";
-
                 self.getPersonas(self.baseUrl); 
+                this.muestraDetalle(false);
                 // Implement further logic if needed
             };
 
@@ -37,19 +37,26 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
             };
 
             self.getPersonas = (url, params = {}) => {
+                utils.waiting();
+
                 utils.getData(url, params).then((response)=>{
 
                     if (response.success){
-                        //console.log(response);
                         self.personas(response.data);
                     }
+
+                    utils.waiting(stop=true);
                     
-                }).catch(error => console.log(error));         
+                }).catch(error => {
+                    utils.waiting(stop=true);
+                    console.log(error)
+                });         
             }
 
             this.detallePersona = (event, data) =>{
                 if(data.item.data){
                     self.personaSeleccionada(data.item.data);
+                    //this.muestraDetalle();
                 }
             };
 
@@ -58,10 +65,39 @@ function (accUtils, config, utils, ko, ArrayDataProvider, ModuleElementUtils, si
                 self.personaSeleccionada(newPersona);
             };
 
-            ko.computed(()=>{
-                this.userInfoSignal.dispatch(self.personaSeleccionada());
+            this.muestraDetalle = (verDetalle=true) =>{
+
+                if (verDetalle){
+                    $("#personas").hide();
+                    $("#form-persona").show();
+                    return verDetalle;
+                }
+
+                $("#personas").show();
+                $("#form-persona").hide();
+                self.personaSeleccionada(null);
+            };
+
+            this.moduleDetallePersona = ModuleElementUtils.createConfig(
+                {name: 'catalogos/persona-detalle', 
+                params: {
+                    userInfoSignal: this.userInfoSignal, 
+                    getPersonas: this.getPersonas,
+                    muestraDetalle: this.muestraDetalle
+                }
             });
 
+            self.personaSeleccionada.subscribe((data)=>{
+                if(data){
+                    this.muestraDetalle();
+                }
+            })
+
+            ko.computed(()=>{
+                this.userInfoSignal.dispatch(self.personaSeleccionada(),"catalogoPersona");
+            });
+
+            
          }
     }
 
