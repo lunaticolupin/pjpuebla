@@ -24,6 +24,9 @@ public class Archivo implements Serializable {
     private Long id;
     private String nombre;
     private String tipo;
+
+    @JsonIgnore
     private byte[] data;
     private Date fechaCreacion;
+    private String firma;
 }

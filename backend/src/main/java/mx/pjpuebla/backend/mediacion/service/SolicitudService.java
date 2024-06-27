@@ -1,14 +1,12 @@
 package mx.pjpuebla.backend.mediacion.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
-import mx.pjpuebla.backend.core.entitiy.Usuario;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
 import mx.pjpuebla.backend.mediacion.repository.SolicitudRepository;
 import mx.pjpuebla.backend.models.SolicitudMediacionEstatus;
@@ -62,5 +60,24 @@ public class SolicitudService {
         }
 
         return solicitud.get().getEstatus()!= SolicitudMediacionEstatus.RECEPCION;
+    }
+
+    public Date generarFechaSesion(Integer solicitudId){
+        Date fechaSesion = this.repositorio.generarFechaSesion();
+        Optional<Solicitud> entity = this.repositorio.findById(solicitudId);
+
+        if (fechaSesion!=null && entity.isPresent()){
+            Solicitud solicitud = entity.get();
+
+            if (solicitud.getFechaSesion()!=null){
+                return solicitud.getFechaSesion();
+            }
+
+            solicitud.setFechaSesion(fechaSesion);
+            solicitud.setFechaActualizacion(new Date());
+            this.repositorio.save(solicitud);
+        }   
+
+        return fechaSesion;
     }
 }
