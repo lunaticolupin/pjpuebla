@@ -145,7 +145,7 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/save")
+    @PostMapping("/save/{id}")
     public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad) {
 
         //entidad.setFolio(solicitudes.generarFolio("CJA"));
@@ -191,6 +191,26 @@ public class SolicitudController {
         return ResponseEntity.badRequest().body(response);
     }
     
+    @PostMapping("/registrarDocumento/{id}")
+    public ResponseEntity<GenericResponse> registrarDocumento(@PathVariable("id") Integer solicitudId, @RequestParam("claveFormato") String claveFormato) {
+        GenericResponse response = new GenericResponse();
+        boolean result=false;
+
+        if (solicitudId!=null && !claveFormato.isEmpty()){
+            String usuario = "TEST";
+            String persona = "Rosa María Morales Cisneros";
+
+            result = solicitudes.registrarDocumento(solicitudId, claveFormato, usuario, persona);
+        }
+
+        if (result){
+            response.setMessage("Documento registrado");
+        }
+
+        response.setSuccess(result);
+        
+        return ResponseEntity.ok(response);
+    }
     
     
     @GetMapping("template")
@@ -209,6 +229,5 @@ public class SolicitudController {
 
         return ResponseEntity.ok(response);
     }
-    
     
 }

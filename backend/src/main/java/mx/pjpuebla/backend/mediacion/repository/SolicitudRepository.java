@@ -16,4 +16,10 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Integer> {
 
     @Query(value = "SELECT * FROM mediacion.fun_fecha_sesion()", nativeQuery = true)
     public Date generarFechaSesion();
+
+    @Query(value = "SELECT * FROM mediacion.fun_registra_archivo(:solicitudId, :claveFormato, :usuario, :personaFirma)", nativeQuery = true)
+    public boolean registrarDocumento(@Param("solicitudId") Integer solicitudId, 
+        @Param("claveFormato") String claveFormato, 
+        @Param("usuario") String usuario, 
+        @Param("personaFirma") String personaFirma);
 }

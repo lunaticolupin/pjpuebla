@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 //import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import mx.pjpuebla.backend.response.GenericResponse;
 
@@ -40,7 +41,7 @@ public class GlobalExceptionHandler{
         return new ResponseEntity<>(
             new GenericResponse(false,"ERROR. Faltan parámetros", Arrays.asList(e.getMessage()), null),status
         );
-    }
+    }*/
 
     //Mostrar mensaje de error en caso rebasar el tamaño de archivo
     @ExceptionHandler(MaxUploadSizeExceededException.class) 
@@ -52,7 +53,7 @@ public class GlobalExceptionHandler{
     }
 
     //Mostrar mensaje de error en caso de la falta de argumentos
-    @ExceptionHandler(IllegalArgumentException.class) 
+    /*@ExceptionHandler(IllegalArgumentException.class) 
     public ResponseEntity<GenericResponse> handleIllegalArgumentException(IllegalArgumentException e){
         HttpStatus status = HttpStatus.BAD_REQUEST; 
         return new ResponseEntity<>(

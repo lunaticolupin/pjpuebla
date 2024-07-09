@@ -80,4 +80,8 @@ public class SolicitudService {
 
         return fechaSesion;
     }
+
+    public boolean registrarDocumento(Integer solicitudId, String claveFormato, String usuario, String personaFirma){
+        return this.repositorio.registrarDocumento(solicitudId, claveFormato, usuario, personaFirma);
+    }
 }
