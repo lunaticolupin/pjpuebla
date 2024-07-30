@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invitacion" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="medicacion"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SegundaInvitacion" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Postgres Local"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="249"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="740"/>
@@ -247,7 +247,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["SERVICIOS GRATUITOS\n"+
 					"NUMERO DE SOLICITUD "+$F{folio}+"\n"+
-					"ASUNTO: INVITACIÓN "]]></textFieldExpression>
+					"ASUNTO: SEGUNDA INVITACIÓN"]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -267,15 +267,17 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="490" splitType="Stretch">
+		<band height="495" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="0" y="10" width="480" height="150" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999"/>
+				<reportElement x="0" y="10" width="480" height="190" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
 				<textElement textAlignment="Justified" markup="html">
 					<font size="11"/>
 					<paragraph lineSpacingSize="1.0"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Por medio del presente se le extiende un cordial una cordial invitación para que asista el día <u> " +$V{v_fecha_sesion}+"</u>  en las instalaciones del Centro de Justicia Alternativa del Poder Judicial del Estado de Puebla; para llevar a cabo una <b>MEDIACIÓN,</b> en donde se brindan las condiciones necesarias para resolver un conflicto a través del diálogo y encontrar soluciones voluntarias y justas para ambas partes, haciendo mención que en el servicio que se otorga es de manera gratuita, voluntaria, imparcial y confidencial.  <br><br> Su asistencia es muy importante a fin de lograr una solución pacífica a un conflicto de carácter <u>"+$F{materia} +"</u>, por lo que se solicita su <b>PUNTUAL</b> y <b>AMABLE</b> participación, presentando <b>original y copia simple de su identificación oficial vigente con fotografía y de algún comprobante domiciliario,</b> lo anterior expuesto con fundamento en lo establecido en los artículos 84, 85 y 86 de la Ley Orgánica del Poder Judicial del Estado de Puebla; 832, 833 y 835 del Código de Procedimientos Civiles del Estado.  "]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Por medio del presente se le extiende un cordial una cordial invitación para que asista el día <u> " +$V{v_fecha_sesion}+"</u>  en las instalaciones del Centro de Justicia Alternativa del Poder Judicial del Estado de Puebla; para llevar a cabo una <b>MEDIACIÓN,</b> en donde se brindan las condiciones necesarias para resolver un conflicto a través del diálogo y encontrar soluciones voluntarias y justas para ambas partes, haciendo mención que en el servicio que se otorga es de manera gratuita, voluntaria, imparcial y confidencial.  <br><br> Su asistencia es muy importante a fin de lograr una solución pacífica a un conflicto de carácter <u>"+$F{materia} +"</u>, por lo que se solicita su <b>PUNTUAL</b> y <b>AMABLE</b> participación, presentando <b>original y copia simple de su identificación oficial vigente con fotografía y de algún comprobante domiciliario,</b> lo anterior expuesto con fundamento en lo establecido en los artículos 84, 85 y 86 de la Ley Orgánica del Poder Judicial del Estado de Puebla; 832, 833 y 835 del Código de Procedimientos Civiles del Estado."]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="201" width="480" height="130" uuid="0ae6c40a-a44d-47c4-96c0-7749065161a2"/>
