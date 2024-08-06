@@ -47,6 +47,26 @@ public class SolicitudController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<GenericResponse> getSolicitudById(@PathVariable("id") Integer solicitudId) {
+
+        Solicitud solicitud = solicitudes.findById(solicitudId);
+        response = new GenericResponse();
+
+        if (solicitud==null){
+            String mensaje = String.format("La solicitud con ID %s no existe", solicitudId);
+
+            response.setMessage(mensaje);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        response.setSuccess(true);
+        response.setMessage("OK");
+        response.setData(solicitud);
+
+        return ResponseEntity.ok(response);
+    }
     
     @GetMapping("/folio/{folio}")
     public ResponseEntity<GenericResponse> getSolicitud(@PathVariable("folio") String folio) {
@@ -125,7 +145,7 @@ public class SolicitudController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/save")
+    @PostMapping("/save/{id}")
     public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad) {
 
         //entidad.setFolio(solicitudes.generarFolio("CJA"));
@@ -153,6 +173,44 @@ public class SolicitudController {
         return ResponseEntity.badRequest().body(response);
         
     }
+
+    @PostMapping("/generarFecha/{id}")
+    public ResponseEntity<GenericResponse> generarFechaSesion(@PathVariable("id") Integer solicitudId) {
+        //TODO: process POST request
+        GenericResponse response = new GenericResponse();
+        Date fechaSesion = solicitudes.generarFechaSesion(solicitudId);
+
+        if (fechaSesion!=null){
+            response.setSuccess(true);
+            response.setData(fechaSesion);
+
+            return ResponseEntity.ok(response);
+        }
+        
+        response.setMessage("No se pudo asignar fecha");
+        return ResponseEntity.badRequest().body(response);
+    }
+    
+    @PostMapping("/registrarDocumento/{id}")
+    public ResponseEntity<GenericResponse> registrarDocumento(@PathVariable("id") Integer solicitudId, @RequestParam("claveFormato") String claveFormato) {
+        GenericResponse response = new GenericResponse();
+        boolean result=false;
+
+        if (solicitudId!=null && !claveFormato.isEmpty()){
+            String usuario = "TEST";
+            String persona = "Rosa María Morales Cisneros";
+
+            result = solicitudes.registrarDocumento(solicitudId, claveFormato, usuario, persona);
+        }
+
+        if (result){
+            response.setMessage("Documento registrado");
+        }
+
+        response.setSuccess(result);
+        
+        return ResponseEntity.ok(response);
+    }
     
     
     @GetMapping("template")
@@ -171,6 +229,5 @@ public class SolicitudController {
 
         return ResponseEntity.ok(response);
     }
-    
     
 }

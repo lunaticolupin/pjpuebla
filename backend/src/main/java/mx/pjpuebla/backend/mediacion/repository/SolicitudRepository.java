@@ -1,5 +1,7 @@
 package mx.pjpuebla.backend.mediacion.repository;
 
+import java.util.Date;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,4 +13,13 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Integer> {
 
     @Query(value = "SELECT * FROM mediacion.foliador(:claveArea)", nativeQuery = true)
     public String generarFolio(@Param("claveArea") String claveArea);
+
+    @Query(value = "SELECT * FROM mediacion.fun_fecha_sesion()", nativeQuery = true)
+    public Date generarFechaSesion();
+
+    @Query(value = "SELECT * FROM mediacion.fun_registra_archivo(:solicitudId, :claveFormato, :usuario, :personaFirma)", nativeQuery = true)
+    public boolean registrarDocumento(@Param("solicitudId") Integer solicitudId, 
+        @Param("claveFormato") String claveFormato, 
+        @Param("usuario") String usuario, 
+        @Param("personaFirma") String personaFirma);
 }
