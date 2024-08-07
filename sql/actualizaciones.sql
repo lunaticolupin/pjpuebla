@@ -90,3 +90,12 @@ AS SELECT s.id,
      JOIN core.persona p2 ON p2.id = s.invitado_persona_id
      JOIN core.materia m ON m.id = s.materia_id
      JOIN mediacion.tipo_apertura ta ON ta.id = s.tipo_apertura_id;
+
+
+-- se aplican cambios en la tabla solicitud para no asignar por defecto una solicitud como mediable: 
+-- Cambios : se elimina restricción de NOT NULL y se elimina valor por defecto True.
+ALTER TABLE IF EXISTS mediacion.solicitud
+    ALTER COLUMN es_mediable DROP DEFAULT;
+
+ALTER TABLE IF EXISTS mediacion.solicitud
+    ALTER COLUMN es_mediable DROP NOT NULL;
