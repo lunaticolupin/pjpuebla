@@ -29,7 +29,7 @@ public class Permiso {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERMISO_ID_GENERATOR")	
     @SequenceGenerator(name = "PERMISO_ID_GENERATOR", sequenceName = "core.permiso_id_seq", allocationSize = 1)
     private Integer id;
-    private Integer clave;
+    private String clave;
     private String descripcion;
     
     @Column(name = "activo", nullable = false)
