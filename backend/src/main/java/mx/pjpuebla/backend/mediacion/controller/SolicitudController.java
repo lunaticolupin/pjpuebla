@@ -146,13 +146,46 @@ public class SolicitudController {
     }
 
     @PostMapping("/save/{id}")
-    public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad) {
+    public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad, Errors errors) {
+        response = new GenericResponse();
+        /* 
+        BUSCAMOS LOS DATOS DEL USUARIO PERSONA Y EL USUARIO INVITADO PARA VALIDAR SI HUBO UN CAMBIO Y NO EXISTE EN BASE LO REGISTRAMOS, POR EL CONTRARIO,
+        CAMBIAMOS SOLO EL ID ASOCIADO.
+        */
 
-        //entidad.setFolio(solicitudes.generarFolio("CJA"));
-        //entidad.setUsuarioCreo("TEST");
+        String CurpOrRfc_invitado = entidad.getInvitadoPersona().getPersonaMoral() ?  entidad.getInvitadoPersona().getRfc() : entidad.getInvitadoPersona().getCurp();
+        String CurpOrRfc_persona = entidad.getUsuarioPersona().getPersonaMoral() ?  entidad.getUsuarioPersona().getRfc() : entidad.getUsuarioPersona().getCurp();
+
+        Persona usuario_invitado = personas.findByCurpOrRfc(CurpOrRfc_invitado);
+        Persona usuario_persona = personas.findByCurpOrRfc(CurpOrRfc_persona);
+
+        if(usuario_invitado == null){
+            usuario_invitado = personas.save(entidad.getInvitadoPersona());
+            entidad.setInvitadoPersona(usuario_invitado);
+        }
+
+        if(usuario_persona == null){
+            usuario_persona = personas.save(entidad.getUsuarioPersona());
+            entidad.setUsuarioPersona(usuario_persona);
+        }
+
+
+        if (errors.hasErrors()){
+            response.setMessage("La entidad tiene errores");
+            response.setErrors(errors.getAllErrors());
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
 
         entidad.setFechaActualizacion(new Date());
         entidad.setUsuarioActualizo("TEST");
+        entidad.setUsuarioCreo("TEST");
+        Solicitud solicitudActualizada = solicitudes.save(entidad);
+        
+        response.setSuccess(true);
+        response.setMessage("OK");
+        response.setData(solicitudActualizada);
         
         return ResponseEntity.ok(response);
     }
@@ -161,6 +194,8 @@ public class SolicitudController {
     public ResponseEntity<GenericResponse> eliminar(@PathVariable("id") Integer id) {
         //TODO: process POST request
         response = new GenericResponse();
+
+        
 
         if (solicitudes.esEliminable(id)){
             response.setSuccess(solicitudes.delete(id));
