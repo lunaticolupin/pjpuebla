@@ -148,41 +148,48 @@ public class SolicitudController {
     @PostMapping("/save/{id}")
     public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad, Errors errors) {
         response = new GenericResponse();
-        /* 
-        BUSCAMOS LOS DATOS DEL USUARIO PERSONA Y EL USUARIO INVITADO PARA VALIDAR SI HUBO UN CAMBIO Y NO EXISTE EN BASE LO REGISTRAMOS, POR EL CONTRARIO,
-        CAMBIAMOS SOLO EL ID ASOCIADO.
-        */
 
+        // Determinamos si la persona es moral o física para obtener su CURP o RFC.
         String CurpOrRfc_invitado = entidad.getInvitadoPersona().getPersonaMoral() ?  entidad.getInvitadoPersona().getRfc() : entidad.getInvitadoPersona().getCurp();
         String CurpOrRfc_persona = entidad.getUsuarioPersona().getPersonaMoral() ?  entidad.getUsuarioPersona().getRfc() : entidad.getUsuarioPersona().getCurp();
-
+    
+        // Buscamos si ya existe el usuario invitado y el usuario persona en la base de datos.
         Persona usuario_invitado = personas.findByCurpOrRfc(CurpOrRfc_invitado);
         Persona usuario_persona = personas.findByCurpOrRfc(CurpOrRfc_persona);
-
+    
+        // Si el usuario invitado no existe, lo creamos y lo guardamos en la base de datos.
         if(usuario_invitado == null){
             usuario_invitado = personas.save(entidad.getInvitadoPersona());
-            entidad.setInvitadoPersona(usuario_invitado);
+            entidad.setInvitadoPersona(usuario_invitado); // Asignamos el usuario invitado recién creado a la entidad `Solicitud`.
         }
-
+    
+        // Si el usuario persona no existe, lo creamos y lo guardamos en la base de datos.
         if(usuario_persona == null){
             usuario_persona = personas.save(entidad.getUsuarioPersona());
-            entidad.setUsuarioPersona(usuario_persona);
+            entidad.setUsuarioPersona(usuario_persona); // Asignamos el usuario persona recién creado a la entidad `Solicitud`.
         }
-
-
+    
+        // Asignamos los objetos `usuario_invitado` y `usuario_persona` a la entidad `Solicitud` 
+        // para asegurar que las relaciones con las llaves foráneas estén correctamente establecidas.
+        entidad.setInvitadoPersona(usuario_invitado);
+        entidad.setUsuarioPersona(usuario_persona);
+    
+        // Si existen errores de validación en la entidad, los retornamos en la respuesta.
         if (errors.hasErrors()){
             response.setMessage("La entidad tiene errores");
             response.setErrors(errors.getAllErrors());
-
             return ResponseEntity.badRequest().body(response);
         }
-
-
+    
+        // Actualizamos la fecha de actualización y los usuarios que crearon y actualizaron la entidad.
         entidad.setFechaActualizacion(new Date());
-        entidad.setUsuarioActualizo("TEST");
-        entidad.setUsuarioCreo("TEST");
+        entidad.setUsuarioActualizo("TEST"); 
+        entidad.setUsuarioCreo("TEST"); 
+    
+        // Guardamos o actualizamos la entidad `Solicitud` en la base de datos.
         Solicitud solicitudActualizada = solicitudes.save(entidad);
         
+        // Construimos la respuesta con los datos de la solicitud actualizada.
         response.setSuccess(true);
         response.setMessage("OK");
         response.setData(solicitudActualizada);

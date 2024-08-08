@@ -388,8 +388,8 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 if (!valid) {
                     return false;
                 }
-                
-                self.solicitudSeleccionada().data.id ? self.putSolicitud() : self.postSolicitud();
+               
+                self.solicitudId() ? self.putSolicitud() : self.postSolicitud();
             });
 
             self.btnCancelarSolicitud = (()=>{
@@ -407,7 +407,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             });
 
             self.btnEditarSolicitud = ((event, detail)=>{
-
+               
                 self.solicitudDetalle(true);
                 self.solicitudSeleccionada({key: detail.item.key, data:detail.item.data});
                 self.parseSolicitud(detail.item.data);              
@@ -557,7 +557,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.postSolicitud =(()=>{
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
-                return true;
+                
                 utils.confirmar('Solicitud').then((confirmacion)=>{
 
                     if (confirmacion){
@@ -600,25 +600,21 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     tipoApertura: self.solicitudTipoApertura()
                 }
 
-                console.log(data);
-                const url = self.urlBase + '/solicitud/save/'+ self.solicitudSeleccionada().data.id;
+                
+                const url = self.urlBase + '/solicitud/save/'+ self.solicitudId();
                
 
                 utils.confirmar('Solicitud').then((confirmacion)=>{
 
                     if (confirmacion){
                         utils.postData(url, data).then((response)=>{        
-                            console.log(response);
-                            
-                            return true;
+                           
                             if (response.success){
-                                
-        
-                                self.getSolicitudes();
                                 self.solicitudSeleccionada(response);
                                 self.parseSolicitud(response.data);
+                                self.getSolicitudes();
                                 
-                                swal("Solicitud actualiza","Folio: " + folio, "success");
+                                swal("Solicitud actualiza","Se han actualizado los datos de la solicitud");
         
                                 return true;
                             }
