@@ -388,8 +388,8 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 if (!valid) {
                     return false;
                 }
-
-                self.postSolicitud();
+                
+                self.solicitudSeleccionada().data.id ? self.putSolicitud() : self.postSolicitud();
             });
 
             self.btnCancelarSolicitud = (()=>{
@@ -557,8 +557,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.postSolicitud =(()=>{
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
-
+                return true;
                 utils.confirmar('Solicitud').then((confirmacion)=>{
+
                     if (confirmacion){
                         utils.postData(url, data).then((response)=>{                    
                             if (response.success){
@@ -569,6 +570,55 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                                 self.parseSolicitud(response.data);
                                 
                                 swal("Solicitud Registrada","Folio: " + folio, "success");
+        
+                                return true;
+                            }
+        
+                            const errores = JSON.stringify(response.errors);
+                            swal(response.message, errores, "error");
+                        }).catch((response)=>{
+                            const errores = JSON.stringify(response);
+                            
+                            swal("Error al procesar la petición", errores, "error");
+                        });
+                    }
+                });
+            });
+
+            self.putSolicitud =(()=>{
+
+                const data =  {
+                    id: self.solicitudId(),
+                    folio: self.solicitudFolio(),
+                    esMediable: self.solicitudMediable(),
+                    canalizado: self.solicitudCanalizada(),
+                    usuarioPersona: self.solicitudUsuario(),
+                    invitadoPersona: self.solicitudInvitado(),
+                    materia: self.solicitudMateria(),
+                    descripcionConflicto: self.solicitudDescripcion(),
+                    estatus: self.solicitudEstatus(),
+                    tipoApertura: self.solicitudTipoApertura()
+                }
+
+                console.log(data);
+                const url = self.urlBase + '/solicitud/save/'+ self.solicitudSeleccionada().data.id;
+               
+
+                utils.confirmar('Solicitud').then((confirmacion)=>{
+
+                    if (confirmacion){
+                        utils.postData(url, data).then((response)=>{        
+                            console.log(response);
+                            
+                            return true;
+                            if (response.success){
+                                
+        
+                                self.getSolicitudes();
+                                self.solicitudSeleccionada(response);
+                                self.parseSolicitud(response.data);
+                                
+                                swal("Solicitud actualiza","Folio: " + folio, "success");
         
                                 return true;
                             }
