@@ -35,6 +35,16 @@ public class InstitucionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("activas")
+    public ResponseEntity<GenericResponse> getInstitucionesActivas() {
+        GenericResponse response = new GenericResponse();
+
+        response.setSuccess(true);
+        response.setData(instituciones.obtenerInstitucionesActivas());
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/template")
     public ResponseEntity<GenericResponse> getJsonTemplate() {
         Institucion template = new Institucion();

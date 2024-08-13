@@ -21,8 +21,6 @@ import mx.pjpuebla.backend.response.GenericResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-
 @RestController
 @RequestMapping("mediacion/mediadores")
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class MediadorController {
     private PersonaService persona;
 
     @GetMapping("")
-    public ResponseEntity<GenericResponse> getMediadores(){
+    public ResponseEntity<GenericResponse> getMediadores() {
         GenericResponse response = new GenericResponse();
 
         response.setSuccess(true);
@@ -41,96 +39,93 @@ public class MediadorController {
         return ResponseEntity.ok(response);
     }
 
-@GetMapping("template")
+    @GetMapping("activos")
+    public ResponseEntity<GenericResponse> getMediadoresActivos() {
+        GenericResponse response = new GenericResponse();
+
+        response.setSuccess(true);
+        response.setData(mediadores.obtenerMediadoresActivos());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("template")
     public ResponseEntity<GenericResponse> getJsonTemplate() {
         Mediador template = new Mediador();
         Persona persona = new Persona();
 
-
         template.setUsuario(persona);
         template.setSupervisadoPor(persona);
-
-
 
         response = new GenericResponse(true, "OK", null, template);
 
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Mediador entidad, Errors errors) {
+        response = new GenericResponse();
 
-@PostMapping("/add")
-public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Mediador entidad, Errors errors ) {
-    response = new GenericResponse();
+        entidad.setUsuarioRegistro("TEST");
 
-    entidad.setUsuarioRegistro("TEST");
-
-
-    if (errors.hasErrors()){
-        response.setMessage("La entidad tiene errores");
-        response.setErrors(errors.getAllErrors());
-
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    if (entidad.getId()!=null){
-        response.setMessage("La entidad ya existe");
-
-        return ResponseEntity.badRequest().body(response);
-    }
-
-
-    Mediador nuevo_mediador = mediadores.save(entidad);
-    response.setSuccess(true);
-    response.setMessage("OK");
-    response.setData(nuevo_mediador);
-
-    return ResponseEntity.ok(response);
-}
-
-@PostMapping("/save/{id}")
-public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Mediador entidad, Errors errors) {
-    GenericResponse response = new GenericResponse();
-
-    try {
-
-        if (errors.hasErrors()){
+        if (errors.hasErrors()) {
             response.setMessage("La entidad tiene errores");
             response.setErrors(errors.getAllErrors());
+
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (entidad.getId() != null && mediadores.existsByID(entidad.getId())){
-            entidad.setFechaActualizacion(new Date());
-            entidad.setUsuarioActualizo("Test");
+        if (entidad.getId() != null) {
+            response.setMessage("La entidad ya existe");
+
+            return ResponseEntity.badRequest().body(response);
         }
 
-        Mediador mediadorActualizado = mediadores.save(entidad);
-        if (mediadorActualizado == null) {
-            response.setMessage("No se pudo guardar la entidad");
-            response.setData(entidad);
-            throw new SQLException(response.getMessage());
-        }
-
+        Mediador nuevo_mediador = mediadores.save(entidad);
         response.setSuccess(true);
         response.setMessage("OK");
-        response.setData(mediadorActualizado);
-            
+        response.setData(nuevo_mediador);
+
         return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.setMessage(e.getCause().getCause().getLocalizedMessage());
-
-        return ResponseEntity.internalServerError().body(response);
     }
-    
 
-    
+    @PostMapping("/save/{id}")
+    public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Mediador entidad, Errors errors) {
+        GenericResponse response = new GenericResponse();
+
+        try {
+
+            if (errors.hasErrors()) {
+                response.setMessage("La entidad tiene errores");
+                response.setErrors(errors.getAllErrors());
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (entidad.getId() != null && mediadores.existsByID(entidad.getId())) {
+                entidad.setFechaActualizacion(new Date());
+                entidad.setUsuarioActualizo("Test");
+            }
+
+            Mediador mediadorActualizado = mediadores.save(entidad);
+            if (mediadorActualizado == null) {
+                response.setMessage("No se pudo guardar la entidad");
+                response.setData(entidad);
+                throw new SQLException(response.getMessage());
+            }
+
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(mediadorActualizado);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage(e.getCause().getCause().getLocalizedMessage());
+
+            return ResponseEntity.internalServerError().body(response);
+        }
+
+    }
 
 }
-
-
-
-}
-
-

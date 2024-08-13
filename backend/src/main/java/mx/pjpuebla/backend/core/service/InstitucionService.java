@@ -8,6 +8,7 @@ import mx.pjpuebla.backend.core.entitiy.Institucion;
 import lombok.AllArgsConstructor;
 import mx.pjpuebla.backend.core.repository.InstitucionRepository;
 
+
 @Service
 @AllArgsConstructor
 public class InstitucionService {
@@ -33,6 +34,10 @@ public class InstitucionService {
 
     public boolean existsByID(Integer id){
         return this.repo.existsById(id);
+    }
+
+    public List<Institucion> obtenerInstitucionesActivas() {
+        return repo.findAllByActivo(true);  
     }
 
 

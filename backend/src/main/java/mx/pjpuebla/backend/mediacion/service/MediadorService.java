@@ -36,6 +36,10 @@ public class MediadorService {
         return null;
     }
 
+    public List<Mediador> obtenerMediadoresActivos() {
+        return repo.findAllByEstatus(1);  // 1 representa el estatus activo
+    }
+
     public boolean existsByID(Integer id){
         return this.repo.existsById(id);
     }

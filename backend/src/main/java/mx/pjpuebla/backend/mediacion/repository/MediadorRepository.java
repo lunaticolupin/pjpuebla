@@ -14,4 +14,6 @@ public interface MediadorRepository extends JpaRepository<Mediador,Integer> {
     @SuppressWarnings({ "null", "unchecked" })
     public Mediador save(Mediador m);
 
+    public List<Mediador> findAllByEstatus(Integer num);
+
 }
