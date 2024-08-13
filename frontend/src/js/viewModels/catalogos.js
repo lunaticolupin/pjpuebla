@@ -14,6 +14,8 @@ define(['../accUtils', 'require', 'knockout', 'ojs/ojarraydataprovider', 'ojs/oj
                 { name: "Roles", id: "roles", icons: "oj-ux-ico-book" },
                 { name: "Modulos", id: "modulos", icons: "oj-ux-ico-book" },
                 { name: "Permisos", id: "permisos", icons: "oj-ux-ico-book" },
+                { name: "Mediadores", id: "mediador", icons: "oj-ux-ico-book" },
+                { name: "Psicologos", id: "psicologo", icons: "oj-ux-ico-book" }
             ];
 
             self.catalogos = ko.observableArray(data);
