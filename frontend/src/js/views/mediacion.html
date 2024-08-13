@@ -48,6 +48,7 @@
             <oj-c-button label="Borrar" display="icons" chroming="borderless" size="sm"><span slot="startIcon" class="oj-ux-ico-delete-all"></span></oj-c-button>
         </template>
     </oj-table>
+    
     <oj-bind-if test="[[solicitudSeleccionada()]]">
         <div id="solicitud" class="oj-panel oj-sm-margin-2x-top">
             <h4 class="oj-typography-subheading-xs">Datos generales</h4>
@@ -97,7 +98,7 @@
                         validators="[[requeridoValidator]]">
                     </oj-c-text-area>
                 </oj-c-form-layout>
-            </oj-validation-group>
+           
         </div>
 
         <div class="oj-panel oj-sm-margin-2x-vertical">
@@ -116,7 +117,7 @@
                         <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
                             <oj-c-radioset 
                                 id="esMediable" 
-                                value="{{solicitudMediable}}"
+                                value="{{ solicitudMediable }}"
                                 direction="row" 
                                 label-hint="La solicitud es Mediable" 
                                 options="[[esMediableDP]]">
@@ -138,7 +139,7 @@
                             data="[[estadoSolicitudDP]]" 
                             item-text="label" 
                             value="{{solicitudEstatus}}"
-                            disabled="[[!solicitudMediable()]]"
+                            disabled="[[solicitudMediable()]]"
                             label-hint="Seguimiento"></oj-c-select-single>
                         </div>
                         <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
@@ -151,10 +152,10 @@
                         <div class ="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
                             <oj-c-select-single 
                             id = "estatusSolicitud"
-                            data="[[estadoSolicitudDP]]" 
+                            data="[[mediadoresDP]]" 
                             item-text="label" 
                             value="{{solicitudEstatus}}"
-                            disabled="[[!solicitudMediable()]]"
+                            
                             label-hint="Mediador"></oj-c-select-single>
                         </div>
                         <oj-bind-if test="[[!mostrarDocNoMed()]]">
@@ -164,7 +165,7 @@
                             <div class="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-c-select-single 
                                 id = "estatusSolicitud"
-                                data="[[estadoSolicitudDP]]" 
+                                data="[[institucionesDP]]" 
                                 item-text="label" 
                                 value="{{solicitudEstatus}}"
                                 disabled="[[!solicitudCanalizada()]]"

@@ -59,6 +59,8 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
             /** Catalogos */
             self.materias = ko.observableArray();
+            self.instituciones = ko.observableArray();
+            self.mediadores = ko.observableArray();
             self.tipoAperturas = ko.observableArray(
                 [
                     {id: 1, clave: 'P', descripcion: 'Presencial', activo: true},
@@ -68,14 +70,15 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
             self.estadoSolicitud = ko.observableArray([
                 {value: 0, label: 'En Recepción'},
-                {value: 1, label: "Por Determinar"}, 
+                {value: 1, label: 'En Dirección'},
                 {value: 2, label: "Mediable"},
                 {value: 3, label: "No Mediable"}
             ]);
 
             self.esMediableArray = [
-                {value: 0, label: "No"},
-                {value: 1, label: "Si"}
+                {value: null, label: "Por determinar" },
+                {value: false, label: "No"},
+                {value: true, label: "Si"}
             ];
 
 
@@ -108,6 +111,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             this.estadoSolicitudDP = new ArrayDataProvider(self.estadoSolicitud, {keyAttributes: 'value'});
             this.esMediableDP = new ArrayDataProvider(self.esMediableArray, {keyAttributes: 'value'});
             this.protocoloViolenciaDP = new ArrayDataProvider(self.protocoloViolencia, {keyAttributes: 'value'});
+            this.mediadoresDP = new ArrayDataProvider(self.mediadores,  {keyAttributes:'value'});
+            this.institucionesDP = new ArrayDataProvider(self.instituciones, {keyAttributes:'value'});
+
             this.documentosDP = ko.computed(()=>{
                 let documentosEnabled = self.documentos().filter((item)=>item.disabled()==false);
 
@@ -233,7 +239,12 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 });
             });
 
-            this.moduleDetallePersona = ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: this.userInfoSignal}})
+            this.moduleDetallePersona = ModuleElementUtils.createConfig(
+                {
+                    name: 'catalogos/persona-detalle',
+                    params: {
+                                userInfoSignal: this.userInfoSignal
+                }})
 
             this.requeridoValidator = [
                 new RequiredValidator({
@@ -270,7 +281,9 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
                 Promise.all([
                     self.getMaterias(),
-                    self.getSolicitudes()
+                    self.getSolicitudes(),
+                    self.getInstituciones(),
+                    self.getMediadores()
                 ]).finally(()=>{
                     utils.waiting(true);
                 });
@@ -292,6 +305,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             };
 
             self.parseSolicitud =((solicitud)=>{
+                
                 self.solicitudId(solicitud.id);
                 self.solicitudFolio(solicitud.folio);
                 self.solicitudFecha(solicitud.fechaSolicitud);
@@ -543,6 +557,34 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 });
             });
 
+            self.getInstituciones = (() => {
+                const url = config.baseEndPoint + '/instituciones'
+                return utils.getData(url, {}).then((response)=> {
+                    if(response.success){
+                        let instituciones_temp = []
+                        response.data.forEach(element => {
+                            instituciones_temp.push({ value:element.id, label:element.nombre });         
+                        });
+                        self.instituciones(instituciones_temp);
+                    }
+                })
+            })
+
+            self.getMediadores = (() => {
+                const url = config.baseEndPoint + '/mediacion/mediadores'
+                return utils.getData(url, {}).then((response)=> {
+                    if(response.success){
+                        let mediadores_temp = []
+                        response.data.forEach(element => {
+                            console.log(element);
+                            
+                            mediadores_temp.push({ value:element.id, label:element.usuario.nombreCompleto });         
+                        });
+                        self.mediadores(mediadores_temp);
+                    }
+                })
+            })
+
             self.getJSONTemp=(()=>{
                 const url = self.urlBase + '/solicitud/template';
 
@@ -557,6 +599,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             self.postSolicitud =(()=>{
                 const url = self.urlBase + '/solicitud/add';
                 const data = self.fromSolicitud();
+
                 
                 utils.confirmar('Solicitud').then((confirmacion)=>{
 
@@ -614,7 +657,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                                 self.parseSolicitud(response.data);
                                 self.getSolicitudes();
                                 
-                                swal("Solicitud actualiza","Se han actualizado los datos de la solicitud");
+                                swal("Solicitud actualiza","Se han actualizado los datos de la solicitud","success");
         
                                 return true;
                             }
