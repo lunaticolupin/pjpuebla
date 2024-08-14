@@ -6,6 +6,7 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                 var self = this;
     
                 self.mediadores = ko.observableArray();
+                self.mediadores_select = ko.observableArray();
                 self.baseUrl = config.baseEndPoint + '/mediacion/mediadores';
                 self.mediadorSeleccionado = ko.observable();
                 self.personas = ko.observableArray([]);
@@ -14,6 +15,7 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                 self.mediador_template = ko.observable({});
                 this.ModuleElementUtils = ModuleElementUtils;
                 this.dataProvider = new ArrayDataProvider(self.mediadores, {keyAttributes: 'id'});
+                this.mediadoresDP = new ArrayDataProvider(self.mediadores_select, { keyAttributes: 'value' });
                 this.userInfoSignal = new signals.Signal();
                 self.dataProviderPersonas = new ArrayDataProvider(self.personas, {keyAttributes: 'value'})
 
@@ -64,12 +66,18 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                     utils.waiting();
     
                     utils.getData(url, params).then((response)=>{
-                        console.log(response);
                         
-    
                         if (response.success){
                             self.mediadores(response.data);
                             
+                            let mediadores_temp = [];
+                            mediadores_temp.push({ value: '', label: "Sin supervisor" })
+                            response.data.forEach(element => {
+                                mediadores_temp.push({ value: element.id, label: element.usuario.nombreCompleto });
+                            });
+                            self.mediadores_select(mediadores_temp);   
+                            
+                             
                         }
     
                         utils.waiting(stop=true);
@@ -119,12 +127,12 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                 this.muestraDetalle = (verDetalle=true) =>{
     
                     if (verDetalle){
-                        $("#mediadors").hide();
+                        $("#mediadores").hide();
                         $("#form-mediador").show();
                         return verDetalle;
                     }
     
-                    $("#mediadors").show();
+                    $("#mediadores").show();
                     $("#form-mediador").hide();
                     self.mediadorSeleccionado(null);
                 };
@@ -144,8 +152,9 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
 
 
                 self.parseMediador = ((mediador) =>{
-                  
-                    const id_supervisor = mediador.supervisadoPor ? mediador.supervisadoPor.id : null
+                    
+                    
+                    const id_supervisor = mediador.supervisadoPor ? mediador.supervisadoPor : ''
                     const id_usuario = mediador.usuario ? mediador.usuario.id : null
                     
                     self.id_mediador(mediador.id);
@@ -165,7 +174,7 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                         certificado: self.certificado(),
                         estatus: self.estatus() ? self.estatus() ? 1 : 0 : 0,
                         usuario: { id:self.usuario() },
-                        supervisadoPor: { id:self.supervisado_por() } 
+                        supervisadoPor: self.supervisado_por() ? self.supervisado_por() : null
                     }
     
                     return mediador;

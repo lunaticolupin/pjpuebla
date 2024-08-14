@@ -15,8 +15,7 @@
     {"headerText":"ID", "field":"id","minWidth":"50"},
     {"headerText":"Número", "field":"numero", "minWidth":"200" },
     {"headerText":"Certificado", "field":"certificado"},
-    {"headerText":"Estatus", "field":"estatus", "id": "estatus_id" },
-    {"headerText":"Supervisado por", "field": "supervisadoPor.nombreCompleto",  "minWidth":"100"},
+    {"headerText":"Estatus", "template": "estatusTemplate", "id": "estatus_id" },
     {"headerText":"Usuario", "field":"usuario.nombreCompleto", "minWidth":"100"},
     {"headerText": "Detalle",
     "maxWidth": "10rem",
@@ -31,6 +30,15 @@
         data-oj-clickthrough="disabled">
         <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
       </oj-c-button>
+    </template>
+
+    <template slot="estatusTemplate" data-oj-as="cell">
+      <oj-bind-if test="[[cell.row.estatus === 1]]">
+        <span>Activo</span>
+      </oj-bind-if>
+      <oj-bind-if test="[[cell.row.estatus === 0]]">
+        <span>Inactivo</span>
+      </oj-bind-if>
     </template>
      
   </oj-table>
@@ -52,8 +60,8 @@
           <oj-switch id="estatusId" label-hint="Estatus" id="enabledSwitchOn"
             value="{{ estatus }}"></oj-switch>
 
-          <oj-c-select-single id="supervisorID" data="[[dataProviderPersonas]]" item-text="label"
-            value=" {{ supervisado_por }} " label-hint="Supervisado por" required="true"></oj-c-select-single>
+          <oj-c-select-single id="supervisorID" data="[[mediadoresDP]]" item-text="label"
+            value=" {{ supervisado_por }} " label-hint="Supervisado por" ></oj-c-select-single>
 
           <oj-c-select-single id="usuarioId" data="[[dataProviderPersonas]]" item-text="label"
             value=" {{ usuario }} " label-hint="Usuario" required="true"></oj-c-select-single>

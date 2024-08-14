@@ -55,7 +55,6 @@ public class MediadorController {
         Persona persona = new Persona();
 
         template.setUsuario(persona);
-        template.setSupervisadoPor(persona);
 
         response = new GenericResponse(true, "OK", null, template);
 
