@@ -14,6 +14,7 @@ import mx.pjpuebla.backend.mediacion.service.SolicitudService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -125,6 +126,8 @@ public class SolicitudController {
                 }
 
                 entidad.setInvitadoPersona(invitadoPersona);
+                entidad.setFechaSesion(null);
+                entidad.setEsMediable(null);
             }
         }catch(Exception e){
             response.setMessage("No se pudo registrar al Usuario o Invitado");
@@ -185,6 +188,32 @@ public class SolicitudController {
         entidad.setFechaActualizacion(new Date());
         entidad.setUsuarioActualizo("TEST"); 
         entidad.setUsuarioCreo("TEST"); 
+
+       
+        //verificamos si en la actualización tiene a la entidad  mediable y si la fecha de sesión es nula generamos automaticamente la fecha. 
+        if(entidad.getEsMediable() && entidad.getFechaSesion() == null){       
+            Date fecha_sesion = solicitudes.generarFechaSesion(entidad.getId());
+            entidad.setFechaSesion(fecha_sesion);
+        }   
+
+
+        if(entidad.getEsMediable()  && entidad.getFechaSesion() != null){
+            Integer fecha_valida = solicitudes.validar_fecha_sesion(entidad.getFechaSesion());
+
+            if(fecha_valida != 1){
+                ArrayList<Object> errores = new ArrayList<>();
+                response.setSuccess(false);
+                if(fecha_valida == 2) {  errores.add("La Hora seleccionada no es valida."); errores.add("Seleccione una hora entre los siguientes rangos: '08:30', '10:00', '12:00', '13:30' ");  }
+                if(fecha_valida == 3) {  errores.add("El dia elegido no puede ser Sábado o Domingo.");  }
+                if(fecha_valida == 4) {  errores.add("La fecha seleccionada no puede ser un dia inhábil.");  }
+                if(fecha_valida == 5) {  errores.add("La fecha seleccionada ya tiene todas las sesiones asignadas.");  }
+
+                response.setMessage("Error en la fecha de sesión.");
+                response.setErrors(errores);
+                return ResponseEntity.ok(response);
+            }
+            
+        }
     
         // Guardamos o actualizamos la entidad `Solicitud` en la base de datos.
         Solicitud solicitudActualizada = solicitudes.save(entidad);
