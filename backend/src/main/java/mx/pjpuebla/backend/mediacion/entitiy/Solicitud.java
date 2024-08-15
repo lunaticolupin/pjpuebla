@@ -28,6 +28,7 @@ import mx.pjpuebla.backend.core.entitiy.Materia;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.models.SolicitudMediacionEstatus;
 
+
 @Table(schema="mediacion", name = "solicitud")
 @Entity
 @Getter
@@ -48,7 +49,7 @@ public class Solicitud {
     //@JsonFormat(pattern = "dd/MM/yyyy")
     private Date fechaSesion;
 
-    private Boolean esMediable = true;
+    private Boolean esMediable;
 
     private Boolean canalizado = false;
 
@@ -100,4 +101,5 @@ public class Solicitud {
 
     @OneToMany(mappedBy = "solicitudId")
     private List<SolicitudArchivo> archivos;
+    
 }
