@@ -145,7 +145,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
 
             this.dateTimeConverterInput = ko.observable(new ojconverter_datetime_1.IntlDateTimeConverter({
                 timeZone: 'America/Mexico_City',
-                pattern: 'dd/MM/yyyy hh:mm'
+                pattern: 'dd/MM/yyyy HH:mm'
             }));
 
             this.maxFecha = new Date().toISOString();
@@ -317,11 +317,17 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 self.invitadoPM(solicitud.invitadoPersona.personaMoral);
                 self.solicitudMateria(solicitud.materia);
                 self.solicitudMateriaId(solicitud.materia.id);
-                self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
+                
                 self.solicitudDescripcion(solicitud.descripcionConflicto);
                 self.solicitudEstatus(solicitud.estatus);
                 self.solicitudTipoApertura(solicitud.tipoApertura);
                 self.solicitudTipoAperturaId(solicitud.tipoApertura.id);
+
+               
+                
+                if(solicitud.fechaSesion){    
+                    self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
+                }else { self.solicitudFechaSesion("") }
 
                 if (self.solicitudFechaSesion()){
                     let doc= this.documentos().find((element)=>element.value==2);
@@ -558,7 +564,7 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             });
 
             self.getInstituciones = (() => {
-                const url = config.baseEndPoint + '/instituciones'
+                const url = config.baseEndPoint + '/instituciones/activas'
                 return utils.getData(url, {}).then((response)=> {
                     if(response.success){
                         let instituciones_temp = []
@@ -571,14 +577,14 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
             })
 
             self.getMediadores = (() => {
-                const url = config.baseEndPoint + '/mediacion/mediadores'
+                const url = config.baseEndPoint + '/mediacion/mediadores/activos'
                 return utils.getData(url, {}).then((response)=> {
                     if(response.success){
                         let mediadores_temp = []
                         response.data.forEach(element => {
                             console.log(element);
                             
-                            mediadores_temp.push({ value:element.id, label:element.usuario.nombreCompleto });         
+                            mediadores_temp.push({ value:element.id, label:'Mediador:' + element.usuario.nombreCompleto + ' -  Supervisado por: ' + element.supervisadoPor.nombreCompleto });         
                         });
                         self.mediadores(mediadores_temp);
                     }
@@ -628,8 +634,34 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                 });
             });
 
-            self.putSolicitud =(()=>{
+            function formatear_fecha(p_fecha){
+            
+            // Crear un objeto Date a partir de la cadena
+            let date = new Date(p_fecha);
 
+            // Obtener la hora local en la zona horaria de Ciudad de México
+            let options = {
+                timeZone: 'America/Mexico_City',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+
+            let formatter = new Intl.DateTimeFormat('en-GB', options);
+            let parts = formatter.formatToParts(date);
+
+            // Formatear la fecha al estilo deseado yyyy-MM-dd HH:mm:ss
+            let formattedDate = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value} ${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value}`;
+
+            return formattedDate;
+            }
+
+            self.putSolicitud =(()=>{
+                 
                 const data =  {
                     id: self.solicitudId(),
                     folio: self.solicitudFolio(),
@@ -640,10 +672,10 @@ define(['../accUtils','jquery', 'webConfig','utils','knockout','ojs/ojarraydatap
                     materia: self.solicitudMateria(),
                     descripcionConflicto: self.solicitudDescripcion(),
                     estatus: self.solicitudEstatus(),
-                    tipoApertura: self.solicitudTipoApertura()
+                    tipoApertura: self.solicitudTipoApertura(),
+                    fechaSesion: self.solicitudFechaSesion() ? formatear_fecha(self.solicitudFechaSesion()) : null
                 }
 
-                
                 const url = self.urlBase + '/solicitud/save/'+ self.solicitudId();
                
 

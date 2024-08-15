@@ -139,25 +139,29 @@
                             data="[[estadoSolicitudDP]]" 
                             item-text="label" 
                             value="{{solicitudEstatus}}"
-                            disabled="[[solicitudMediable()]]"
+                           
                             label-hint="Seguimiento"></oj-c-select-single>
                         </div>
-                        <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
-                            <oj-input-date-time id="fechaSesion" value="{{solicitudFechaSesion}}" label-hint="Fecha de Sesión"
-                            converter="[[dateTimeConverterInput]]"
-                            min="[[maxFecha]]"
-                            disabled="[[!solicitudMediable()]]"
-                            required></oj-input-date-time>
-                        </div>
-                        <div class ="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
-                            <oj-c-select-single 
-                            id = "estatusSolicitud"
-                            data="[[mediadoresDP]]" 
-                            item-text="label" 
-                            value="{{solicitudEstatus}}"
-                            
-                            label-hint="Mediador"></oj-c-select-single>
-                        </div>
+                        <oj-bind-if test="[[ solicitudMediable() ]]">
+                            <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
+                                <oj-input-date-time id="fechaSesion" value="{{solicitudFechaSesion}}" label-hint="Fecha de Sesión"
+                                converter="[[dateTimeConverterInput]]"
+                                min="[[maxFecha]]"
+                                disabled="[[!solicitudMediable() || !solicitudFechaSesion() ]]"
+                                required></oj-input-date-time>
+                            </div>
+                            <div class ="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
+                                <oj-c-select-single 
+                                id = "estatusSolicitud"
+                                data="[[mediadoresDP]]" 
+                                item-text="label" 
+                                value="{{solicitudEstatus}}"
+                                disabled="[[!solicitudMediable()]]"
+                                label-hint="Mediador"></oj-c-select-single>
+                            </div>
+                        </oj-bind-if>
+                        
+
                         <oj-bind-if test="[[!mostrarDocNoMed()]]">
                             <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-switch id="enabledSwitchOn" value="{{solicitudCanalizada}}" label-hint="Canalizada"></oj-switch>
