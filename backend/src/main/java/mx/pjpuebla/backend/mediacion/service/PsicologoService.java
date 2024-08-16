@@ -43,4 +43,11 @@ public class PsicologoService {
         return true; // Se realizó la actualización
     }
 
+
+    public Integer obtenerNumeroConsecutivoPsicologo(){
+        Optional<Psicologo> psicologo = this.repo.findTopByOrderByNumeroDesc();
+        
+        return psicologo.isPresent() ? psicologo.get().getNumero() + 1 : 1;
+    }
+
 }
