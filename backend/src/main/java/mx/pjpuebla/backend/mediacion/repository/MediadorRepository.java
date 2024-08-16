@@ -1,6 +1,7 @@
 package mx.pjpuebla.backend.mediacion.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,5 +16,7 @@ public interface MediadorRepository extends JpaRepository<Mediador,Integer> {
     public Mediador save(Mediador m);
 
     public List<Mediador> findAllByEstatus(Integer num);
+
+    public Optional<Mediador> findTopByOrderByNumeroDesc();
 
 }

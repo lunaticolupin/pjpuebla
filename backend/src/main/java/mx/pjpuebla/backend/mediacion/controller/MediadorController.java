@@ -1,8 +1,13 @@
 package mx.pjpuebla.backend.mediacion.controller;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +44,7 @@ public class MediadorController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("activos")
+    @GetMapping("/activos")
     public ResponseEntity<GenericResponse> getMediadoresActivos() {
         GenericResponse response = new GenericResponse();
 
@@ -61,31 +66,64 @@ public class MediadorController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Mediador entidad, Errors errors) {
-        response = new GenericResponse();
+    @GetMapping("numeroConsecutivo")
+    public ResponseEntity<GenericResponse> getNumeroConsecutivo() {
+        GenericResponse response = new GenericResponse();
 
-        entidad.setUsuarioRegistro("TEST");
-
-        if (errors.hasErrors()) {
-            response.setMessage("La entidad tiene errores");
-            response.setErrors(errors.getAllErrors());
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        if (entidad.getId() != null) {
-            response.setMessage("La entidad ya existe");
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        Mediador nuevo_mediador = mediadores.save(entidad);
         response.setSuccess(true);
-        response.setMessage("OK");
-        response.setData(nuevo_mediador);
+        response.setData(mediadores.obtenerNumeroConsecutivoMediador());
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Mediador entidad, Errors errors) {
+        try {
+
+            response = new GenericResponse();
+
+            entidad.setUsuarioRegistro("TEST");
+
+            if (errors.hasErrors()) {
+                response.setMessage("La entidad tiene errores");
+                response.setErrors(errors.getAllErrors());
+
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (entidad.getId() != null) {
+                response.setMessage("La entidad ya existe");
+
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            Mediador nuevo_mediador = mediadores.save(entidad);
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(nuevo_mediador);
+
+            return ResponseEntity.ok(response);
+
+        } catch (DataIntegrityViolationException e) {
+            response = new GenericResponse();
+            e.printStackTrace();
+            String errorMessage;
+            List<String> errorList = new ArrayList<>(Arrays.asList("El usuario seleccionado ya se encuentra registrado como mediador."));
+            
+
+            errorMessage = "Mediador registrado";
+
+            response.setMessage(errorMessage);
+            response.setSuccess(false);
+            response.setErrors(errorList);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        return null;
     }
 
     @PostMapping("/save/{id}")

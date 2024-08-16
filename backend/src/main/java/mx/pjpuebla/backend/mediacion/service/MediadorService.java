@@ -43,4 +43,16 @@ public class MediadorService {
     public boolean existsByID(Integer id){
         return this.repo.existsById(id);
     }
+
+    public Integer obtenerNumeroConsecutivoMediador(){
+        Optional<Mediador> mediador = this.repo.findTopByOrderByNumeroDesc();
+
+        if(mediador.isPresent()){
+            Mediador entidad = mediador.get();
+
+            return entidad.getNumero() + 1;
+        }else{
+            return 1;
+        }
+    }
 }
