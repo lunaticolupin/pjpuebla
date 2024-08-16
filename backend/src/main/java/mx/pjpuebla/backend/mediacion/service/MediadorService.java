@@ -47,12 +47,6 @@ public class MediadorService {
     public Integer obtenerNumeroConsecutivoMediador(){
         Optional<Mediador> mediador = this.repo.findTopByOrderByNumeroDesc();
 
-        if(mediador.isPresent()){
-            Mediador entidad = mediador.get();
-
-            return entidad.getNumero() + 1;
-        }else{
-            return 1;
-        }
+        return mediador.isPresent() ? mediador.get().getNumero()  + 1 : 1;
     }
 }
