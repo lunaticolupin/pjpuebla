@@ -9,7 +9,9 @@ import mx.pjpuebla.backend.core.entitiy.Materia;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
+import mx.pjpuebla.backend.mediacion.entitiy.SolicitudCanalizacion;
 import mx.pjpuebla.backend.mediacion.entitiy.TipoApertura;
+import mx.pjpuebla.backend.mediacion.service.SolicitudCanalizacionService;
 import mx.pjpuebla.backend.mediacion.service.SolicitudService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class SolicitudController {
     private final SolicitudService solicitudes;
     private final PersonaService personas;
+    private final SolicitudCanalizacionService solicitudCanalizaciones;
     private GenericResponse response;
 
     @GetMapping("")
@@ -150,82 +153,16 @@ public class SolicitudController {
 
     @PostMapping("/save/{id}")
     public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad, Errors errors) {
-        response = new GenericResponse();
-
-        // Determinamos si la persona es moral o física para obtener su CURP o RFC.
-        String CurpOrRfc_invitado = entidad.getInvitadoPersona().getPersonaMoral() ?  entidad.getInvitadoPersona().getRfc() : entidad.getInvitadoPersona().getCurp();
-        String CurpOrRfc_persona = entidad.getUsuarioPersona().getPersonaMoral() ?  entidad.getUsuarioPersona().getRfc() : entidad.getUsuarioPersona().getCurp();
-    
-        // Buscamos si ya existe el usuario invitado y el usuario persona en la base de datos.
-        Persona usuario_invitado = personas.findByCurpOrRfc(CurpOrRfc_invitado);
-        Persona usuario_persona = personas.findByCurpOrRfc(CurpOrRfc_persona);
-    
-        // Si el usuario invitado no existe, lo creamos y lo guardamos en la base de datos.
-        if(usuario_invitado == null){
-            usuario_invitado = personas.save(entidad.getInvitadoPersona());
-            entidad.setInvitadoPersona(usuario_invitado); // Asignamos el usuario invitado recién creado a la entidad `Solicitud`.
-        }
-    
-        // Si el usuario persona no existe, lo creamos y lo guardamos en la base de datos.
-        if(usuario_persona == null){
-            usuario_persona = personas.save(entidad.getUsuarioPersona());
-            entidad.setUsuarioPersona(usuario_persona); // Asignamos el usuario persona recién creado a la entidad `Solicitud`.
-        }
-    
-        // Asignamos los objetos `usuario_invitado` y `usuario_persona` a la entidad `Solicitud` 
-        // para asegurar que las relaciones con las llaves foráneas estén correctamente establecidas.
-        entidad.setInvitadoPersona(usuario_invitado);
-        entidad.setUsuarioPersona(usuario_persona);
-    
-        // Si existen errores de validación en la entidad, los retornamos en la respuesta.
-        if (errors.hasErrors()){
+        if (errors.hasErrors()) {
+            GenericResponse response = new GenericResponse();
             response.setMessage("La entidad tiene errores");
             response.setErrors(errors.getAllErrors());
             return ResponseEntity.badRequest().body(response);
         }
-    
-        // Actualizamos la fecha de actualización y los usuarios que crearon y actualizaron la entidad.
-        entidad.setFechaActualizacion(new Date());
-        entidad.setUsuarioActualizo("TEST"); 
-        entidad.setUsuarioCreo("TEST"); 
 
-       
-        //verificamos si en la actualización tiene a la entidad  mediable y si la fecha de sesión es nula generamos automaticamente la fecha. 
-        if(entidad.getEsMediable() && entidad.getFechaSesion() == null){       
-            Date fecha_sesion = solicitudes.generarFechaSesion(entidad.getId());
-            entidad.setFechaSesion(fecha_sesion);
-        }   
-
-
-        if(entidad.getEsMediable()  && entidad.getFechaSesion() != null){
-            Integer fecha_valida = solicitudes.validar_fecha_sesion(entidad.getFechaSesion());
-
-            if(fecha_valida != 1){
-                ArrayList<Object> errores = new ArrayList<>();
-                response.setSuccess(false);
-                if(fecha_valida == 2) {  errores.add("La Hora seleccionada no es valida."); errores.add("Seleccione una hora entre los siguientes rangos: '08:30', '10:00', '12:00', '13:30' ");  }
-                if(fecha_valida == 3) {  errores.add("El dia elegido no puede ser Sábado o Domingo.");  }
-                if(fecha_valida == 4) {  errores.add("La fecha seleccionada no puede ser un dia inhábil.");  }
-                if(fecha_valida == 5) {  errores.add("La fecha seleccionada ya tiene todas las sesiones asignadas.");  }
-
-                response.setMessage("Error en la fecha de sesión.");
-                response.setErrors(errores);
-                return ResponseEntity.ok(response);
-            }
-            
-        }
-    
-        // Guardamos o actualizamos la entidad `Solicitud` en la base de datos.
-        Solicitud solicitudActualizada = solicitudes.save(entidad);
-        
-        // Construimos la respuesta con los datos de la solicitud actualizada.
-        response.setSuccess(true);
-        response.setMessage("OK");
-        response.setData(solicitudActualizada);
-        
-        return ResponseEntity.ok(response);
+        // Procesa la solicitud y maneja posibles errores
+        return solicitudes.procesarSolicitud(entidad);
     }
-
     @PostMapping("/delete/{id}")
     public ResponseEntity<GenericResponse> eliminar(@PathVariable("id") Integer id) {
         //TODO: process POST request
