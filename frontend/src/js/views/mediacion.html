@@ -111,7 +111,7 @@
 
         <oj-bind-if test="[[solicitudId()]]">
             <div class="oj-panel oj-sm-margin-2x-top" style="width: 1px; min-width: 100%;">
-                <h4 class="oj-typography-subheading-xs">Mediación</h4>
+                <h4 class="oj-typography-subheading-xs">Seguimiento solicitud</h4>
                 <oj-c-form-layout full-width="true">
                     <div class="oj-flex">
                         <div class ="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
@@ -139,7 +139,7 @@
                             data="[[estadoSolicitudDP]]" 
                             item-text="label" 
                             value="{{solicitudEstatus}}"
-                           
+                            disabled="{{ estatusSolicitudDisabled }}"
                             label-hint="Seguimiento"></oj-c-select-single>
                         </div>
                         <oj-bind-if test="[[ solicitudMediable() ]]">
@@ -171,14 +171,14 @@
                                 id = "estatusSolicitud"
                                 data="[[institucionesDP]]" 
                                 item-text="label" 
-                                value="{{solicitudEstatus}}"
+                                value="{{ institucion_seleccionada }}"
                                 disabled="[[!solicitudCanalizada()]]"
                                 label-hint="Institucion"></oj-c-select-single>
                             </div>
                         </oj-bind-if>
                         <oj-bind-if test="[[!mostrarDocNoMed()]]">
                             <oj-c-text-area class="oj-sm-padding-2x-end oj-md-padding-3x-end"
-                            label-hint="Describa el motivo por el cual se considera No Mediable"
+                            label-hint="Describa el motivo por el cual se considera No Mediable" value="{{ descripcionNoMediable  }}"
                             ></oj-c-text-area>
                         </oj-bind-if>
                         <div class ="oj-flex-item oj-sm-4"></div>
