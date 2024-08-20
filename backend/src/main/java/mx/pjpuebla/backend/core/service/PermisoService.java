@@ -19,7 +19,7 @@ public class PermisoService {
     public List<Permiso> findByActivo(boolean activo) {
         return repo.findByActivo(activo);
     }
-
+    
     public List<Permiso> findAll() {
         return repo.findAll();
     }

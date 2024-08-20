@@ -13,5 +13,5 @@ public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
     public Long uploadArchivo(@Param("nombre") String nombreArchivo, @Param("tipo") String tipoArchivo, @Param("data") byte[] dataArchivo, @Param("usuario") String usuario);
 
     @SuppressWarnings("null")
-    public Optional<Archivo> findById(Long id);
+    public Optional<Archivo> findById(Integer id);
 }
