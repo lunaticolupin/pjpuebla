@@ -110,25 +110,7 @@ public class SolicitudService {
         }
     }
 
-    public Integer validar_fecha_sesion(Date p_fecha_solicitud) {
 
-        try {
-
-            String jsonResult = repositorio.validar_fecha_sesion(p_fecha_solicitud);
-            // Convertir el JSON resultante en un objeto
-            JsonNode jsonNode = objectMapper.readTree(jsonResult);
-
-            int estatus = jsonNode.path("estatus").asInt();
-            String fecha = jsonNode.path("fecha").asText();
-
-            return estatus;
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
 
     public boolean registrarDocumento(Integer solicitudId, String claveFormato, String usuario, String personaFirma) {
         return this.repositorio.registrarDocumento(solicitudId, claveFormato, usuario, personaFirma);
@@ -157,13 +139,14 @@ public class SolicitudService {
         entidad.setInvitadoPersona(usuarioInvitado);
         entidad.setUsuarioPersona(usuarioPersona);
 
+        /* 
         // Validación y ajuste de la fecha de sesión
-        if (entidad.getEsMediable() == true && entidad.getFechaSesion() == null) {
+        if (entidad.getEsMediable() == 1 && entidad.getFechaSesion() == null) {
             Date fechaSesion = generarFechaSesion(entidad.getId());
             entidad.setFechaSesion(fechaSesion);
         }
 
-        if (entidad.getEsMediable() == true && entidad.getFechaSesion() != null) {
+        if (entidad.getEsMediable() == 1 && entidad.getFechaSesion() != null) {
             Integer fechaValida = validar_fecha_sesion(entidad.getFechaSesion());
 
             if (fechaValida != 1) {
@@ -190,16 +173,27 @@ public class SolicitudService {
                 return ResponseEntity.ok(response);
             }
         }
-
+        */
+        
         // Manejo de la canalización
-        if (entidad.getEsMediable() == false) {
+        if (entidad.getEsMediable() == 2) {
+            SolicitudCanalizacion sol = entidad.getCanalizacion();
+            if(sol.getDescripcion().isEmpty()){
+                List<String> errores = new ArrayList<>();
+                errores.add("Es necesario escribir algun motivo por el cual no se considera mediable");
+                response.setSuccess(false);
+                response.setMessage("Error al guardar la información");
+                response.setErrors(errores);
+                return ResponseEntity.ok(response);
+            }
+            
 
             if (entidad.getCanalizacion().getId() != null) {
                 SolicitudCanalizacion solicitudEntity = entidad.getCanalizacion();
 
                 solicitudEntity.setDescripcion(solicitudEntity.getDescripcion());
                 solicitudEntity.setFecha_actualizacion(new Date());
-                solicitudEntity.setEstatus(solicitudEntity.getEstatus());
+                solicitudEntity.setEstatus(1);
                 
                 //Evaluamos si el ha sido canalizada a una institución si lo ha sido asignamos la institucion canalizada si no lo ha sido eliminamos cualquier canalización que se tenga
                 if(solicitudEntity.getEstatus() == 1){ solicitudEntity.setInstitucion(solicitudEntity.getInstitucion()); }
@@ -221,7 +215,7 @@ public class SolicitudService {
 
         }
 
-        if(entidad.getEsMediable() == null){
+        if(entidad.getEsMediable() == 0){
             if (entidad.getCanalizacion().getId() != null) {
                 SolicitudCanalizacion solicitudEntity = entidad.getCanalizacion();
 
@@ -245,6 +239,33 @@ public class SolicitudService {
         response.setData(solicitudActualizada);
 
         return ResponseEntity.ok(response);
+    }
+
+
+    /* 
+    public Integer validar_fecha_sesion(Date p_fecha_solicitud) {
+
+        try {
+
+            String jsonResult = repositorio.validar_fecha_sesion(p_fecha_solicitud);
+            // Convertir el JSON resultante en un objeto
+            JsonNode jsonNode = objectMapper.readTree(jsonResult);
+
+            int estatus = jsonNode.path("estatus").asInt();
+            String fecha = jsonNode.path("fecha").asText();
+
+            return estatus;
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+    */
+
+    public void validar_fecha_sesion(){
+        
     }
 
 }

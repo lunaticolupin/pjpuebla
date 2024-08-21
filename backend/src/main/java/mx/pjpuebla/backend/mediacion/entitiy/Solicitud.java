@@ -50,7 +50,7 @@ public class Solicitud {
     //@JsonFormat(pattern = "dd/MM/yyyy")
     private Date fechaSesion;
 
-    private Boolean esMediable;
+    private Integer esMediable = 0;
 
     private Boolean canalizado = false;
 
