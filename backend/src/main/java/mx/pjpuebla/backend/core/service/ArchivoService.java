@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -18,9 +20,11 @@ import mx.pjpuebla.backend.core.repository.ArchivoRepository;
 @AllArgsConstructor
 public class ArchivoService {
     private final ArchivoRepository repo;
-    // private MultipartFile file;
 
-    public Archivo findById(Long id){
+    public Archivo save(Archivo a) {
+        return this.repo.save(a);
+    }
+    public Archivo findById(Integer id){
         Optional<Archivo> archivo = this.repo.findById(id);
 
         if (archivo.isPresent()){

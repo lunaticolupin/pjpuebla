@@ -19,6 +19,8 @@ import lombok.Getter;
 import lombok.Setter;
 import mx.pjpuebla.backend.core.entitiy.Archivo;
 import mx.pjpuebla.backend.core.entitiy.Formato;
+import jakarta.persistence.Column;
+import java.util.UUID;
 
 @Entity
 @Table(schema = "mediacion", name = "solicitud_archivo")
@@ -27,38 +29,46 @@ import mx.pjpuebla.backend.core.entitiy.Formato;
 public class SolicitudArchivo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID  id;
 
     @JsonIgnore
     private Long solicitudId;
 
-    @OneToOne
+    // @OneToOne
     @JoinColumn(name = "archivo_id")
-    private Archivo archivo;
+    private Integer archivoId;
 
-    @ManyToOne
-    private Formato formato;
+    // @ManyToOne
+    @Column(name = "formato_id", nullable = false)
+    private Integer formato;
 
+    @Column(name = "estatus", nullable = false)
     private int estatus;
 
+    @Column(name = "fecha_creacion", nullable = false)
     private Date fechaCreacion=new Date();
+
+    @Column(name = "fecha_actualizacion", nullable = false)
     private Date fechaActualizacion;
 
+    @Column(name = "usuario_creo", nullable = false)
     private String usuarioCreo;
+
+    @Column(name = "usuario_actualizo", nullable = false)
     private String usuarioActualizo;
 
-    private String personaFirma;
+    // private String personaFirma;
 
-    public Object getArchivo(){
-        if (archivo==null){
-            return archivo;
-        }
+    // public Object getArchivo(){
+    //     if (archivo==null){
+    //         return archivo;
+    //     }
  
-        JSONObject object = new JSONObject();
+    //     JSONObject object = new JSONObject();
 
-        object.put("id", archivo.getId());  
-        object.put("nombre", archivo.getNombre());
+    //     object.put("id", archivo.getId());  
+    //     object.put("nombre", archivo.getNombre());
 
-        return object.toMap();
-    }
+    //     return object.toMap();
+    // }
 }
