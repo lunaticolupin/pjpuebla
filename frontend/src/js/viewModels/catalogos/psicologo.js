@@ -8,14 +8,14 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                 self.psicologos = ko.observableArray([]);
                 self.baseUrl = config.baseEndPoint + '/mediacion/psicologos';
                 self.psicologoSeleccionado = ko.observable();
-                self.personas = ko.observableArray([]);
+                self.usuarios = ko.observableArray([]);
                 
                 self.psicologoDetalle = ko.observable(false);
                 self.psicologo_template = ko.observable({});
                 this.ModuleElementUtils = ModuleElementUtils;
                 this.dataProvider = new ArrayDataProvider(self.psicologos, {keyAttributes: 'id'});
                 this.userInfoSignal = new signals.Signal();
-                self.dataProviderPersonas = new ArrayDataProvider(self.personas, {keyAttributes: 'value'})
+                self.dataProviderUsuarios = new ArrayDataProvider(self.usuarios, {keyAttributes: 'value'})
 
                 //Observables para formulario de psicologo.
                 self.id_psicologo = ko.observable();
@@ -29,7 +29,7 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                     accUtils.announce('Catalogos page loaded.', 'assertive');
                     document.title = "Catálogos / psicologos";
                     self.getPsicologos(self.baseUrl); 
-                    self.getPersonas(config.baseEndPoint + '/personas');
+                    self.getUsuarios(config.baseEndPoint + '/usuarios');
                 };
 
                 this.firstSelectedRowChangedListener = ((event) => {
@@ -74,29 +74,36 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                     });         
                 }
 
-                self.getPersonas = (url, params = {}) => {
+                self.getUsuarios = (url, params = {}) => {
                     utils.waiting();
     
                     utils.getData(url, params).then((response)=>{
-                        
+                        let usuarios_temp = [];
                         if (response.success){
-                            let personas_temp = [];
                             
 
                             response.data.forEach(element => {
-                                if(!element.personaMoral){
-                                    personas_temp.push({value: element.id, label: element.nombre + ' ' + element.apellidoMaterno + ' ' + element.apellidoPaterno})
-                                }   
-                            });
-                            self.personas(personas_temp);
-                            
-                            
+                                usuarios_temp.push({value: element.persona.id, label: element.persona.nombreCompleto });                                
+                                });
                         }
+                        self.usuarios(usuarios_temp);
     
                         utils.waiting(stop=true);
                         
                     }).catch(error => {
                         utils.waiting(stop=true);
+                    });         
+                }
+
+                  self.getNumeroConsecutivo = (url, params = {}) => {
+                    utils.waiting();                    
+                
+                    utils.getData(url, params).then((response)=>{
+                        utils.waiting(stop=true);
+                        self.numero(response.data);
+                    }).catch(error => {
+                        utils.waiting(stop=true);
+                       
                     });         
                 }
     
@@ -107,6 +114,7 @@ define(['../../accUtils', 'jquery', 'webConfig', 'utils',  'knockout', 'ojs/ojar
                 };
     
                 this.agregarPsicologo = () =>{
+                    self.getNumeroConsecutivo(config.baseEndPoint + '/mediacion/psicologos/numeroConsecutivo');
                     self.psicologoDetalle(true);
                     self.getJSONTemp();
                    
