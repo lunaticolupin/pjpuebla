@@ -82,6 +82,18 @@ public class AsistenciaController {
 
     }
     
+    @PostMapping("/save/{id}")
+    public ResponseEntity<GenericResponse>  guardar(@Valid @RequestBody Asistencia entidad, Errors errors ) {
+        if (errors.hasErrors()) {
+            GenericResponse response = new GenericResponse();
+            response.setMessage("La entidad tiene errores");
+            response.setErrors(errors.getAllErrors());
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return asistenciaService.actualizarAsistencia(entidad, entidad.getSolicitud().getId(), entidad.getFecha_asistencia());
+    }
+    
 
     @GetMapping("/findBySolicitudId/{solicitud_id}")
     public ResponseEntity<GenericResponse> getAsistenciasBySolicitud(@PathVariable("solicitud_id") Integer solicitud_id){

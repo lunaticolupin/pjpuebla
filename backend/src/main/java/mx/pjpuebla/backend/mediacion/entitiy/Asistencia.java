@@ -1,11 +1,10 @@
 package mx.pjpuebla.backend.mediacion.entitiy;
 
-import mx.pjpuebla.backend.mediacion.entitiy.SesionMediacion;
-
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +16,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,6 +42,8 @@ public class Asistencia {
     private Integer tipo;
     private Boolean acepta_usuario;
     private Boolean acepta_invitado;
+    @NotNull
+    private Integer estatus = 1;
 
     @JsonIgnore
     private Date fecha_registro = new Date();
@@ -55,7 +57,6 @@ public class Asistencia {
     @OneToOne
     @JoinColumn(name = "sesion_mediacion_id")
     private SesionMediacion sesionMediacion;
-
 
 
 }
