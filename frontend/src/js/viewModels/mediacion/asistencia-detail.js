@@ -5,13 +5,12 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
         class asistenciaDetalleViewModel {
             constructor(params) {
                 const asistenciaInfoSignal = params.asistenciaInfoSignal;
-                console.log(params);
                 
                 var self = this;
 
                 this.serviceURL = config.baseEndPoint + '/mediacion/asistencias';
 
-                self.asistencia = ko.observable({});
+                self.asistencia = ko.observable({fecha_asistecia: ''});
                 this.maxFecha = new Date().toISOString();
                 this.groupValid = ko.observable();
                 self.solicitud_id = ko.observable();
@@ -29,7 +28,15 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                 this.asistenciaDP = new ArrayDataProvider(self.asistencia_array_options,
                     { keyAttributes: 'value' });
 
-                this.getAsistencias = params.getAsistencias;
+                self.isToday = ko.computed(() => {
+    
+                    const today = new Date().toISOString().split('T')[0]; // Obtener solo la fecha en formato YYYY-MM-DD
+                    const selectedDate = self.asistencia().fecha_asistencia ?
+                        new Date(self.asistencia().fecha_asistencia).toISOString().split('T')[0] :
+                        ""; // Extraer solo la fecha de la propiedad
+
+                    return today >= selectedDate;
+                });
 
                 function formatear_fecha(p_fecha) {
 
@@ -82,11 +89,6 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                                 if (response.success) {
                                     swal('Invitación', response.message, 'success');
 
-
-                                    this.getAsistencias();
-
-
-
                                 } else {
                                     swal(response.message, JSON.stringify(response.errors), 'error');
                                 }
@@ -97,8 +99,6 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                         }
                     })
                 });
-
-                
 
                 asistenciaInfoSignal.add((p_asistencia, p_solicitud_id) => {
 

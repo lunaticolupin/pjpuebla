@@ -70,10 +70,16 @@ public class AsistenciaController {
             
         }else if(esAgendable == 2){
             response.setSuccess(false);
-            response.setMessage("No es posible agendar mas invitaciones para esta solicitud.");
+            List<String> errores = new ArrayList<>();
+            errores.add("No es posible generar una nueva invitación ya que aun sigue activa una.");
+            response.setErrors(errores);
+            response.setMessage("Error al generar invitación.");
         }else if(esAgendable == 3){
             response.setSuccess(false);
-            response.setMessage("No es posible generar una nueva invitación ya que aun sigue activa una.");
+            List<String> errores = new ArrayList<>();
+            errores.add("No es posible agendar mas invitaciones para esta solicitud.");
+            response.setErrors(errores);
+            response.setMessage("Error al generar invitación.");
         }
 
 

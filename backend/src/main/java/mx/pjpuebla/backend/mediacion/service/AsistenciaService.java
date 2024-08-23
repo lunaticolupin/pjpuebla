@@ -2,6 +2,8 @@ package mx.pjpuebla.backend.mediacion.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,20 +53,31 @@ public class AsistenciaService {
     public Integer esAgendable(Integer solicitud_id) {
 
         List<Asistencia> asistencias = findAllBySolicitudId(solicitud_id);
-        Boolean fecha_activa;
-        Date today = new Date();
-
+    
+        // Obtener la fecha de hoy como LocalDate
+        LocalDate today = LocalDate.now();
+        
+        // Mostrar las fechas para depuración
+        for (Asistencia asistencia2 : asistencias) {
+            LocalDate fechaAsistencia = asistencia2.getFecha_asistencia().toInstant()
+                    .atZone(ZoneId.systemDefault()).toLocalDate();
+            System.out.println(fechaAsistencia + " YYYY " + today);
+        }
+    
+        // Si hay dos asistencias, devuelve 2
         if (asistencias.size() == 2) {
             return 2;
         }
-
-        fecha_activa = asistencias.stream()
-                .anyMatch(asistencia -> asistencia.getFecha_asistencia().compareTo(today) <= 0);
-
+    
+        // Verifica si alguna asistencia tiene una fecha igual o mayor a hoy
+        boolean fecha_activa = asistencias.stream()
+                .anyMatch(asistencia -> asistencia.getFecha_asistencia().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDate().compareTo(today) >= 0);
+    
         if (fecha_activa) {
             return 3;
         }
-
+    
         return 1;
     }
 
@@ -103,9 +116,9 @@ public class AsistenciaService {
     public ResponseEntity<GenericResponse> actualizarAsistencia(Asistencia asistencia, Integer solicitud_id,
             Date fecha_solicitud) {
         GenericResponse response = new GenericResponse();
-       
+
         try {
-           
+
             Solicitud solicitud = solService.findById(solicitud_id);
 
             if (solicitud != null && solicitud.getEsMediable() == 1) {
@@ -122,8 +135,6 @@ public class AsistenciaService {
                         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                         String fs = fecha;
                         Date fechaSesion = formatter.parse(fs);
-
-                        
 
                         save(asistencia);
                         solicitud.setFechaSesion(fechaSesion);

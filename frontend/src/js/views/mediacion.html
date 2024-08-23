@@ -100,7 +100,7 @@
                         <oj-bind-if test="[[ solicitudMediable() == 1 ]]">
 
                             <oj-c-button chroming="callToAction" label="Generar invitación"
-                                on-oj-action="[[ generar_invitacion ]]"></oj-c-button>
+                                on-oj-action="[[  generar_invitacion ]]" disabled="[[ isToday ]]"></oj-c-button>
                             <!--
                             <div class="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-input-date-time id="fechaSesion" value="{{solicitudFechaSesion}}"
@@ -254,7 +254,7 @@
 
 <!-- Modal para la visualización de los detalles de la Asistencia Seleccionada -->
 <oj-dialog id="modalAsistencia" dialog-title="Detalle de Invitación" aria-describedby="desc"
-    style="width: 45vw; height: 50vh;" cancel-behavior="escape">
+    style="width: 60vw; height: 50vh;" cancel-behavior="escape"   on-oj-before-close="[[handleDialogClose]]">
     <div slot="body">
         <oj-module
               config="[[moduleDetalleAsistencia]]"></oj-module>

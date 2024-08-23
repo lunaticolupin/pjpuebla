@@ -1,14 +1,16 @@
-define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarraydataprovider', 'ojs/ojbufferingdataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
-    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider',
-    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker', 'oj-c/select-single', 'oj-c/checkbox', 'ojs/ojvalidationgroup', 'sweetalert',
+define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarraydataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
+    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider', 'text!models/mediacion.json',
+    'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker', 'oj-c/select-single', 'ojs/ojvalidationgroup', 'sweetalert',
     'oj-c/text-area', 'ojs/ojtoolbar', 'oj-c/radioset', 'ojs/ojradioset', 'ojs/ojtoolbar', "oj-c/list-item-layout", "oj-c/list-view", "ojs/ojswitch", "ojs/ojoption", "ojs/ojmodule-element"
 ],
-    function (accUtils, $, config, utils, ko, ArrayDataProvider, BufferingDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator,
-        signals, ListDataProviderView, ojdataprovider_1) {
+    function (accUtils, $, config, utils, ko, ArrayDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator,
+        signals, ListDataProviderView, ojdataprovider_1, catalogos_json) {
         class MediacionViewModel {
             constructor() {
                 var self = this;
                 var rootViewModel = ko.dataFor(document.getElementById('globalBody'));
+
+                self.catalogos = JSON.parse(catalogos_json);
 
                 rootViewModel.validaSesion();
 
@@ -21,7 +23,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.solicitudId = ko.observable();
                 self.solicitudFolio = ko.observable();
                 self.solicitudFecha = ko.observable();
-                self.solicitudEsMediable = ko.observable(true);
+                self.solicitudEsMediable = ko.observable();
                 self.solicitudCanalizada = ko.observable(false);
                 self.solicitudUsuario = ko.observable({ nombre: "", apellidoPaterno: "", apellidoMaterno: "" });
                 self.solicitudInvitado = ko.observable({ nombre: "", apellidoPaterno: "", apellidoMaterno: "" });
@@ -35,7 +37,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.solicitudDetalle = ko.observable(false);
                 self.solicitudMediable = ko.observable();
                 self.solicitudCanalizada = ko.observable();
-                self.institucion_seleccionada = ko.observable(""); // INSTITUCION SELECCIONADA - COMPROBAR DE DONDE VIENE.
+                self.institucion_seleccionada = ko.observable("");
                 self.usuarioPM = ko.observable(false);
                 self.invitadoPM = ko.observable(false);
                 self.tipoPersonaSeleccionada = ko.observable();
@@ -49,54 +51,19 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.asistencias = ko.observableArray();
                 self.asistenciaSeleccionada = ko.observableArray();
 
-
-                self.mostrarForm = ko.computed(() => {
-                    if (self.solicitudSeleccionada() || self.solicitudDetalle())
-                        return true;
-                });
-
-                self.mostrarDocMed = ko.computed(() => {
-                    return !self.solicitudMediable();
-                });
-
-
-
-                self.mostrarDocNoMed = ko.computed(() => {
-                    if (self.solicitudMediable() == 0 || self.solicitudMediable()) {
-                        return true;
-                    }
-
-                    return false;
-                });
+                /* Funciones flecha para mostrar o ocultar formularios  */
+                self.mostrarForm = ko.computed(() => self.solicitudSeleccionada() || self.solicitudDetalle());
+                self.mostrarDocMed = ko.computed(() => !self.solicitudMediable());
+                self.mostrarDocNoMed = ko.computed(() => self.solicitudMediable() == 0 || self.solicitudMediable());
 
                 /** Catalogos */
                 self.materias = ko.observableArray();
                 self.instituciones = ko.observableArray();
                 self.mediadores = ko.observableArray();
-                self.tipoAperturas = ko.observableArray(
-                    [
-                        { id: 1, clave: 'P', descripcion: 'Presencial', activo: true },
-                        { id: 2, clave: 'L', descripcion: 'En Línea', activo: true }
-                    ]
-                );
-
-                self.estadoSolicitud = ko.observableArray([
-                    { value: 0, label: 'En Recepción' },
-                    { value: 1, label: 'En Dirección' },
-                    { value: 2, label: "Mediable" },
-                    { value: 3, label: "No Mediable" },
-                    { value: 4, label: "1ra invitación" },
-                    { value: 5, label: "2da invitación" }
-                ]);
-
-                self.esMediableArray = [
-                    { value: 0, label: "Por determinar" },
-                    { value: 2, label: "No" },
-                    { value: 1, label: "Si" }
-
-                ];
-
-
+                self.tipoAperturas = self.catalogos.aperturas
+                self.estadoSolicitud = ko.observableArray(self.catalogos.estadosSolicitudes);
+                self.esMediableArray = self.catalogos.esMediable;
+                self.protocoloViolencia = self.catalogos.protocolosViolencia;
                 self.documentos = ko.observableArray([
                     { value: 1, label: "Solicitud", disabled: ko.observable(false), filename: ko.observable(), printEnabled: ko.observable(true) },
                     { value: 2, label: "1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable() },
@@ -106,11 +73,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     { value: 6, label: "Canalización", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable() }
                 ]);
 
-                self.protocoloViolencia = [
-                    { value: null, label: "N/A" },
-                    { value: "DV", label: "De violencia" },
-                    { value: "CV", label: "Con violencia" }
-                ]
 
                 /** variables y funciones Knockout */
                 this.userInfoSignal = new signals.Signal();
@@ -152,9 +114,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     return new ListDataProviderView(dataProvider, { filterCriterion: criterio });
                 }, this);
 
-                this.dateConverter = ((fecha) => {
-                    return utils.parseFecha(fecha);
-                });
+                this.dateConverter = (fecha) => utils.parseFecha(fecha);
 
                 this.dateConverterInput = ko.observable(new ojconverter_datetime_1.IntlDateTimeConverter({
                     timeZone: 'America/Mexico_City',
@@ -180,6 +140,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     return d.toISOString().split('T')[0];
                 }, this);
 
+               
 
                 /** Eventos  */
 
@@ -266,13 +227,10 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         }
                     })
 
-                self.moduleDetalleAsistencia = ModuleElementUtils.createConfig(
+                this.moduleDetalleAsistencia = ModuleElementUtils.createConfig(
                     {
                         name: 'mediacion/asistencia-detail',
-                        params: {
-                            asistenciaInfoSignal: self.asistenciaInfoSignal,
-                            getAsistencias: self.getAsistencias
-                        }
+                        params: { asistenciaInfoSignal: self.asistenciaInfoSignal }
                     });
 
                 this.requeridoValidator = [
@@ -302,15 +260,13 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }, this);
 
                 ko.computed(() => {
-                    this.asistenciaInfoSignal.dispatch(self.asistenciaSeleccionada(), self.solicitudId());     
+                    this.asistenciaInfoSignal.dispatch(self.asistenciaSeleccionada(), self.solicitudId());
                 }, this)
 
                 self.solicitudMediable.subscribe((value) => {
 
-
                     self.solicitudProtocoloViolencia(null);
                     self.estadoSolicitud.removeAll();
-
 
                     switch (value) {
                         case 0:
@@ -368,26 +324,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 };
 
-                /**
-                 * Optional ViewModel method invoked after the View is disconnected from the DOM.
-                 */
-                this.disconnected = () => {
-                    // Implement if needed
-                };
-
-                /**
-                 * Optional ViewModel method invoked after transition to the new View is complete.
-                 * That includes any possible animation between the old and the new View.
-                 */
-                this.transitionCompleted = () => {
-                    // Implement if needed
-                };
-
-
-
-
-
-                self.parseSolicitud = (async (solicitud) => {
+                self.parseSolicitud = ((solicitud) => {
                     self.solicitudId(solicitud.id);
                     self.solicitudFolio(solicitud.folio);
                     self.solicitudFecha(solicitud.fechaSolicitud);
@@ -423,12 +360,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         doc.printEnabled(true);
                     }
 
-                    //obteniendo asistencias:
-                    // Esperar a que getAsistencias se complete antes de continuar
-                   
-                    await self.getAsistencias();
+                    self.getAsistencias();
 
                 });
+
+                self.handleDialogClose = () => { self.getAsistencias(); };
+
 
                 self.fromSolicitud = (() => {
                     let solicitud = {
@@ -454,6 +391,51 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     }
 
                     $('#solicitudes').show();
+                });
+
+                self.generar_invitacion = () => {
+                    var url_template = self.urlBase + '/asistencias/template';
+                    var url_add = self.urlBase + '/asistencias/add';
+                    var template = {}
+
+                    utils.getData(url_template, {}).then((response) => {
+                        if (response.success) {
+                            utils.crear_cita('Invitación').then((confirmacion) => {
+                                template = response.data;
+                                template.solicitud = { id: self.solicitudId() };
+                                utils.postData(url_add, template).then((response) => {
+                                    if (response.success) {
+                                        swal("Invitación generada", "Se han generado una nueva invitación", "success");
+                                        self.getAsistencias();
+                                        return true;
+                                    }
+                                    const errores = JSON.stringify(response.errors);
+                                    swal(response.message, errores, "error");
+                                }).catch((response) => {
+                                    const errores = JSON.stringify(response);
+    
+                                    swal("Error al procesar la petición", errores, "error");
+                                });
+
+                            })
+
+                        }
+                    })
+                }
+
+                self.isToday = ko.computed(() => {
+    
+                    const today = new Date().toISOString().split('T')[0]; // Obtener solo la fecha en formato YYYY-MM-DD
+                    const selectedDate = self.solicitudFechaSesion() ?
+                        new Date(self.solicitudFechaSesion()).toISOString().split('T')[0] :
+                        "";
+                    console.log(today);
+                    console.log(selectedDate);
+                    console.log( today <= selectedDate);
+                    
+                    
+                    
+                    return today <= selectedDate;
                 });
 
                 /*
@@ -588,8 +570,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 this.btnOpenDetailAsistencia = (event, detail) => {
                     self.asistenciaSeleccionada(detail.item.data);
-                    
-                    
                     document.getElementById("modalAsistencia").open();
                 }
 
@@ -667,7 +647,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         }
                     })
                 };
-                
 
                 self.getMaterias = (() => {
                     const url = config.baseEndPoint + '/materias';
@@ -752,34 +731,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 });
 
-                function formatear_fecha(p_fecha) {
-
-                    // Crear un objeto Date a partir de la cadena
-                    let date = new Date(p_fecha);
-
-                    // Obtener la hora local en la zona horaria de Ciudad de México
-                    let options = {
-                        timeZone: 'America/Mexico_City',
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false
-                    };
-
-                    let formatter = new Intl.DateTimeFormat('en-GB', options);
-                    let parts = formatter.formatToParts(date);
-
-                    // Formatear la fecha al estilo deseado yyyy-MM-dd HH:mm:ss
-                    let formattedDate = `${parts.find(p => p.type === 'year').value}-${parts.find(p => p.type === 'month').value}-${parts.find(p => p.type === 'day').value} ${parts.find(p => p.type === 'hour').value}:${parts.find(p => p.type === 'minute').value}:${parts.find(p => p.type === 'second').value}`;
-
-                    return formattedDate;
-                }
-
                 self.putSolicitud = (() => {
-
 
                     var data = {
                         id: self.solicitudId(),
@@ -799,7 +751,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         descripcionConflicto: self.solicitudDescripcion(),
                         estatus: self.solicitudEstatus(),
                         tipoApertura: self.solicitudTipoApertura(),
-                        fechaSesion: self.solicitudFechaSesion() ? formatear_fecha(self.solicitudFechaSesion()) : null
+                        fechaSesion: self.solicitudFechaSesion() ? self.dateConverter(self.solicitudFechaSesion()) : null
                     }
 
 
@@ -906,7 +858,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         });
                     }
                 });
-
             }
 
             _checkValidationGroup() {
@@ -940,11 +891,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
             }
         }
 
-        /*
-         * Returns an instance of the ViewModel providing one instance of the ViewModel. If needed,
-         * return a constructor for the ViewModel so that the ViewModel is constructed
-         * each time the view is displayed.
-         */
         return MediacionViewModel;
     }
 );

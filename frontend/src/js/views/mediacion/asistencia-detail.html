@@ -7,7 +7,7 @@
       <oj-c-input-number id="tipo_id" label-hint="Invitación número" value="{{ asistencia().tipo }}" readonly="true"></oj-c-input-number>
       
       <oj-input-date-time id="fechaSesion" value="{{ asistencia().fecha_asistencia }}" label-hint="Fecha de Sesión"
-        converter="[[dateTimeConverterInput]]" min="[[maxFecha]]" required></oj-input-date-time>
+        converter="[[dateTimeConverterInput]]" min="[[maxFecha]]" required readonly="[[ isToday ]]"></oj-input-date-time>
 
       <oj-c-radioset id="radioSetsAsistenciaPer" value="{{ asistencia().asiste_usuario }}" direction="row"
         label-hint="Asiste persona" options="[[asistenciaDP]]" required></oj-c-radioset>

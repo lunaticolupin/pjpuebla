@@ -1,0 +1,29 @@
+{
+    "aperturas": [
+        { "id": 1, "clave": "P", "descripcion": "Presencial", "activo": true },
+        { "id": 2, "clave": "L", "descripcion": "En Línea", "activo": true }
+     ],
+
+    "estadosSolicitudes": [
+        { "value": 0, "label": "En Recepción" },
+        { "value": 1, "label": "En Dirección" },
+        { "value": 2, "label": "Mediable" },
+        { "value": 3, "label": "No Mediable" },
+        { "value": 4, "label": "1ra invitación" },
+        { "value": 5, "label": "2da invitación" }
+    ],
+    
+    "esMediable": [
+        { "value": 0, "label": "Por determinar" },
+        { "value": 2, "label": "No" },
+        { "value": 1, "label": "Si" }
+    ],
+
+    "protocolosViolencia": [
+        { "value": null, "label": "N/A" },
+        { "value": "DV", "label": "De violencia" },
+        { "value": "CV", "label": "Con violencia" }
+      ]
+      
+     
+}
