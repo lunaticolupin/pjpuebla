@@ -19,6 +19,10 @@ public class PermisoService {
     public List<Permiso> findByActivo(boolean activo) {
         return repo.findByActivo(activo);
     }
+    
+    public List<Permiso> findAll() {
+        return repo.findAll();
+    }
 
     public Permiso save(Permiso p) {
         return this.repo.save(p);

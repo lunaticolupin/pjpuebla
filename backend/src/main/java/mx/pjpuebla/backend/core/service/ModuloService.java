@@ -19,6 +19,10 @@ public class ModuloService {
         return repo.findAll();
     }
 
+    public List<Modulo> findByActivo(boolean activo) {
+        return repo.findByActivo(activo);
+    }
+
     public Modulo save(Modulo m){
         return this.repo.save(m);
     }

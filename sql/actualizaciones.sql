@@ -90,3 +90,21 @@ AS SELECT s.id,
      JOIN core.persona p2 ON p2.id = s.invitado_persona_id
      JOIN core.materia m ON m.id = s.materia_id
      JOIN mediacion.tipo_apertura ta ON ta.id = s.tipo_apertura_id;
+
+
+
+
+
+
+ALTER TABLE mediacion.solicitud_canalizacion ADD CONSTRAINT solicitud_canalizacion_unique UNIQUE (solicitud_id);
+
+-- se camia el tipo de dato a es_mediable quedando como entero, se almacenaran los siguientes valores;
+-- 0 - por determinar
+-- 1 - mediable
+-- 2 - no es mediable
+ALTER TABLE mediacion.solicitud ADD es_mediable int4 NULL;
+ALTER TABLE mediacion.solicitud ALTER COLUMN es_mediable SET DEFAULT 0;
+
+
+
+ALTER TABLE mediacion.asistencia ALTER COLUMN fecha_asistencia TYPE timestamp USING fecha_asistencia::timestamp;

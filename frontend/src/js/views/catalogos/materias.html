@@ -1,0 +1,99 @@
+<body>
+  <head>
+    <link rel="stylesheet" href="css/tablas.css">
+    <script src="../../viewModels/catalogos/materia-detalle.js"></script>
+    <!-- <link rel="stylesheet" href="../../viewModels/catalogos/materia-detalle.js"> -->
+  </head>
+  <div class="container">
+      <h4>Materias</h4>
+      <oj-button id="buttonOpener" on-oj-action="[[openModalAgregar]]">Agregar nueva Materia</oj-button>
+      <div style="padding-top: 2rem;">
+        <oj-table id = "materias" data = "[[dataProvider]]" class="tabla"
+          columns-default='{"sortable": "disabled"}'
+          selection-mode.row="none"
+          scroll-policy="loadMoreOnScroll"
+          scroll-policy-options.fetch-size="10"
+          scroll-policy-options.scroller="#samplePage"
+          scroll-policy-options.scroller-offset-top="0"
+          scroll-policy-options.scroller-offset-bottom="100"
+          scroll-policy-options.scroller-offset-start="0"
+          scroll-policy-options.scroller-offset-end="100"
+          columns='[
+          {"headerText":"ID", "field":"id","minWidth":"50"},
+          {"headerText":"Clave", "field":"clave"},
+          {"headerText":"Descripción", "field":"descripcion"},
+          {"headerText": "Editar","template": "actionTemplate", "id": "action"},
+          {"headerText":"Eliminar","template": "actionTemplateDelete","id": "action"}]'>
+          <template slot="actionTemplate" data-oj-as="cell">
+            <oj-c-button
+              chroming="borderless"
+              display="icons"
+              on-oj-action="[[openModalEditar]]"
+              data-oj-clickthrough="disabled">
+              <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+            </oj-c-button>
+            
+          </template>
+          <template slot="actionTemplateDelete" data-oj-as="cell">
+            <oj-c-button
+              chroming="borderless"
+              display="icons"
+              data-oj-clickthrough="disabled">
+              <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
+            </oj-c-button>
+            
+          </template>
+        </oj-table>
+      </div>
+    <div id="dialogAgregar">
+
+      <oj-dialog id="modalAgregar" dialog-title="Nuevo registro" aria-describedby="desc">
+        <oj-module
+          config="[[ModuleElementUtils.createConfig({name: 'catalogos/persona-detalle', params: {userInfoSignal: userInfoSignal}})]]"
+          class="oj-bg-info-20">
+          <input type="text" id="clave">
+        </oj-module>  
+        <!-- <div slot="body">
+          <oj-c-form-layout id="materia-information" direction="row" max-columns="3">
+            <oj-c-input-text
+                id="clave"
+                label-hint="Clave"
+                required="true"
+                autocomplete="off"></oj-c-input-text>
+            <oj-c-input-text
+                id="descripcion"
+                label-hint="Descripción"
+                required="true"
+                autocomplete="off"></oj-c-input-text>    
+          </oj-c-form-layout>
+        </div>
+        <div slot="footer">
+          <oj-button id="okButton" on-oj-action="[[guardar]]">Guardar</oj-button>
+          <oj-button id="okButton" on-oj-action="[[closeModalAgregar]]">Cancelar</oj-button>
+        </div> -->
+      </oj-dialog>
+    </div>
+    <div id="dialogEditar">
+      <oj-dialog id="modalEditar" dialog-title="Editar registro" aria-describedby="desc">
+        <div slot="body">
+          <oj-c-form-layout id="materia-information" direction="row" max-columns="3">
+            <oj-c-input-text
+                id="clave"
+                label-hint="Clave"
+                required="true"
+                autocomplete="off"></oj-c-input-text>
+            <oj-c-input-text
+                id="descripcion"
+                label-hint="Descripción"
+                required="true"
+                autocomplete="off"></oj-c-input-text>    
+          </oj-c-form-layout>
+        </div>
+        <div slot="footer">
+          <oj-button id="okButton" on-oj-action="[[guardar]]">Guardar</oj-button>
+          <oj-button id="okButton" on-oj-action="[[closeModalEditar]]">Cancelar</oj-button>
+        </div>
+      </oj-dialog>
+    </div>
+  </div>
+</body>  

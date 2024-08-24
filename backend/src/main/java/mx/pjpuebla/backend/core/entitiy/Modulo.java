@@ -45,6 +45,9 @@ public class Modulo implements Serializable {
 
     @Column(name = "estatus", nullable = true)
     private Integer estatus;
+    
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = Boolean.valueOf(true);
 
     @ManyToMany // 1 :: N Permisos
 	@JoinTable(schema = "core", name = "rol_modulo_permiso", joinColumns = @JoinColumn(name="modulo_id"), inverseJoinColumns = @JoinColumn(name="permiso_id"))

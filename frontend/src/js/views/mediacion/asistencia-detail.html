@@ -1,0 +1,35 @@
+<div class="oj-panel oj-bg-info-10">
+  <h1 class="oj-typography-heading-xs">Invitación</h1>
+  <h2 class="oj-typography-subheading-xs">Detalle de la invitación</h2>
+  <oj-validation-group id="trackerAsistencia" valid="{{groupValid}}" role="group">
+    <oj-c-form-layout id="personal-information" direction="row" max-columns="3">
+
+      <oj-c-input-number id="tipo_id" label-hint="Invitación número" value="{{ asistencia().tipo }}" readonly="true"></oj-c-input-number>
+      
+      <oj-input-date-time id="fechaSesion" value="{{ asistencia().fecha_asistencia }}" label-hint="Fecha de Sesión"
+        converter="[[dateTimeConverterInput]]" min="[[maxFecha]]" required readonly="[[ isToday ]]"></oj-input-date-time>
+
+      <oj-c-radioset id="radioSetsAsistenciaPer" value="{{ asistencia().asiste_usuario }}" direction="row"
+        label-hint="Asiste persona" options="[[asistenciaDP]]" required></oj-c-radioset>
+
+      <oj-c-radioset id="radioSetsAsistenciaInv" value="{{ asistencia().asiste_invitado }}" direction="row"
+        label-hint="Asiste Invitado" options="[[asistenciaDP]]" required></oj-c-radioset>
+
+      <oj-c-radioset id="radioSetsAceptaPer" value="{{ asistencia().acepta_usuario }}" direction="row"
+        label-hint="Acepta Persona" options="[[asistenciaDP]]" required></oj-c-radioset>
+
+      <oj-c-radioset id="radioSetsAceptaInv" value="{{ asistencia().acepta_invitado }}" direction="row"
+        label-hint="Acepta Invitado" options="[[asistenciaDP]]" required></oj-c-radioset>
+
+    </oj-c-form-layout>
+  </oj-validation-group>
+</div>
+
+<oj-toolbar chroming="outlined">
+
+  <oj-c-button label="Guardar" on-oj-action="[[guardar]]" data-oj-clickthrough="disabled" chroming="callToAction">
+    <span slot="startIcon" class="oj-ux-ico-save"></span>
+  </oj-c-button>
+
+
+</oj-toolbar>

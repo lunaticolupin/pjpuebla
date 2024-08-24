@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,11 +29,15 @@ public class Permiso {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="PERMISO_ID_GENERATOR")	
     @SequenceGenerator(name = "PERMISO_ID_GENERATOR", sequenceName = "core.permiso_id_seq", allocationSize = 1)
     private Integer id;
-    private Integer clave;
+    private String clave;
     private String descripcion;
-    private boolean activo;
+    
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = Boolean.valueOf(true);  
 
     public String descripcion() {
         return this.descripcion;
     }
+
+    
 }

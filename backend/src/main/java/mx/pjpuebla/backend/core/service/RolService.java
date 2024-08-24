@@ -19,8 +19,6 @@ public class RolService {
     private final RolRepository repo;
 
     public List<Rol> findAll() {
-
-        
         return repo.findAll();
     }
 

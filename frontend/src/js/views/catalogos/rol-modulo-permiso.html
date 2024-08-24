@@ -1,0 +1,50 @@
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Rol</h1>
+    <h2 class="oj typography-subheading-xs">Información rol</h2>
+
+    <oj-c-form-layout id="rol-modulo-permiso" direction="row" max-columns="3">
+                
+        <oj-c-select-single 
+            id="rol_id"
+            data="[[dataProviderRoles]]"
+            item-text="descripcion"
+            label-hint="Rol"
+            value="{{rol_id}}" 
+            disabled
+            required="true" >
+        </oj-c-select-single>
+
+        <oj-c-select-single 
+            id="modulo_id"
+            data="[[dataProviderModulos]]"
+            item-text="descripcion"
+            label-hint="Modulo"
+            value="{{modulo_id}}" 
+            required="true" >
+        </oj-c-select-single>
+
+        <oj-c-select-single 
+            id="permiso_id"
+            data="[[dataProviderPermisos]]"
+            item-text="descripcion"
+            label-hint="Permiso"
+            value="{{permiso_id}}" 
+            required="true" >
+        </oj-c-select-single>
+    </oj-c-form-layout>
+</div>
+
+<oj-c-button
+label="Guardar"
+on-oj-action="[[guardar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-save"></span>
+</oj-c-button>
+
+<oj-c-button
+label="Cerrar"
+on-oj-action="[[closeModalAgregar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-close-all"></span>
+</oj-c-button>
+

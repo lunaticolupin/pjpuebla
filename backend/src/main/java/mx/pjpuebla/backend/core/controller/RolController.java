@@ -30,12 +30,21 @@ public class RolController {
     private final RolService roles;
 
     @GetMapping("")
-    public ResponseEntity<GenericResponse> getRoles() {
+    public ResponseEntity<GenericResponse> getRolesAll() {
+        GenericResponse response = new GenericResponse();
+
+        response.setSuccess(true);
+        response.setData(roles.findAll());
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("activos")
+    public ResponseEntity<GenericResponse> getRolesActivos() {
         GenericResponse response = new GenericResponse();
 
         response.setSuccess(true);
         response.setData(roles.findByActivo(true));
-        // response.setData(roles.findAll());
 
         return ResponseEntity.ok(response);
     }
@@ -84,7 +93,6 @@ public class RolController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            // response.setMessage(e.getCause().getCause().getLocalizedMessage());
 
             return ResponseEntity.internalServerError().body(response);
         }
@@ -104,11 +112,10 @@ public class RolController {
         }
 
         try {
-            //Se realiza un borrado logico(solo se desactiva el rol)
             rol.setActivo(false);
             roles.save(rol);
 
-            String mensaje = String.format("Rol %d fue eliminado con éxito");
+            String mensaje = String.format("Rol %d fue dado de baja con éxito",id);
             response.setSuccess(true);
             response.setMessage(mensaje);
             response.setData(rol);
@@ -116,7 +123,6 @@ public class RolController {
             return ResponseEntity.ok(response);
 
         }catch (Exception e) {
-            // response.setMessage(e.getCause().getCause().getLocalizedMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

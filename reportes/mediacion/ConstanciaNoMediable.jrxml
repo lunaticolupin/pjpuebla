@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaNoMediable" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PostgresLocal"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="medicacion"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<parameter name="p_solicitud_id" class="java.lang.Integer"/>
 	<parameter name="p_acuse" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[new Boolean(false)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="p_image_path" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["images"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[select * from mediacion.qry_solicitud where id = $P{p_solicitud_id}]]>
@@ -106,8 +109,8 @@ new SimpleDateFormat("EEEE d 'de' MMMM  'de' yyyy ", $P{REPORT_LOCALE}).format(n
 				<textFieldExpression><![CDATA["SOLICITUD "+$F{folio}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="0" y="0" width="180" height="60" uuid="bd34e604-eba3-406a-b6a7-ad6d30133a4c"/>
-				<imageExpression><![CDATA["images/centro_justicia_a.png"]]></imageExpression>
+				<reportElement x="0" y="0" width="180" height="60" uuid="7470a979-9cb9-4f1f-8b57-6da4637b79e9"/>
+				<imageExpression><![CDATA[$P{p_image_path}+"/centro_justicia_a.png"]]></imageExpression>
 			</image>
 		</band>
 	</title>
@@ -128,7 +131,7 @@ new SimpleDateFormat("EEEE d 'de' MMMM  'de' yyyy ", $P{REPORT_LOCALE}).format(n
 	<detail>
 		<band height="486" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="10" width="480" height="220" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999">
+				<reportElement x="2" y="10" width="480" height="220" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999">
 					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Justified" markup="html">

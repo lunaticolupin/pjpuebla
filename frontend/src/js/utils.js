@@ -48,9 +48,7 @@ define(['jquery','sweetalert'],
                     success: false,
                     error: error
                 }
-            }
-
-            
+            }            
         }
 
         _getReporte = async (url, data={})=>{
@@ -122,6 +120,17 @@ define(['jquery','sweetalert'],
             );
         });
 
+        _crear_invitacion = ( async(title = "Generar invitación", text = "¿Desea generar una nueva invitación?") => {
+            return await swal(
+                {
+                    title: title,
+                    text: text,
+                    buttons: ["No", "Si"],
+                    dangerMode: true
+                }
+            );
+        });
+
         _checkValidationGroup = ((idValigGroup) => {
             const validGroup = document.getElementById(idValigGroup);
 
@@ -142,6 +151,7 @@ define(['jquery','sweetalert'],
             parseFecha: _parseFecha,
             waiting: _waiting,
             confirmar: _confirmar,
+            crear_cita: _crear_invitacion,
             checkValidationGroup: _checkValidationGroup
         }
     }

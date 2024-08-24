@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,6 +29,7 @@ import mx.pjpuebla.backend.core.entitiy.Materia;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.models.SolicitudMediacionEstatus;
 
+
 @Table(schema="mediacion", name = "solicitud")
 @Entity
 @Getter
@@ -48,7 +50,7 @@ public class Solicitud {
     //@JsonFormat(pattern = "dd/MM/yyyy")
     private Date fechaSesion;
 
-    private Boolean esMediable = true;
+    private Integer esMediable = 0;
 
     private Boolean canalizado = false;
 
@@ -100,4 +102,10 @@ public class Solicitud {
 
     @OneToMany(mappedBy = "solicitudId")
     private List<SolicitudArchivo> archivos;
+
+    @OneToOne(mappedBy = "solicitud")
+    @JsonManagedReference
+    private SolicitudCanalizacion canalizacion;
+
+    
 }

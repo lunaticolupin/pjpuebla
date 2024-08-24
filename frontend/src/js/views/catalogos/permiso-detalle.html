@@ -1,0 +1,35 @@
+<div id="form-container">
+    <h1 class="oj-typography-heading-xs">Permiso</h1>
+    <h2 class="oj typography-subheading-xs">Información permiso</h2>
+
+    <oj-c-form-layout id="rol-information" direction="row" max-columns="3">
+        <oj-c-input-text
+            id="clave"
+            label-hint="Clave"
+            required="true"
+            value="{{clave}}" autocomplete="off"
+        >
+        </oj-c-input-text>
+        <oj-c-input-text
+            id="descripcion"
+            label-hint="Descripción"
+            required="true"
+            value="{{descripcion}}" autocomplete="off"
+        ></oj-c-input-text>
+    </oj-c-form-layout>
+</div>
+
+<oj-c-button
+label="Guardar"
+on-oj-action="[[guardar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-save"></span>
+</oj-c-button>
+
+<oj-c-button
+label="Cerrar"
+on-oj-action="[[closeModalAgregar]]"
+data-oj-clickthrough="disabled">
+<span slot="startIcon" class="oj-ux-ico-close-all"></span>
+</oj-c-button>
+

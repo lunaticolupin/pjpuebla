@@ -113,7 +113,6 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                 if (id==undefined || id==null){
                     return false;
                 }
-
                 let url = this.serviceURL+"/delete/"+id;
             
                 utils.confirmar('Persona','¿Desea eliminar el registro?').then((confirmacion)=>{
@@ -225,9 +224,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                 })
             ];
            
-         }
-     }
-
+        }
+    }
     return PersonaDetalleViewModel;
   }
 );

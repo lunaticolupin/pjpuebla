@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaNoAsistenciaFirma" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="medicacion"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="expediente" class="java.lang.String"/>
+	<parameter name="p_image_path" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["images"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT e.folio as expediente,
+		core.nombre_persona(p1.id) as usuario_nombre,
+		core.nombre_persona(p2.id) as invitado_nombre,
+		core.nombre_persona(U.persona_id) as mediador,
+		s.folio as folio_solicitud,
+		s.fecha_solicitud as fecha_solicitud,
+		s.fecha_sesion as fecha_sesion,
+		p1.num_identificacion,
+		mat.descripcion as materia
+		FROM mediacion.expediente e
+		join mediacion.solicitud s on s.id = e.solicitud_id  
+		join core.persona p1 on p1.id = s.usuario_persona_id 
+		join core.persona p2 on p2.id = s.invitado_persona_id
+		join mediacion.mediador m on m.id = e.mediador_id 
+		join core.usuario u on u.persona_id  = m.usuario_id
+		join core.materia mat on mat.id = s.materia_id 
+		where  e.folio = $P{expediente}]]>
+	</queryString>
+	<field name="expediente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="expediente"/>
+		<property name="com.jaspersoft.studio.field.label" value="expediente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="expediente"/>
+	</field>
+	<field name="usuario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre"/>
+	</field>
+	<field name="invitado_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre"/>
+	</field>
+	<field name="mediador" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediador"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediador"/>
+	</field>
+	<field name="folio_solicitud" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="folio_solicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="folio_solicitud"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="solicitud"/>
+	</field>
+	<field name="fecha_solicitud" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="solicitud"/>
+	</field>
+	<field name="fecha_sesion" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="fecha_sesion"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_sesion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="solicitud"/>
+	</field>
+	<field name="num_identificacion" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="num_identificacion"/>
+		<property name="com.jaspersoft.studio.field.label" value="num_identificacion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persona"/>
+	</field>
+	<field name="materia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="materia"/>
+		<property name="com.jaspersoft.studio.field.label" value="materia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="materia"/>
+	</field>
+	<variable name="v_hora_fecha_constancia" class="java.lang.String">
+		<variableExpression><![CDATA[$V{v_number_spell}.format(new Date().getHours())+" horas y "+ $V{v_number_spell}.format(new Date().getMinutes() )+" minutos del día "+
+new SimpleDateFormat("EEEE d 'de' MMMM  'de' yyyy ", $P{REPORT_LOCALE}).format(new Date())]]></variableExpression>
+	</variable>
+	<variable name="v_number_spell" class="com.ibm.icu.text.RuleBasedNumberFormat">
+		<initialValueExpression><![CDATA[new com.ibm.icu.text.RuleBasedNumberFormat($P{REPORT_LOCALE}, com.ibm.icu.text.RuleBasedNumberFormat.SPELLOUT)]]></initialValueExpression>
+	</variable>
+	<variable name="v_fecha_sesion" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("h:mm a 'del' d 'de' MMMM 'de' yyyy", $P{REPORT_LOCALE}).format($F{fecha_sesion})]]></variableExpression>
+	</variable>
+	<variable name="v_fecha_actual" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("h:mm a 'del' dd 'de' MMMM 'de' yyyy").format(new Date())]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="74" splitType="Stretch">
+			<textField>
+				<reportElement x="340" y="44" width="146" height="30" uuid="5ea61a3c-de93-4547-8bb6-67c33aad15ff"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SOLICITUD: "+$F{folio_solicitud}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="0" width="180" height="60" uuid="3946e69d-2cf1-41df-9ee6-ca0a6c235685"/>
+				<imageExpression><![CDATA[$P{p_image_path}+"/centro_justicia_a.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="480" height="23" uuid="6ee7be92-ecdc-4193-868d-888263d5d7a5"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CONSTANCIA DE NO ASISTENCIA A FIRMA"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="500" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="167" width="484" height="110" uuid="94e658c0-e420-4979-b537-0f7ab26c0169">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="10"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="60"/>
+				</textElement>
+				<textFieldExpression><![CDATA["En atención a lo anterior, se levanta la presente por duplicado, en presencia y a petición del (de la) "+$F{usuario_nombre}+" en su carácter de USUARIO, quien se identifica Credencial para votar expedida por el Instituto Nacional Electoral con número: "+$F{num_identificacion}+" previo acuse de recibido, y el otro tanto se ordena agregar al expediente en que se actúa para los efectos legales y administrativos a los que haya lugar; dando con este acto por terminado el presente procedimiento de mediación."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="130" y="336" width="200" height="1" uuid="20b0dea8-f2f2-4a15-9d43-77e3b9081c64"/>
+			</line>
+			<staticText>
+				<reportElement x="130" y="343" width="200" height="30" uuid="fb0ecd8a-dced-4e15-ac4e-32b3f8fd3b4a"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[LIC. ROSA MARÍA MORALES CISNEROS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="130" y="373" width="200" height="51" uuid="0320b807-c0c2-4cf9-898a-ca5a2e6efe77"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TITULAR DEL CENTRO DE JUSTICIA ALTERNATIVA DEL TRIBUNAL SUPERIOR DE JUSTICIA DEL PODER JUDICIAL DEL ESTADO DE PUEBLA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="3" width="484" height="160" uuid="651266fd-57d1-41b9-b63e-84f0769294ed">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA["En Ciudad Judicial, Puebla; siendo las "+$V{v_fecha_actual}+" con fundamento en los artículos 2, 7, 15 fracción VII, 23 y 27 de LEY DE MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONTROVERSIAS DEL ESTADO LIBRE Y SOBERANO DE PUEBLA; la que suscribe <b>	LIC. ROSA MARÍA MORALES CISNEROS, Directora del Centro de Justicia Alternativa del Poder Judicial del Estado de Puebla,</b> hago constar que el(la) C. "+$F{invitado_nombre}+" en su caracter de INVITADO(A) segun consta en las documentales que integran el expediente Número <b>"+$F{expediente}+"</b> no compareció en la día y hora señalados para la firma del Acuerdo a las oficinas que ocupa este Centro de Justicia Alternativa, a fin de lograr una amigable solución al conflicto de carácter "+$F{materia}+", en el que está involucrado, para las que fueron señaladas "+$V{v_fecha_sesion}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="194" y="5" width="289" height="72" uuid="d0dfb324-2ada-49d2-9280-c83000cbd176"/>
+				<textElement textAlignment="Right" markup="html">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Centro de Justicia Alternativa del <br> Tribunal Superior de Justicia del Poder Judicial del Estado de Puebla <br>Periférico Ecológico Arco Sur Núm. 4000 Edif. A <br>Ciudad Judicial Siglo XXI<br>San Andrés Cholula, Puebla, Pue. CP 72810<br>Teléfono 222.240.86.14 / 222.240.89.14 / 222.240.89.45 <br><b>Horario de Atención Lunes a Viernes 8:00 a 15:00 Hrs.</b><br>Correo Electrónico: mediacion@pjpuebla.gob.mx
+
+]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

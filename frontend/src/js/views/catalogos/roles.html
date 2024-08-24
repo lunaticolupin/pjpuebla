@@ -1,0 +1,86 @@
+<h4>Roles</h4>
+
+<oj-table id="roles" data="[[dataProvider]]"
+    columns-default='{"sortable": "disabled"}'
+    selection-mode.row="none"
+    scroll-policy="loadMoreOnScroll"
+    scroll-policy-options.fetch-size="10"
+    scroll-policy-options.scroller="#samplePage"
+    scroll-policy-options.scroller-offset-top="0"
+    scroll-policy-options.scroller-offset-bottom="100"
+    scroll-policy-options.scroller-offset-start="0"
+    scroll-policy-options.scroller-offset-end="100"
+
+    columns='[
+    {"headerText":"ID", "field":"id","minWidth":"50"},
+    {"headerText":"Clave", "field":"clave", "minWidth":"200" },
+    {"headerText":"Descripción", "field":"descripcion"},
+    {"headerText": "Detalle",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionTemplate", "id": "action" },
+    {"headerText": "Desactivar",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionDeleteTemplate", "id": "action" },
+    {"headerText": "Asignar Permisos",
+    "maxWidth": "10rem",
+    "sortable": "disabled",
+    "headerStyle": "text-align: center;",
+    "frozenEdge": "end",
+    "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+    "template": "actionAsignar", "id": "action" }]'
+    style="width: 100%;">
+    <template slot="actionTemplate" data-oj-as="cell">
+      <oj-c-button
+        chroming="borderless"
+        display="icons"
+        on-oj-action="[[detalleRol]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+      </oj-c-button>
+    </template>
+    <template slot="actionDeleteTemplate" data-oj-as="cell">
+      <oj-c-button
+        chroming="borderless"
+        tooltip="eliminar"
+        display="icons"
+        on-oj-action="[[eliminar]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
+      </oj-c-button>
+    </template>
+
+    <template slot="actionAsignar" data-oj-as="cell">
+      <oj-c-button
+        chroming="borderless"
+        tooltip="Asignar"
+        display="icons"
+        on-oj-action="[[setRol]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-contact-workflow-role"></span>
+      </oj-c-button>
+    </template>
+</oj-table>
+<oj-button id="buttonOpener" on-oj-action="[[openModalAgregar]]">Agregar Rol</oj-button>
+
+<oj-dialog id="modalAgregar" dialog-title="Nuevo registro" aria-describedby="desc">
+  <oj-module
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/rol-detalle', params: {userInfoSignal: userInfoSignal}})]]"
+    class="oj-bg-info-20">
+    <!-- <input type="text" id="clave"> -->
+  </oj-module>
+</oj-dialog>
+
+<oj-dialog id="modalAsignar" dialog-title="Nuevo registro" aria-describedby="desc">
+  <oj-module
+    config="[[ModuleElementUtils.createConfig({name: 'catalogos/rol-modulo-permiso', params: {userInfoSignal: userInfoSignal1}})]]"
+    class="oj-bg-info-20">
+  </oj-module>
+</oj-dialog>

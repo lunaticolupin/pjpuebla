@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AceptacionServicioPsicologia" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="medicacion"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="expediente" class="java.lang.String"/>
+	<parameter name="p_image_path" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["images"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT e.folio as expediente,
+		core.nombre_persona(p1.id) as usuario_nombre,
+		core.nombre_persona(p2.id) as invitado_nombre,
+		core.nombre_persona(U.persona_id) as mediador,
+		s.folio as folio_solicitud
+		FROM mediacion.expediente e
+		join mediacion.solicitud s on s.id = e.solicitud_id  
+		join core.persona p1 on p1.id = s.usuario_persona_id 
+		join core.persona p2 on p2.id = s.invitado_persona_id
+		join mediacion.mediador m on m.id = e.mediador_id 
+		join core.usuario u on u.persona_id  = m.usuario_id
+		where  e.folio = $P{expediente}]]>
+	</queryString>
+	<field name="expediente" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="expediente"/>
+		<property name="com.jaspersoft.studio.field.label" value="expediente"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="expediente"/>
+	</field>
+	<field name="usuario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre"/>
+	</field>
+	<field name="invitado_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre"/>
+	</field>
+	<field name="mediador" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediador"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediador"/>
+	</field>
+	<field name="folio_solicitud" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="folio_solicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="folio_solicitud"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="solicitud"/>
+	</field>
+	<variable name="v_hora_fecha_constancia" class="java.lang.String">
+		<variableExpression><![CDATA[$V{v_number_spell}.format(new Date().getHours())+" horas y "+ $V{v_number_spell}.format(new Date().getMinutes() )+" minutos del día "+
+new SimpleDateFormat("EEEE d 'de' MMMM  'de' yyyy ", $P{REPORT_LOCALE}).format(new Date())]]></variableExpression>
+	</variable>
+	<variable name="v_number_spell" class="com.ibm.icu.text.RuleBasedNumberFormat">
+		<initialValueExpression><![CDATA[new com.ibm.icu.text.RuleBasedNumberFormat($P{REPORT_LOCALE}, com.ibm.icu.text.RuleBasedNumberFormat.SPELLOUT)]]></initialValueExpression>
+	</variable>
+	<variable name="v_fecha_actual" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("h:mm a 'del' dd 'de' MMMM 'de' yyyy").format(new Date())]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="74" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="180" height="60" uuid="fc22272a-6b3c-4001-bee8-be32ed561ce9"/>
+				<imageExpression><![CDATA[$P{p_image_path}+"/centro_justicia_a.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="55" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="-6" width="270" height="60" uuid="6ee7be92-ecdc-4193-868d-888263d5d7a5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" markup="html">
+					<font size="11" isBold="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>ACEPTACIÓN DEL SERVICIO DE PSICOLOGIA</b><br>A QUIEN CORRESPONDA <br>PRESENTE"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="270" y="-5" width="214" height="50" uuid="9cb7fc6b-6bbd-49af-a06f-00fa5b27d4ef">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" markup="html">
+					<font size="11" isBold="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["EXPEDIENTE: <b>"+$F{expediente}+"</b><br>MEDIADOR: "+$F{mediador}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="463" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="20" width="484" height="50" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="9"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Los suscritos C. "+$F{usuario_nombre}+"y C. "+$F{invitado_nombre}+"l”, manifestamos que es nuestra voluntad solicitar los servicios de psicología que presta en forma gratuita este Centro Justicia Alternativa para llevar a cabo los procedimientos de mediación; a través de su personal calificado."]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="41" y="295" width="150" height="1" uuid="39542c9b-8f8d-4c95-8f78-42b8b7d1e4a7"/>
+			</line>
+			<line>
+				<reportElement x="290" y="293" width="150" height="1" uuid="5c4a8eda-aa01-47a5-b7a5-d5804eb12e2c"/>
+			</line>
+			<textField>
+				<reportElement x="40" y="298" width="150" height="16" uuid="c6342e35-9de2-4132-8e61-0b0ccc1fff6f"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{usuario_nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="290" y="296" width="148" height="16" uuid="b3875407-28d1-4b2e-85b9-5fb343576833"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{invitado_nombre}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="40" y="314" width="150" height="20" uuid="0c40b703-5c1f-4418-8b01-06081a9e3316"/>
+				<textElement textAlignment="Center" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usuario(a)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="312" width="148" height="14" uuid="feecb3e3-8f4d-4239-9611-1c1b13d8ca6b"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Invitado(a)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="70" width="484" height="60" uuid="94e658c0-e420-4979-b537-0f7ab26c0169">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="9"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="60"/>
+				</textElement>
+				<textFieldExpression><![CDATA["La atención podrá incluir: intervención en crisis, orientación psicológica individual, de pareja y familiar y se podrá dar como una asistencia previa a la mediación, durante la mediación, o una vez concluido el procedimiento, como sesión de seguimiento en caso de ser necesario ."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="131" width="484" height="60" uuid="26484164-67ba-4244-b6c1-bf242c695dde">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="9"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="60"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Así mismo, por este medio y a la firma del presente, declaramos y hacemos saber que, deslindamos de toda responsabilidad civil, penal, mercantil o de cualquier otra naturaleza a este Centro de Justicia Alternativa perteneciente al Poder Judicial del Estado de Puebla, ante quien iniciamos este procedimiento."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="218" width="484" height="26" uuid="486b6cf8-ff2e-406e-a666-a984b435a4bb">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="9"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="120"/>
+				</textElement>
+				<textFieldExpression><![CDATA["H. Puebla dezaragoza, Puebla a "+$V{v_fecha_actual}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
