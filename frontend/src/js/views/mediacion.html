@@ -102,13 +102,7 @@
                             <oj-c-button chroming="callToAction" label="Generar invitación"
                                 on-oj-action="[[  generar_invitacion ]]" disabled="[[ isToday ]]"></oj-c-button>
                             <!--
-                            <div class="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
-                                <oj-input-date-time id="fechaSesion" value="{{solicitudFechaSesion}}"
-                                    label-hint="Fecha de Sesión" converter="[[dateTimeConverterInput]]"
-                                    min="[[maxFecha]]"
-                                    disabled="[[ solicitudMediable() == 2 || !solicitudFechaSesion() ]]"
-                                    required></oj-input-date-time>
-                            </div>
+                            mediador
                             <div class="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-c-select-single id="estatusSolicitud" data="[[mediadoresDP]]" item-text="label"
                                     value="{{solicitudEstatus}}" disabled="[[ solicitudMediable() == 2]]"
@@ -173,6 +167,7 @@
                     </div>
                 </oj-c-form-layout>
             </div>
+
             <div class="oj-panel oj-sm-margin-2x-top">
                 <h4 class="oj-typography-subheading-xs">Documentos</h4>
                 <div class="oj-flex">
@@ -185,21 +180,26 @@
                             <div class="oj-flex">
                                 <div class="oj-flex-item oj-sm-6"><oj-bind-text
                                         value="[[item.data.label]]"></oj-bind-text></div>
-                                <div class="oj-flex-item oj-sm-2">No disponible</div>
+                                <div class="oj-flex-item oj-sm-2"><oj-bind-text
+                                            value="[[ item.data.fecha ]]"></oj-bind-text></div>
                                 <div class="oj-flex-item oj-sm-4">
+                                    
                                     <oj-c-button id="btnImprimir" display="icons" size="sm" chroming="borderless"
                                         label="Imprimir documento" on-oj-action="[[btnOpen]]"
                                         disabled="[[!item.data.printEnabled()]]">
                                         <span slot="startIcon" class="oj-ux-ico-print"></span>
                                     </oj-c-button>
+
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
-                                        label="Subir archivo" disabled="[[item.data.filename()]]">
+                                        label="Subir archivo" disabled="[[item.data.filename()]]" on-oj-action="[[ btnUploadFile ]]"> 
                                         <span slot="startIcon" class="oj-ux-ico-upload"></span>
                                     </oj-c-button>
+
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
                                         label="Ver archivo" disabled="[[!item.data.filename()]]">
                                         <span slot="startIcon" class="oj-ux-ico-view"></span>
                                     </oj-c-button>
+
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
                                         label="Eliminar archivo" disabled="[[!item.data.filename()]]">
                                         <span slot="startIcon" class="oj-ux-ico-delete-all"></span>

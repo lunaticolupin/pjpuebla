@@ -1,10 +1,10 @@
 define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarraydataprovider', 'ojs/ojkeyset', 'ojs/ojconverter-datetime',
-    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider', 'text!models/mediacion.json',
+    'ojs/ojmodule-element-utils', 'ojs/ojasyncvalidator-regexp', 'ojs/ojvalidator-required', 'signals', 'ojs/ojlistdataproviderview', 'ojs/ojdataprovider', 'text!models/mediacion.json', 'ojs/ojfilepickerutils',
     'ojs/ojknockout', 'oj-c/button', 'ojs/ojtable', 'oj-c/form-layout', 'oj-c/input-text', 'ojs/ojdatetimepicker', 'oj-c/select-single', 'ojs/ojvalidationgroup', 'sweetalert',
     'oj-c/text-area', 'ojs/ojtoolbar', 'oj-c/radioset', 'ojs/ojradioset', 'ojs/ojtoolbar', "oj-c/list-item-layout", "oj-c/list-view", "ojs/ojswitch", "ojs/ojoption", "ojs/ojmodule-element"
 ],
     function (accUtils, $, config, utils, ko, ArrayDataProvider, ojkeyset_1, ojconverter_datetime_1, ModuleElementUtils, AsyncRegExpValidator, RequiredValidator,
-        signals, ListDataProviderView, ojdataprovider_1, catalogos_json) {
+        signals, ListDataProviderView, ojdataprovider_1, catalogos_json, FilePickerUtils) {
         class MediacionViewModel {
             constructor() {
                 var self = this;
@@ -53,8 +53,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 /* Funciones flecha para mostrar o ocultar formularios  */
                 self.mostrarForm = ko.computed(() => self.solicitudSeleccionada() || self.solicitudDetalle());
-                self.mostrarDocMed = ko.computed(() => !self.solicitudMediable());
-                self.mostrarDocNoMed = ko.computed(() => self.solicitudMediable() == 0 || self.solicitudMediable());
+                self.solicitudCanalizada.subscribe((value) =>{
+                    value ? addDocument(self, 8, "Canalización", true, "") : self.documentos.remove((item) => item.label === 'Canalización' ); 
+                });
 
                 /** Catalogos */
                 self.materias = ko.observableArray();
@@ -64,14 +65,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.estadoSolicitud = ko.observableArray(self.catalogos.estadosSolicitudes);
                 self.esMediableArray = self.catalogos.esMediable;
                 self.protocoloViolencia = self.catalogos.protocolosViolencia;
-                self.documentos = ko.observableArray([
-                    { value: 1, label: "Solicitud", disabled: ko.observable(false), filename: ko.observable(), printEnabled: ko.observable(true) },
-                    { value: 2, label: "1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable() },
-                    { value: 3, label: "Acuse 1ra Invitación", disabled: self.mostrarDocMed, filename: ko.observable(), printEnabled: ko.observable() },
-                    { value: 4, label: "Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable() },
-                    { value: 5, label: "Acuse Constancia de Asunto no Mediable", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable() },
-                    { value: 6, label: "Canalización", disabled: self.mostrarDocNoMed, filename: ko.observable(), printEnabled: ko.observable() }
-                ]);
+                self.documentos = ko.observableArray([ { value: 1, label: "Solicitud", filename: ko.observable(), printEnabled: ko.observable(true), fecha: ko.observable(), nombreReporte: "Solicitud" } ]);
 
 
                 /** variables y funciones Knockout */
@@ -92,13 +86,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.mediadoresDP = new ArrayDataProvider(self.mediadores, { keyAttributes: 'value' });
                 this.institucionesDP = new ArrayDataProvider(self.instituciones, { keyAttributes: 'value' });
                 this.asistenciasDP = new ArrayDataProvider(self.asistencias, { keyAttributes: 'id' });
-
-
-                this.documentosDP = ko.computed(() => {
-                    let documentosEnabled = self.documentos().filter((item) => item.disabled() == false);
-
-                    return new ArrayDataProvider(documentosEnabled, { keyAttributes: 'value' });
-                });
+                this.documentosDP = ko.computed(() =>  new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }) );
 
                 this.dataProvider = ko.computed(() => {
                     let criterio = null;
@@ -140,7 +128,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     return d.toISOString().split('T')[0];
                 }, this);
 
-               
+
 
                 /** Eventos  */
 
@@ -149,9 +137,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                     if (itemContext && itemContext.data) {
                         const solicitud = itemContext.data;
-
                         self.parseSolicitud(solicitud);
-
                         self.solicitudDetalle(true);
                     }
                 });
@@ -267,16 +253,17 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                     self.solicitudProtocoloViolencia(null);
                     self.estadoSolicitud.removeAll();
+                    self.documentos.removeAll();
+                    addDocument(self, 1, "Solicitud", true, "Solicitud");
 
                     switch (value) {
                         case 0:
-
+                            
                             self.estadoSolicitud([
                                 { value: 0, label: 'En Recepción' },
                                 { value: 1, label: 'En Dirección' }
                             ]);
                             self.estatusSolicitudDisabled(false);
-
                             break;
 
                         case 1:
@@ -291,6 +278,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             ])
 
                             self.estatusSolicitudDisabled(true);
+                            verificaDocsAsistencias();
                             break;
 
                         case 2:
@@ -299,6 +287,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             ]);
                             self.solicitudEstatus(3);
                             self.estatusSolicitudDisabled(true);
+                            verificaDocsAsistencias();
+                            addDocument(self, 6, "Constancia de Asunto no Mediable", true, "ConstanciaNoMediable");
+                            addDocument(self, 7, "Acuse Constancia de Asunto no Mediable", true, "");
                             break;
 
 
@@ -324,7 +315,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 };
 
-                self.parseSolicitud = ((solicitud) => {
+                self.parseSolicitud = (async (solicitud) => {
                     self.solicitudId(solicitud.id);
                     self.solicitudFolio(solicitud.folio);
                     self.solicitudFecha(solicitud.fechaSolicitud);
@@ -350,9 +341,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         self.institucion_seleccionada(solicitud.canalizacion.institucion ? solicitud.canalizacion.institucion.id : '');
                     }
 
+                    //Configurando fecha de sesión:
+                    /*
                     if (solicitud.fechaSesion) {
                         self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
                     } else { self.solicitudFechaSesion("") }
+                    */
 
                     if (self.solicitudFechaSesion()) {
                         let doc = this.documentos().find((element) => element.value == 2);
@@ -360,9 +354,50 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         doc.printEnabled(true);
                     }
 
-                    self.getAsistencias();
+                    //configurando asistencias /citas:
+                    await self.getAsistencias();
+
+                    //Configurando archivos
 
                 });
+
+                function verificaDocsAsistencias(){
+                    if (self.asistencias().length >= 1) {
+                        addDocument(self, 2, "1ra Invitación", true, "invitacion");
+                        addDocument(self, 3, "Acuse 1ra Invitación", true, "acuseInvitacion1");
+                    }
+
+                    if (self.asistencias().length >= 2) {
+                        addDocument(self, 4, "2da Invitación", true, "invitacion2");
+                        addDocument(self, 5, "Acuse 2da Invitación", true, "acuseInvitacion2");
+                    }
+
+                    /* Por definir si existe una tercera invitación 
+                    if(self.asistencias().length >= 3){
+                        addDocument(self, 4, "3ra Invitación");
+                        addDocument(self, 5, "Acuse 3ra Invitación");
+                    }
+                    */
+                }
+
+                function addDocument(self, value, label, printname=false,  nombreReporte= "", filename=false) {
+                    // Verifica si ya existe un documento con el mismo value
+                    var exists = self.documentos().some(function (doc) {
+                        return doc.value === value;
+                    });
+
+                    // Si no existe, entonces realiza el push
+                    if (!exists) {
+                        self.documentos.push({
+                            value: value,
+                            label: label,
+                            filename: ko.observable(filename),
+                            printEnabled: ko.observable(printname),
+                            nombreReporte: nombreReporte,
+                        });
+                    }
+                }
+
 
                 self.handleDialogClose = () => { self.getAsistencias(); };
 
@@ -413,7 +448,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                     swal(response.message, errores, "error");
                                 }).catch((response) => {
                                     const errores = JSON.stringify(response);
-    
+
                                     swal("Error al procesar la petición", errores, "error");
                                 });
 
@@ -428,11 +463,11 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     const selectedDate = self.solicitudFechaSesion() ?
                         new Date(self.solicitudFechaSesion()).toISOString() :
                         "";
-                
+
                     console.log(today);
                     console.log(selectedDate);
                     console.log(today <= selectedDate);
-                
+
                     return today <= selectedDate; // Compara fecha y hora completas
                 });
 
@@ -542,6 +577,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 this.btnOpen = (event, detail) => {
                     let solicitud;
+                    let nombre_reporte = detail.data.nombreReporte;
+
                     const element = event.srcElement.id;
 
                     if (element == "btnImprimir") {
@@ -549,8 +586,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     } else {
                         solicitud = detail.item.data;
                     }
-
-                    self.getReporte(solicitud).then(response => {
+                    
+                    self.getReporte(solicitud, nombre_reporte).then(response => {
                         this.dataPDF(response);
 
                         if (this.frameHabilitado()) {
@@ -565,6 +602,55 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             swal(error.message, JSON.stringify(error.errors), "error");
                         });
                 }
+
+                this.selectListener = (files) => {
+                    /*
+                    this.fileNames(Array.prototype.map.call(files, (file) => {
+                        return file.name;
+                    }));
+                    */
+                    const url = config.baseEndPoint + '/archivos/upload';
+                    const fileData = {
+                        file: files[0],
+                        solicitud_id: self.solicitudId(),
+                        formato_id: 1,
+                        usuario_creo: 'testing-front'
+                    }
+
+                    utils.confirmar('Archivo', '¿Desea subir el archivo ' + fileData.file.name + ' ?').then((confirmacion) => {
+
+                        if (confirmacion) {
+                            utils.postDataFiles(url, fileData).then((response) => {
+                                if (response.success) {
+
+                                    swal("Archivo Cargado", "El archivo se ha cargado exitosamente.", "success");
+
+                                    return true;
+                                }
+
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+                        }
+                    });
+
+                    console.log(files);
+
+                };
+
+                self.btnUploadFile = (event, detail) => {
+                    FilePickerUtils.pickFiles(this.selectListener, {
+                        accept: [],
+                        capture: "none",
+                        selectionMode: "single",
+                    });
+                }
+
+
 
                 this.btnOpenDetailAsistencia = (event, detail) => {
                     self.asistenciaSeleccionada(detail.item.data);
@@ -642,6 +728,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     return utils.getData(url, {}).then((response) => {
                         if (response.success) {
                             self.asistencias(response.data);
+                            verificaDocsAsistencias();
                         }
                     })
                 };
@@ -793,12 +880,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 });
 
-                self.getReporte = ((data) => {
+                self.getReporte = ((data, tipo_reporte) => {
                     const params = {
                         "p_solicitud_id": data.id
                     };
 
-                    const url = config.baseEndPoint + '/reportes/mediacion/Solicitud';
+                    const url = config.baseEndPoint + '/reportes/mediacion/'+tipo_reporte;
 
                     this.dataPDF(null);
 
