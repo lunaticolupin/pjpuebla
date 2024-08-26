@@ -31,8 +31,8 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                 self.isToday = ko.computed(() => {
     
                     const today = new Date().toISOString().split('T')[0]; // Obtener solo la fecha en formato YYYY-MM-DD
-                    const selectedDate = self.asistencia().fecha_asistencia ?
-                        new Date(self.asistencia().fecha_asistencia).toISOString().split('T')[0] :
+                    const selectedDate = self.asistencia().fechaAsistencia ?
+                        new Date(self.asistencia().fechaAsistencia).toISOString().split('T')[0] :
                         ""; // Extraer solo la fecha de la propiedad
 
                     return today >= selectedDate;
@@ -70,7 +70,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
                     const url = this.serviceURL + '/save/' + self.asistencia().id;
                     const data = self.asistencia();
 
-                    self.asistencia().fecha_asistencia = formatear_fecha(self.asistencia().fecha_asistencia)
+                    self.asistencia().fechaAsistencia = formatear_fecha(self.asistencia().fechaAsistencia)
                     self.asistencia().solicitud = { id: self.solicitud_id() };
 
                     if (!valid) {
@@ -104,7 +104,7 @@ define(['knockout', 'webConfig', 'utils', 'ojs/ojarraydataprovider', 'ojs/ojasyn
 
                     if ((Array.isArray(p_asistencia) && p_asistencia.length > 0) ||
                         (p_asistencia && typeof p_asistencia === 'object' && Object.keys(p_asistencia).length > 0)) {
-                        p_asistencia.fecha_asistencia = new Date(p_asistencia.fecha_asistencia).toISOString();
+                        p_asistencia.fechaAsistencia = new Date(p_asistencia.fechaAsistencia).toISOString();
                         this.asistencia(p_asistencia);
                     }
 

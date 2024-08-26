@@ -424,18 +424,16 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }
 
                 self.isToday = ko.computed(() => {
-    
-                    const today = new Date().toISOString().split('T')[0]; // Obtener solo la fecha en formato YYYY-MM-DD
+                    const today = new Date().toISOString(); // Obtener la fecha y hora actuales en formato ISO completo
                     const selectedDate = self.solicitudFechaSesion() ?
-                        new Date(self.solicitudFechaSesion()).toISOString().split('T')[0] :
+                        new Date(self.solicitudFechaSesion()).toISOString() :
                         "";
+                
                     console.log(today);
                     console.log(selectedDate);
-                    console.log( today <= selectedDate);
-                    
-                    
-                    
-                    return today <= selectedDate;
+                    console.log(today <= selectedDate);
+                
+                    return today <= selectedDate; // Compara fecha y hora completas
                 });
 
                 /*

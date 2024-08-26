@@ -120,8 +120,8 @@
                                 <h4 class="oj-typography-subheading-xs">Detalles de las invitaciones: </h4>
                                 
                                 <oj-table style="width:100%"  id="asistencias" class="" data='[[ asistenciasDP ]]' columns='[
-                                {"headerText":"Número de invitación", "template": "numRowTemplate"},
-                                {"headerText":"Fecha invitación", "field":"fecha_asistencia", "template": "fechaRowTemplate"},
+                                {"headerText":"Número de invitación", "field":"tipo", "template": "numRowTemplate"},
+                                {"headerText":"Fecha invitación", "field":"fechaAsistencia", "template": "fechaRowTemplate"},
                                 {"headerText":"Asiste persona", "field":"acepta_usuario", "template": "textRowTemplate"},
                                 {"headerText":"Asiste invitado", "field":"acepta_invitado", "template": "textRowTemplate"},
                                 {"headerText":"Acciones", "width":"150", "template":"botonesTemplate"}
@@ -129,7 +129,7 @@
                                     scroll-policy-options.fetch-size="10">
 
                                     <template slot="numRowTemplate" data-oj-as="item">
-                                        <oj-bind-text value="[[ item.index + 1 ]]"></oj-bind-text>
+                                        <oj-bind-text value="[[ item.data ]]"></oj-bind-text>
                                     </template>
 
                                     <template slot="fechaRowTemplate" data-oj-as="item">
