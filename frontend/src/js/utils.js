@@ -51,6 +51,47 @@ define(['jquery','sweetalert'],
             }            
         }
 
+        _postDataWithFiles = async (url, files = {}) => {
+            // Crea un objeto FormData
+            let formData = new FormData();
+            
+            // Añade cada archivo al FormData
+            for (let key in files) {
+                formData.append(key, files[key]);
+            }
+            
+            let params = {
+                method: "POST",
+                body: formData,
+                // No es necesario establecer el Content-Type ya que FormData se encarga de esto automáticamente
+            };
+            
+            $("#overlay").fadeIn(300);
+            
+            try {
+                const respuesta = await fetch(url, params);
+                
+                $("#overlay").fadeOut(300);
+                
+                // Si la respuesta es JSON, parsea y retorna el resultado
+                const contentType = respuesta.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    return respuesta.json();
+                } else {
+                    // Maneja otros tipos de respuestas si es necesario
+                    return respuesta.text(); // O lo que necesites dependiendo de la respuesta
+                }
+            } catch (error) {
+                $("#overlay").fadeOut(300);
+                
+                return {
+                    success: false,
+                    error: error
+                };
+            }
+        }
+        
+
         _getReporte = async (url, data={})=>{
             let params ={
                 method: "POST",
@@ -147,6 +188,7 @@ define(['jquery','sweetalert'],
         return {
             getData: _getData,
             postData: _postData,
+            postDataFiles: _postDataWithFiles,
             getReporte: _getReporte,
             parseFecha: _parseFecha,
             waiting: _waiting,
