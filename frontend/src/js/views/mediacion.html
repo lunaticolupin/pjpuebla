@@ -170,10 +170,35 @@
 
             <div class="oj-panel oj-sm-margin-2x-top">
                 <h4 class="oj-typography-subheading-xs">Documentos</h4>
-                <div class="oj-flex">
+                
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Seleccione el documento que desea agregar.</b></p>
+                           
+                        </div>
+    
+                        <div class="oj-flex-item oj-sm-6">
+                            <oj-c-select-single id="formatosSelected" data="[[ formatosDP ]]" value="{{ formatoSeleccionado }}" item-text="label" label-hint="formatos disponibles"></oj-c-select-single>
+                        </div>
+    
+                     
+                    
+                    </div>
+
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <oj-c-button label="Agregar" on-oj-action="[[ agregar_formato ]]"></oj-c-button>
+                    
+                    </div>
+                </div>
+               
+                
+
+                <div class="oj-flex oj-sm-margin-2x-top">
                     <div class="oj-flex oj-sm-6">Formato</div>
                     <div class="oj-flex oj-sm-2">Fecha</div>
                 </div>
+
                 <oj-c-list-view aria-label="Basic list" data="[[documentosDP]]" id="listview">
                     <template slot="itemTemplate" data-oj-as="item">
                         <oj-c-list-item-layout>
@@ -201,7 +226,7 @@
                                     </oj-c-button>
 
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
-                                        label="Eliminar archivo" disabled="[[!item.data.existeDocumento]]" on-oj-action="[[ btnEliminarDocumento ]]">
+                                        label="Eliminar archivo"  on-oj-action="[[ btnEliminarDocumento ]]">
                                         <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
                                     </oj-c-button>
                                 </div>

@@ -52,6 +52,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.asistenciaSeleccionada = ko.observableArray();
                 self.solicitudArchivos = ko.observableArray();
                 self.archivoSeleccionado = ko.observable();
+            
                 /* Funciones flecha para mostrar o ocultar formularios  */
                 self.solicitudCanalizada.subscribe((value) => {
                     if (!self.documentos().some(item => item.nombre_documento == 'CANALIZACIÓN')) {
@@ -72,8 +73,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.esMediableArray = self.catalogos.esMediable;
                 self.protocoloViolencia = self.catalogos.protocolosViolencia;
                 self.formatos = ko.observableArray();
+                self.formatos_selected = ko.observableArray();
                 self.documentos = ko.observableArray([]);
-
+                self.formatoSeleccionado = ko.observable();
 
                 /** variables y funciones Knockout */
                 this.userInfoSignal = new signals.Signal();
@@ -94,7 +96,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.institucionesDP = new ArrayDataProvider(self.instituciones, { keyAttributes: 'value' });
                 this.asistenciasDP = new ArrayDataProvider(self.asistencias, { keyAttributes: 'id' });
                 this.documentosDP = ko.computed(() => new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }));
-
+                this.formatosDP = new ArrayDataProvider(self.formatos_selected, { keyAttributes: 'value' })
                 this.dataProvider = ko.computed(() => {
                     let criterio = null;
 
@@ -212,6 +214,46 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 });
 
+                self.agregar_formato = () => {
+                    if(!self.formatoSeleccionado()){
+                        swal('Error: documento no seleccionado', 'Es necesario seleccionar un docuemnto a agregar', 'warning');
+                        return false;
+                    }
+                    
+                    utils.confirmar('Documento', '¿Esta usted seguro(a) de agregar el documento seleccionado?').then(response =>{
+                        const url = config.baseEndPoint + '/archivos/create';
+                        const data = {
+                            solicitud_id: self.solicitudId(),
+                            formato_id:self.formatoSeleccionado(),
+                            usuario_creo: 'TEXT'
+                        } 
+
+                        console.log(data);
+
+                        
+                        if(response){
+                            utils.postDataFiles(url, data).then((response) => {
+
+                                console.log(response);
+                                
+                                if (response.success) {
+                                    swal('Exito', 'El archivo ha sido agregado exitosamente', 'success')
+                                    comprobarArchivos();
+                                    return true;
+                                }
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+                        }
+                        
+                    });
+                }
+
                 this.moduleDetallePersona = ModuleElementUtils.createConfig(
                     {
                         name: 'catalogos/persona-detalle',
@@ -261,9 +303,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     
                     self.solicitudProtocoloViolencia(null);
                     self.estadoSolicitud.removeAll();
-                    self.documentos.removeAll();
-                    comprobarArchivos();
-
                     switch (value) {
                         case 0:
 
@@ -289,16 +328,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             break;
 
                         case 2:
-                            self.estadoSolicitud([
-                                { value: 3, label: "No Mediable" }
-                            ]);
+                            self.estadoSolicitud([ { value: 3, label: "No Mediable" } ]);
                             self.solicitudEstatus(3);
                             self.estatusSolicitudDisabled(true);
-
-                            const [documento1, documento2] = self.formatos().filter(item => item.clave == 'F004' || item.clave == 'F005');
-
-                            addDocument(null, documento1.descripcion, null, false, documento1.esAcuse, documento1.id);
-                            addDocument(null, documento2.descripcion, null, false, documento2.esAcuse, documento2.id);
                             break;
                     }
                 })
@@ -322,6 +354,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 };
 
                 self.parseSolicitud = (async (solicitud) => {
+                    //limpeamos variable.
+                    self.formatoSeleccionado(null);
                     self.solicitudId(solicitud.id);
                     self.solicitudFolio(solicitud.folio);
                     self.solicitudFecha(solicitud.fechaSolicitud);
@@ -373,8 +407,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     try {
                         const response = await utils.getData(url, data);
                         response.data.forEach(element => {
-                            let esAcuse = element.formatoDescripcion.includes('ACUSE');
-                            addDocument(element.archivoId, element.formatoDescripcion, element.fechaCreacion, element.existeDocumento, esAcuse, element.formatoId);
+                            addDocument(element.archivoId, element.formatoDescripcion, element.fechaCreacion, element.existeDocumento, element.esAcuse, element.formatoId, element.solicitudArchivoId);
                         });
 
 
@@ -383,7 +416,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     }
                 }
 
-                function addDocument(id_documento, nombre_documento, fecha_creacion, existeDocumento = false, esAcuse = false, formatoId) {
+                function addDocument(id_documento, nombre_documento, fecha_creacion, existeDocumento = false, esAcuse = false, formatoId, solicitudArchivoID) {
                     // Verifica si ya existe un documento con el mismo formato
 
                     var exists = self.documentos().some(doc => doc.formatoId == formatoId);
@@ -396,7 +429,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             fecha_creacion: fecha_creacion,
                             existeDocumento: existeDocumento,
                             esAcuse: esAcuse,
-                            formatoId: formatoId
+                            formatoId: formatoId,
+                            solicitudArchivoID: solicitudArchivoID
                         });
                     }
                 }
@@ -692,7 +726,13 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 self.btnEliminarDocumento = (event, detail) => {
                     const url = config.baseEndPoint + '/archivos/delete'
-                    let data = { archivoId: detail.data.id_documento, solicitudId: self.solicitudId(), usuarioActualizo: 'TEST' };
+                    let data = { 
+                        archivoId: detail.data.id_documento,
+                        solicitudArchivoId: detail.data.solicitudArchivoID,
+                        usuarioActualizo: 'TEST' };
+
+                        console.log( detail.data);
+                        
 
                     utils.confirmar('Confirmación', '¿Desea eliminar el archivo cargado?').then((response) => {
                         if (response) {
@@ -842,7 +882,19 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     const url = config.baseEndPoint + '/formatos'
                     return utils.getData(url, {}).then((response) => {
                         if (response.success) {
+                            let formatos_temp = [];
+
                             self.formatos(response.data);
+                            response.data.forEach(element => {
+                                formatos_temp.push({ value: element.id, label: element.descripcion })
+                            });
+                            console.log(formatos_temp);
+                            
+                            self.formatos_selected(formatos_temp)
+
+
+                            console.log(self.formatos_selected());
+                            
                         }
                     })
                 })
@@ -924,10 +976,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         return false;
                     }
 
-
                     const url = self.urlBase + '/solicitud/save/' + self.solicitudId();
-
-
+                    
                     utils.confirmar('Solicitud').then((confirmacion) => {
 
                         if (confirmacion) {
@@ -959,11 +1009,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         "p_solicitud_id": solicitud.id,
                         "p_acuse": reporte.esAcuse
                     };
-
-                    if (reporte.id_documento == undefined || reporte.id_documento == null) {
-                        await self.crearReporte(reporte);
-                        await comprobarArchivos();
-                    }
 
 
                     const url = config.baseEndPoint + '/reportes/mediacion/' + reporte.nombreReporte;
@@ -1022,32 +1067,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     }
                 });
 
-                //crea el registro en solicitudes_archivo y archivo para que genere correctamente el reporte.
-                self.crearReporte = async (reporte) => {
-                    console.log(reporte);
-
-                    const url = config.baseEndPoint + '/archivos/createRecord';
-                    const fileData = {
-                        solicitud_id: self.solicitudId(),
-                        formato_id: reporte.formatoId,
-                        usuario_creo: 'testing-front',
-                        fileName: ''
-                    };
-
-                    try {
-                        const response = await utils.postDataFiles(url, fileData);
-
-                        if (response.success) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    } catch (error) {
-                        const errores = JSON.stringify(error);
-                        swal("Error al procesar la petición", errores, "error");
-                        return false;
-                    }
-                };
 
             }
 

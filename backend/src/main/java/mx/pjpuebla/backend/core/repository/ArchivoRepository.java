@@ -26,7 +26,7 @@ public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
                         "FROM SolicitudArchivo sa " +
                         "LEFT JOIN Archivo a ON a.id = sa.archivoId " +
                         "JOIN Formato f ON sa.formato = f.id " +
-                        "WHERE sa.solicitudId = :solicitudId")
+                        "WHERE sa.solicitudId = :solicitudId and sa.estatus = 1 and a.estatus = 1")
         List<FileInfoDto> findFileInfoBySolicitudId(@Param("solicitudId") Integer solicitudId);
 
 }

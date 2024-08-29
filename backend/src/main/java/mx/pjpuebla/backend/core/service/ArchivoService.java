@@ -45,6 +45,7 @@ public class ArchivoService {
         return null;
     }
 
+
     public Integer registrarArchivosInvitaciones(Integer solicitud_id) {
         List<Formato> formatos = new ArrayList<>();
         Integer num_invitaciones = asistenciaService.numAsistencia(solicitud_id);

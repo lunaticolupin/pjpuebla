@@ -16,11 +16,13 @@ import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
 import mx.pjpuebla.backend.core.service.ArchivoService;
+import mx.pjpuebla.backend.core.service.FormatoService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.springframework.ui.Model;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +52,7 @@ import org.springframework.core.io.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 // import java.io.IOException;
 
@@ -61,33 +64,50 @@ public class ArchivoController {
 
     private final ArchivoService archivos;
     private final SolicitudArchivoService solicitudArchivos;
+    private final FormatoService formatoService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    @PostMapping("/createRecord")
-    public ResponseEntity<GenericResponse> createRecordFile(@RequestParam("fileName") String fileName , @RequestParam("solicitud_id") Integer solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo) {
+    @PostMapping("/create")
+    public ResponseEntity<GenericResponse> createRecordFile(@RequestParam("solicitud_id") Integer solicitud ,@RequestParam("formato_id") Integer formato_id, @RequestParam("usuario_creo") String usuario_creo) {
         
         GenericResponse response = new GenericResponse();
         Archivo archivo;
         try {
+            Formato formato = formatoService.findById(formato_id);
             
-            archivo = new Archivo();
-            archivo.setUsuario_creo(usuario_creo);
-            archivo.setNombre(fileName);
-            archivos.save(archivo);
+            if(solicitudArchivos.findBySolicitudIdAndFormato(solicitud, formato_id) == null){
 
-            SolicitudArchivo sa = new SolicitudArchivo();
-            sa.setSolicitudId(solicitud);
-            sa.setFormato(formato);
-            sa.setArchivoId(archivo.id);
-            sa.setEstatus(1);
-            sa.setUsuarioCreo(usuario_creo);
-            solicitudArchivos.save(sa);
+                archivo = new Archivo();
+                archivo.setUsuario_creo(usuario_creo);
+                archivo.setNombre("");
+                archivo.setTipo(formato.getDescripcion());
+                archivo.setEstatus(1);
+                archivos.save(archivo);
+    
+                SolicitudArchivo sa = new SolicitudArchivo();
+                sa.setSolicitudId(solicitud);
+                sa.setFormato(formato_id);
+                sa.setArchivoId(archivo.id);
+                sa.setEstatus(1);
+                sa.setUsuarioCreo(usuario_creo);
+                solicitudArchivos.save(sa);
 
-            return ResponseEntity.ok(response);
-
+                response.setSuccess(true);
+                response.setMessage("ok");
+                
+                return ResponseEntity.ok(response);
+            }else {
+                List<String> errores = new ArrayList<>();
+                errores.add("El documeto que esta tratando de agregar ya se encuentra registrado.");
+                response.setSuccess(false);
+                response.setMessage("Error: documento registrado.");
+                response.setErrors(errores);
+                return ResponseEntity.ok(response);
+            }
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.internalServerError().body(response);
             // return new ResponseEntity<>("Error en la carga del archivo", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -120,10 +140,6 @@ public class ArchivoController {
             File dest = new File(filePath);
             file.transferTo(dest);
 
-            System.out.println(fileName);
-            System.out.println(filePath);
-            System.out.println(dest);
-
             // Generar la URL del archivo
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(uploadDir)
@@ -132,6 +148,8 @@ public class ArchivoController {
 
             // archivo.setNombre(fileName);
             Archivo archivo = archivos.findById(archivo_id);
+            
+
             archivo.setNombre(fileName);
             archivo.setUsuario_creo(usuario_creo);
             archivos.save(archivo);
@@ -168,15 +186,20 @@ public class ArchivoController {
         //boorado logico de las tablas solicitud y archivos
         GenericResponse response = new GenericResponse();
         Integer archivoId = (Integer) requestBody.get("archivoId");;
-        Integer solicitudId = (Integer) requestBody.get("solicitudId");;
-        String usuarioActualizo = (String) requestBody.get("usuarioActualizo");;
+        UUID solicitudArchivoId = UUID.fromString((String) requestBody.get("solicitudArchivoId"));
+        String usuarioActualizo = (String) requestBody.get("usuarioActualizo");
 
         // Cambiamos estatus del archivo
         Archivo archivo = archivos.findById(archivoId);
         archivo.setNombre("");
+        archivo.setEstatus(0);
         archivos.save(archivo);
 
 
+        SolicitudArchivo solicitud = solicitudArchivos.findById(solicitudArchivoId);
+        
+        solicitud.setEstatus(0);
+        solicitudArchivos.save(solicitud);
         response.setSuccess(true);
         response.setMessage("Archivo eliminado con éxito");
 
