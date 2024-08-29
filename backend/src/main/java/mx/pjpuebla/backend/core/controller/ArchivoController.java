@@ -9,6 +9,7 @@ import io.jsonwebtoken.io.IOException;
 // import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import mx.pjpuebla.backend.core.DTO.FileInfoDto;
 import mx.pjpuebla.backend.core.entitiy.Archivo;
 import mx.pjpuebla.backend.core.entitiy.Formato;
 import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
@@ -47,6 +48,7 @@ import java.net.MalformedURLException;
 import org.springframework.core.io.Resource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // import java.io.IOException;
@@ -63,8 +65,50 @@ public class ArchivoController {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    @PostMapping("/createRecord")
+    public ResponseEntity<GenericResponse> createRecordFile(@RequestParam("fileName") String fileName , @RequestParam("solicitud_id") Integer solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo) {
+        
+        GenericResponse response = new GenericResponse();
+        Archivo archivo;
+        try {
+            
+            archivo = new Archivo();
+            archivo.setUsuario_creo(usuario_creo);
+            archivo.setNombre(fileName);
+            archivos.save(archivo);
+
+            SolicitudArchivo sa = new SolicitudArchivo();
+            sa.setSolicitudId(solicitud);
+            sa.setFormato(formato);
+            sa.setArchivoId(archivo.id);
+            sa.setEstatus(1);
+            sa.setUsuarioCreo(usuario_creo);
+            solicitudArchivos.save(sa);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(response);
+            // return new ResponseEntity<>("Error en la carga del archivo", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    
+    @GetMapping("/list")
+    public ResponseEntity<GenericResponse> getFileInfo(@RequestParam("solicitud_id") Integer solicitudId) {
+        GenericResponse response = new GenericResponse();
+        List<FileInfoDto> fileInfoList = archivos.getFileInfo(solicitudId);
+        
+        response.setSuccess(true);
+        response.setMessage("ok");
+        response.setData(fileInfoList);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @PostMapping("/upload")
-    public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Long solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo) {
+    public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Integer solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo, @RequestParam("archivo_id") Integer archivo_id ) {
         
         GenericResponse response = new GenericResponse();
         try {
@@ -76,6 +120,10 @@ public class ArchivoController {
             File dest = new File(filePath);
             file.transferTo(dest);
 
+            System.out.println(fileName);
+            System.out.println(filePath);
+            System.out.println(dest);
+
             // Generar la URL del archivo
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(uploadDir)
@@ -83,17 +131,16 @@ public class ArchivoController {
                     .toUriString();
 
             // archivo.setNombre(fileName);
-            Archivo archivo = new Archivo();
+            Archivo archivo = archivos.findById(archivo_id);
             archivo.setNombre(fileName);
             archivo.setUsuario_creo(usuario_creo);
             archivos.save(archivo);
 
-            SolicitudArchivo sa = new SolicitudArchivo();
-            sa.setSolicitudId(solicitud);
+            SolicitudArchivo sa = solicitudArchivos.findBySolicitudIdAndArchivoId(solicitud, archivo.id);
             sa.setFormato(formato);
             sa.setArchivoId(archivo.id);
             sa.setEstatus(1);
-            sa.setUsuarioCreo(usuario_creo);
+            sa.setUsuarioActualizo(usuario_creo);
             solicitudArchivos.save(sa);
 
             Map<String, Object> data = new HashMap<>();
@@ -110,32 +157,52 @@ public class ArchivoController {
             // return new ResponseEntity<>(fileDownloadUri, HttpStatus.OK);
 
         } catch (Exception e) {
+            System.out.println(e);
             return ResponseEntity.internalServerError().body(response);
             // return new ResponseEntity<>("Error en la carga del archivo", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @PostMapping("/delete")
+    public ResponseEntity<GenericResponse> deleteFile( @RequestBody Map<String, Object> requestBody) {
+        //boorado logico de las tablas solicitud y archivos
+        GenericResponse response = new GenericResponse();
+        Integer archivoId = (Integer) requestBody.get("archivoId");;
+        Integer solicitudId = (Integer) requestBody.get("solicitudId");;
+        String usuarioActualizo = (String) requestBody.get("usuarioActualizo");;
+
+        // Cambiamos estatus del archivo
+        Archivo archivo = archivos.findById(archivoId);
+        archivo.setNombre("");
+        archivos.save(archivo);
+
+
+        response.setSuccess(true);
+        response.setMessage("Archivo eliminado con éxito");
+
+        return ResponseEntity.ok(response);
+    }
+    
+
     // @GetMapping("/download/{fileName}")
     // @GetMapping("/download/{fileName:.+}")
     @GetMapping("/download/{id}")
-    // public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
-     public ResponseEntity<Resource> downloadFile(@PathVariable Integer id, HttpServletRequest request) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable Integer id, HttpServletRequest request) {
         Archivo archivo = archivos.findById(id);
-        // Cargar el archivo como un recurso
-        Resource resource = loadFileAsResource(archivo.nombre);
-
-        // Intentar determinar el tipo de contenido del archivo
+        Resource resource = loadFileAsResource(archivo.getNombre());
+    
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (Exception ex) {
             contentType = "application/octet-stream";
         }
-
-        // Devolver el archivo con el tipo de contenido adecuado
+    
+        // Exponer el encabezado Content-Disposition
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION)
                 .body(resource);
     }
 

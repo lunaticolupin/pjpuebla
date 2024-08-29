@@ -34,4 +34,12 @@ public class SolicitudArchivoService {
         return null;
     }
 
+    public SolicitudArchivo findBySolicitudId(Integer id){
+        return repo.findBySolicitudId(id);
+    }
+
+    public SolicitudArchivo findBySolicitudIdAndArchivoId(Integer solicitud_id, Integer archivo_id){
+        return repo.findBySolicitudIdAndArchivoId(solicitud_id, archivo_id);
+    }
+
 }

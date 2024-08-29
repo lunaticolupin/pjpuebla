@@ -14,4 +14,8 @@ public interface SolicitudArchivoRepository extends JpaRepository<SolicitudArchi
 
     @SuppressWarnings("null")
     public Optional<SolicitudArchivo> findById(String id);
+
+    public SolicitudArchivo findBySolicitudId(Integer id);
+
+    public SolicitudArchivo findBySolicitudIdAndArchivoId(Integer solicitud_id, Integer archivo_id);
 }

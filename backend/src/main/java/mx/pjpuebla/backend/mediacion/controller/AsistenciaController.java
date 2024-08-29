@@ -5,10 +5,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mx.pjpuebla.backend.core.entitiy.Archivo;
+import mx.pjpuebla.backend.core.entitiy.Formato;
+import mx.pjpuebla.backend.core.service.ArchivoService;
 import mx.pjpuebla.backend.mediacion.entitiy.Asistencia;
 import mx.pjpuebla.backend.mediacion.entitiy.SesionMediacion;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
+import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
 import mx.pjpuebla.backend.mediacion.service.AsistenciaService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AsistenciaController {
     private GenericResponse response;
     private final AsistenciaService asistenciaService;
+    private final ArchivoService archivoService;
+    private final SolicitudArchivoService solicitudArchivoService;
 
     @PostMapping("/add")
     public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Asistencia entidad,  Errors errors){
@@ -58,9 +65,13 @@ public class AsistenciaController {
         if(esAgendable == 1){
             Asistencia asistencia = asistenciaService.obtenerFecha(entidad.getSolicitud().getId());
             if(asistencia  != null){
+
+                //Si se logro generar una cita, se generaran los dos registros para subir su invitación así como su acuse.
+                archivoService.registrarArchivosInvitaciones(entidad.getSolicitud().getId());
                 response.setData(asistencia);
                 response.setSuccess(true);
                 response.setMessage("OK");
+            
             }else{
                 response.setMessage("Ocurrio un error al generar su fecha de invitación");
                 errores = new ArrayList<>();

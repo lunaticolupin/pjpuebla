@@ -100,7 +100,7 @@
                         <oj-bind-if test="[[ solicitudMediable() == 1 ]]">
 
                             <oj-c-button chroming="callToAction" label="Generar invitación"
-                                on-oj-action="[[  generar_invitacion ]]" disabled="[[ isToday ]]"></oj-c-button>
+                                on-oj-action="[[  generar_invitacion ]]" disabled="[[ invitacionActiva ]]"></oj-c-button>
                             <!--
                             mediador
                             <div class="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
@@ -179,29 +179,29 @@
                         <oj-c-list-item-layout>
                             <div class="oj-flex">
                                 <div class="oj-flex-item oj-sm-6"><oj-bind-text
-                                        value="[[item.data.label]]"></oj-bind-text></div>
+                                        value="[[item.data.nombre_documento]]"></oj-bind-text></div>
                                 <div class="oj-flex-item oj-sm-2"><oj-bind-text
-                                            value="[[ item.data.fecha ]]"></oj-bind-text></div>
+                                            value="[[ item.data.fecha_creacion ]]"></oj-bind-text></div>
                                 <div class="oj-flex-item oj-sm-4">
                                     
                                     <oj-c-button id="btnImprimir" display="icons" size="sm" chroming="borderless"
                                         label="Imprimir documento" on-oj-action="[[btnOpen]]"
-                                        disabled="[[!item.data.printEnabled()]]">
+                                        disabled="[[item.data.printEnabled]]">
                                         <span slot="startIcon" class="oj-ux-ico-print"></span>
                                     </oj-c-button>
 
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
-                                        label="Subir archivo" disabled="[[item.data.filename()]]" on-oj-action="[[ btnUploadFile ]]"> 
+                                        label="Subir archivo"  on-oj-action="[[ btnUploadFile ]]" disabled="[[ !item.data.id_documento ]]"> 
                                         <span slot="startIcon" class="oj-ux-ico-upload"></span>
                                     </oj-c-button>
 
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
-                                        label="Ver archivo" disabled="[[!item.data.filename()]]">
+                                        label="Ver archivo" disabled="[[ !item.data.existeDocumento ]]" on-oj-action="[[ btnVerDocumento ]]">
                                         <span slot="startIcon" class="oj-ux-ico-view"></span>
                                     </oj-c-button>
 
                                     <oj-c-button slot="end" display="icons" size="sm" chroming="borderless"
-                                        label="Eliminar archivo" disabled="[[!item.data.filename()]]">
+                                        label="Eliminar archivo" disabled="[[!item.data.existeDocumento]]" on-oj-action="[[ btnEliminarDocumento ]]">
                                         <span slot="startIcon" class="oj-ux-ico-delete-all"></span>
                                     </oj-c-button>
                                 </div>
@@ -220,6 +220,7 @@
             <!--<oj-c-button id="btnImprimir" label="Imprimir" on-oj-action="[[btnOpen]]" disabled="[[!solicitudId()]]"><span slot="startIcon" class="oj-ux-ico-print"></span></oj-c-button>-->
         </oj-toolbar>
     </oj-bind-if>
+
 </div>
 
 

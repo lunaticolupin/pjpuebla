@@ -89,7 +89,7 @@ public class AsistenciaService {
 
             Solicitud solicitud = solService.findById(solicitud_id);
 
-            if (solicitud != null && solicitud.getEsMediable() == 1) {
+            if (solicitud != null) {
                 String jsonResult = this.repositorio.generarFechaSesion();
                 JsonNode jsonNode = objectMapper.readTree(jsonResult);
 
@@ -99,6 +99,7 @@ public class AsistenciaService {
                 Date fechaSesion = formatter.parse(fs);
 
                 solicitud.setFechaSesion(fechaSesion);
+                solicitud.setEsMediable(1);
                 solService.save(solicitud);
 
                 Asistencia asistencia = new Asistencia();

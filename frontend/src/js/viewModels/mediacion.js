@@ -50,11 +50,17 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.solicitudAsistencia = ko.observable({});
                 self.asistencias = ko.observableArray();
                 self.asistenciaSeleccionada = ko.observableArray();
-
+                self.solicitudArchivos = ko.observableArray();
+                self.archivoSeleccionado = ko.observable();
                 /* Funciones flecha para mostrar o ocultar formularios  */
-                self.mostrarForm = ko.computed(() => self.solicitudSeleccionada() || self.solicitudDetalle());
-                self.solicitudCanalizada.subscribe((value) =>{
-                    value ? addDocument(self, 8, "Canalización", true, "") : self.documentos.remove((item) => item.label === 'Canalización' ); 
+                self.solicitudCanalizada.subscribe((value) => {
+                    if (!self.documentos().some(item => item.nombre_documento == 'CANALIZACIÓN')) {
+                        if (value) {
+                            const documento = self.formatos().find(item => item.clave == 'F006');
+                            addDocument(null, documento.descripcion, null, false, documento.esAcuse, documento.id);
+                        }
+                    }
+                    // value ? addDocument(8, "Canalización", true, "") : self.documentos.remove((item) => item.label === 'Canalización');
                 });
 
                 /** Catalogos */
@@ -65,7 +71,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.estadoSolicitud = ko.observableArray(self.catalogos.estadosSolicitudes);
                 self.esMediableArray = self.catalogos.esMediable;
                 self.protocoloViolencia = self.catalogos.protocolosViolencia;
-                self.documentos = ko.observableArray([ { value: 1, label: "Solicitud", filename: ko.observable(), printEnabled: ko.observable(true), fecha: ko.observable(), nombreReporte: "Solicitud" } ]);
+                self.formatos = ko.observableArray();
+                self.documentos = ko.observableArray([]);
 
 
                 /** variables y funciones Knockout */
@@ -86,7 +93,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.mediadoresDP = new ArrayDataProvider(self.mediadores, { keyAttributes: 'value' });
                 this.institucionesDP = new ArrayDataProvider(self.instituciones, { keyAttributes: 'value' });
                 this.asistenciasDP = new ArrayDataProvider(self.asistencias, { keyAttributes: 'id' });
-                this.documentosDP = ko.computed(() =>  new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }) );
+                this.documentosDP = ko.computed(() => new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }));
 
                 this.dataProvider = ko.computed(() => {
                     let criterio = null;
@@ -249,16 +256,17 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     this.asistenciaInfoSignal.dispatch(self.asistenciaSeleccionada(), self.solicitudId());
                 }, this)
 
-                self.solicitudMediable.subscribe((value) => {
 
+                self.solicitudMediable.subscribe((value) => {   
+                    
                     self.solicitudProtocoloViolencia(null);
                     self.estadoSolicitud.removeAll();
                     self.documentos.removeAll();
-                    addDocument(self, 1, "Solicitud", true, "Solicitud");
+                    comprobarArchivos();
 
                     switch (value) {
                         case 0:
-                            
+
                             self.estadoSolicitud([
                                 { value: 0, label: 'En Recepción' },
                                 { value: 1, label: 'En Dirección' }
@@ -278,7 +286,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             ])
 
                             self.estatusSolicitudDisabled(true);
-                            verificaDocsAsistencias();
                             break;
 
                         case 2:
@@ -287,15 +294,13 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             ]);
                             self.solicitudEstatus(3);
                             self.estatusSolicitudDisabled(true);
-                            verificaDocsAsistencias();
-                            addDocument(self, 6, "Constancia de Asunto no Mediable", true, "ConstanciaNoMediable");
-                            addDocument(self, 7, "Acuse Constancia de Asunto no Mediable", true, "");
+
+                            const [documento1, documento2] = self.formatos().filter(item => item.clave == 'F004' || item.clave == 'F005');
+
+                            addDocument(null, documento1.descripcion, null, false, documento1.esAcuse, documento1.id);
+                            addDocument(null, documento2.descripcion, null, false, documento2.esAcuse, documento2.id);
                             break;
-
-
-
                     }
-
                 })
 
 
@@ -309,7 +314,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         self.getMaterias(),
                         self.getSolicitudes(),
                         self.getInstituciones(),
-                        self.getMediadores()
+                        self.getMediadores(),
+                        self.getFormatos()
                     ]).finally(() => {
                         utils.waiting(true);
                     });
@@ -334,66 +340,63 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     self.solicitudTipoApertura(solicitud.tipoApertura);
                     self.solicitudTipoAperturaId(solicitud.tipoApertura.id);
 
-                    //definiendo variables de canalización:
-                    if (solicitud.canalizacion) {
-                        self.id_canalizacion(solicitud.canalizacion.id);
-                        self.descripcionNoMediable(solicitud.canalizacion.descripcion);
-                        self.institucion_seleccionada(solicitud.canalizacion.institucion ? solicitud.canalizacion.institucion.id : '');
+                    if (solicitud.id) {
+                        //definiendo variables de canalización:
+                        if (solicitud.canalizacion) {
+                            self.id_canalizacion(solicitud.canalizacion.id);
+                            self.descripcionNoMediable(solicitud.canalizacion.descripcion);
+                            self.institucion_seleccionada(solicitud.canalizacion.institucion ? solicitud.canalizacion.institucion.id : '');
+                        }
+
+                        //Configurando fecha de sesión:
+
+                        if (solicitud.fechaSesion) {
+                            self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
+                        } else { self.solicitudFechaSesion("") }
+                    
+
+                        //configurando asistencias /citas:
+                        await self.getAsistencias();
+
+                        //Configurando archivos
+                        comprobarArchivos();
                     }
 
-                    //Configurando fecha de sesión:
-                    /*
-                    if (solicitud.fechaSesion) {
-                        self.solicitudFechaSesion(new Date(solicitud.fechaSesion).toISOString());
-                    } else { self.solicitudFechaSesion("") }
-                    */
-
-                    if (self.solicitudFechaSesion()) {
-                        let doc = this.documentos().find((element) => element.value == 2);
-
-                        doc.printEnabled(true);
-                    }
-
-                    //configurando asistencias /citas:
-                    await self.getAsistencias();
-
-                    //Configurando archivos
 
                 });
 
-                function verificaDocsAsistencias(){
-                    if (self.asistencias().length >= 1) {
-                        addDocument(self, 2, "1ra Invitación", true, "invitacion");
-                        addDocument(self, 3, "Acuse 1ra Invitación", true, "acuseInvitacion1");
-                    }
+                async function comprobarArchivos() {
+                    // llamamos a los archivos que tenemos:
+                    const url = config.baseEndPoint + '/archivos/list?solicitud_id=' + self.solicitudId();
+                    const data = { solicitud_id: self.solicitudId() };
+                    self.documentos.removeAll();
+                    try {
+                        const response = await utils.getData(url, data);
+                        response.data.forEach(element => {
+                            let esAcuse = element.formatoDescripcion.includes('ACUSE');
+                            addDocument(element.archivoId, element.formatoDescripcion, element.fechaCreacion, element.existeDocumento, esAcuse, element.formatoId);
+                        });
 
-                    if (self.asistencias().length >= 2) {
-                        addDocument(self, 4, "2da Invitación", true, "invitacion2");
-                        addDocument(self, 5, "Acuse 2da Invitación", true, "acuseInvitacion2");
-                    }
 
-                    /* Por definir si existe una tercera invitación 
-                    if(self.asistencias().length >= 3){
-                        addDocument(self, 4, "3ra Invitación");
-                        addDocument(self, 5, "Acuse 3ra Invitación");
+                    } catch (error) {
+                        console.error("Error al obtener los archivos:", error);
                     }
-                    */
                 }
 
-                function addDocument(self, value, label, printname=false,  nombreReporte= "", filename=false) {
-                    // Verifica si ya existe un documento con el mismo value
-                    var exists = self.documentos().some(function (doc) {
-                        return doc.value === value;
-                    });
+                function addDocument(id_documento, nombre_documento, fecha_creacion, existeDocumento = false, esAcuse = false, formatoId) {
+                    // Verifica si ya existe un documento con el mismo formato
+
+                    var exists = self.documentos().some(doc => doc.formatoId == formatoId);
 
                     // Si no existe, entonces realiza el push
                     if (!exists) {
                         self.documentos.push({
-                            value: value,
-                            label: label,
-                            filename: ko.observable(filename),
-                            printEnabled: ko.observable(printname),
-                            nombreReporte: nombreReporte,
+                            id_documento: id_documento,
+                            nombre_documento: nombre_documento,
+                            fecha_creacion: fecha_creacion,
+                            existeDocumento: existeDocumento,
+                            esAcuse: esAcuse,
+                            formatoId: formatoId
                         });
                     }
                 }
@@ -434,23 +437,27 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     var template = {}
 
                     utils.getData(url_template, {}).then((response) => {
-                        if (response.success) {
-                            utils.crear_cita('Invitación').then((confirmacion) => {
-                                template = response.data;
-                                template.solicitud = { id: self.solicitudId() };
-                                utils.postData(url_add, template).then((response) => {
-                                    if (response.success) {
-                                        swal("Invitación generada", "Se han generado una nueva invitación", "success");
-                                        self.getAsistencias();
-                                        return true;
-                                    }
-                                    const errores = JSON.stringify(response.errors);
-                                    swal(response.message, errores, "error");
-                                }).catch((response) => {
-                                    const errores = JSON.stringify(response);
 
-                                    swal("Error al procesar la petición", errores, "error");
-                                });
+                        if (response.success) {
+                            utils.confirmar('Invitación', '¿Desea generar una nueva invitación?').then((confirmacion) => {
+                                if (confirmacion) {
+                                    template = response.data;
+                                    template.solicitud = { id: self.solicitudId() };
+                                    utils.postData(url_add, template).then((response) => {
+                                        if (response.success) {
+                                            swal("Invitación generada", "Se ha generado una nueva invitación", "success");
+                                                self.getAsistencias();
+                                                comprobarArchivos()
+                                            return true;
+                                        }
+                                        const errores = JSON.stringify(response.errors);
+                                        swal(response.message, errores, "error");
+                                    }).catch((response) => {
+                                        const errores = JSON.stringify(response);
+
+                                        swal("Error al procesar la petición", errores, "error");
+                                    });
+                                }
 
                             })
 
@@ -458,7 +465,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     })
                 }
 
-                self.isToday = ko.computed(() => {
+                self.invitacionActiva = ko.computed(() => {
                     const today = new Date().toISOString(); // Obtener la fecha y hora actuales en formato ISO completo
                     const selectedDate = self.solicitudFechaSesion() ?
                         new Date(self.solicitudFechaSesion()).toISOString() :
@@ -467,7 +474,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     console.log(today);
                     console.log(selectedDate);
                     console.log(today <= selectedDate);
-
+                    
+                    
+                    
                     return today <= selectedDate; // Compara fecha y hora completas
                 });
 
@@ -577,23 +586,24 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 this.btnOpen = (event, detail) => {
                     let solicitud;
-                    let nombre_reporte = detail.data.nombreReporte;
-
                     const element = event.srcElement.id;
+                    const nombre_reporte = self.formatos().find(item => item.id == detail.data.formatoId).nombreReporte
+                    detail.data.nombreReporte = nombre_reporte
 
                     if (element == "btnImprimir") {
                         solicitud = self.solicitudSeleccionada().data;
                     } else {
                         solicitud = detail.item.data;
                     }
-                    
-                    self.getReporte(solicitud, nombre_reporte).then(response => {
+
+                    self.getReporte(solicitud, detail.data).then(response => {
                         this.dataPDF(response);
 
                         if (this.frameHabilitado()) {
                             document.getElementById("modalPDF").open();
                             return true;
                         }
+
 
                         document.getElementById("btnDescargarPdf").click();
                     })
@@ -604,18 +614,17 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }
 
                 this.selectListener = (files) => {
-                    /*
-                    this.fileNames(Array.prototype.map.call(files, (file) => {
-                        return file.name;
-                    }));
-                    */
+                    const registro = self.archivoSeleccionado();
                     const url = config.baseEndPoint + '/archivos/upload';
                     const fileData = {
                         file: files[0],
                         solicitud_id: self.solicitudId(),
-                        formato_id: 1,
-                        usuario_creo: 'testing-front'
+                        formato_id: registro.formatoId,
+                        usuario_creo: 'testing-front',
+                        archivo_id: registro.id_documento
                     }
+
+
 
                     utils.confirmar('Archivo', '¿Desea subir el archivo ' + fileData.file.name + ' ?').then((confirmacion) => {
 
@@ -624,7 +633,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                 if (response.success) {
 
                                     swal("Archivo Cargado", "El archivo se ha cargado exitosamente.", "success");
-
+                                    comprobarArchivos();
                                     return true;
                                 }
 
@@ -638,11 +647,14 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         }
                     });
 
-                    console.log(files);
 
                 };
 
                 self.btnUploadFile = (event, detail) => {
+
+                    self.archivoSeleccionado(detail.data);
+
+
                     FilePickerUtils.pickFiles(this.selectListener, {
                         accept: [],
                         capture: "none",
@@ -651,6 +663,59 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }
 
 
+                self.btnVerDocumento = (event, detail) => {
+                    const url = config.baseEndPoint + '/archivos/download/' + detail.data.id_documento
+                    let data = { id: detail.data.id_documento }
+
+                    utils.getDocument(url, data).then(response => {
+                        if (response) {
+                            const { blob, fileName } = response;
+
+                            // Crear un enlace de descarga
+                            const downloadUrl = window.URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = downloadUrl;
+                            a.download = fileName; // Usar el nombre del archivo extraído del header
+                            document.body.appendChild(a);
+                            a.click();
+
+                            // Remover el enlace después de la descarga
+                            a.remove();
+                            window.URL.revokeObjectURL(downloadUrl);
+                            console.log('ya obtuve el documento.');
+                            
+                        } else {
+                            console.error("No se pudo obtener el documento.");
+                        }
+                    });
+                }
+
+                self.btnEliminarDocumento = (event, detail) => {
+                    const url = config.baseEndPoint + '/archivos/delete'
+                    let data = { archivoId: detail.data.id_documento, solicitudId: self.solicitudId(), usuarioActualizo: 'TEST' };
+
+                    utils.confirmar('Confirmación', '¿Desea eliminar el archivo cargado?').then((response) => {
+                        if (response) {
+                            utils.postData(url, data).then((response) => {
+                                if (response.success) {
+                                    swal('Exito', 'El archivo ha sido eliminado exitosamente', 'success')
+                                    comprobarArchivos();
+                                    return true;
+                                }
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+
+
+                        }
+
+                    })
+                }
 
                 this.btnOpenDetailAsistencia = (event, detail) => {
                     self.asistenciaSeleccionada(detail.item.data);
@@ -728,7 +793,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     return utils.getData(url, {}).then((response) => {
                         if (response.success) {
                             self.asistencias(response.data);
-                            verificaDocsAsistencias();
+                           
                         }
                     })
                 };
@@ -769,6 +834,15 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                 mediadores_temp.push({ value: element.id, label: element.usuario.nombreCompleto });
                             });
                             self.mediadores(mediadores_temp);
+                        }
+                    })
+                })
+
+                self.getFormatos = (() => {
+                    const url = config.baseEndPoint + '/formatos'
+                    return utils.getData(url, {}).then((response) => {
+                        if (response.success) {
+                            self.formatos(response.data);
                         }
                     })
                 })
@@ -880,12 +954,19 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 });
 
-                self.getReporte = ((data, tipo_reporte) => {
+                self.getReporte = (async (solicitud, reporte) => {
                     const params = {
-                        "p_solicitud_id": data.id
+                        "p_solicitud_id": solicitud.id,
+                        "p_acuse": reporte.esAcuse
                     };
 
-                    const url = config.baseEndPoint + '/reportes/mediacion/'+tipo_reporte;
+                    if (reporte.id_documento == undefined || reporte.id_documento == null) {
+                        await self.crearReporte(reporte);
+                        await comprobarArchivos();
+                    }
+
+
+                    const url = config.baseEndPoint + '/reportes/mediacion/' + reporte.nombreReporte;
 
                     this.dataPDF(null);
 
@@ -907,9 +988,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                                 resolve(window.URL.createObjectURL(fileBlob));
                             });
-
-
-                            //resolve(true);
 
                         }).catch(errors => {
                             console.log(errors);
@@ -943,14 +1021,40 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         });
                     }
                 });
+
+                //crea el registro en solicitudes_archivo y archivo para que genere correctamente el reporte.
+                self.crearReporte = async (reporte) => {
+                    console.log(reporte);
+
+                    const url = config.baseEndPoint + '/archivos/createRecord';
+                    const fileData = {
+                        solicitud_id: self.solicitudId(),
+                        formato_id: reporte.formatoId,
+                        usuario_creo: 'testing-front',
+                        fileName: ''
+                    };
+
+                    try {
+                        const response = await utils.postDataFiles(url, fileData);
+
+                        if (response.success) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } catch (error) {
+                        const errores = JSON.stringify(error);
+                        swal("Error al procesar la petición", errores, "error");
+                        return false;
+                    }
+                };
+
             }
 
             _checkValidationGroup() {
                 const solicitud = document.getElementById('trackerSolicitud');
                 const usuario = document.getElementById('trackerUsuario');
                 const invitado = document.getElementById('trackerInvitado');
-
-                console.log(solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid');
 
                 if (solicitud.valid === 'valid' && usuario.valid === 'valid' && invitado.valid === 'valid') {
                     return true;
