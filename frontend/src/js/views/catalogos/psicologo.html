@@ -1,0 +1,113 @@
+<h4>Psicologos</h4>
+<div class="oj-panel">
+  <oj-c-button label="Agregar" on-oj-action="[[agregarPsicologo]]" data-oj-clickthrough="disabled"
+    disabled="[[psicologoSeleccionado]]">
+    <span slot="startIcon" class="oj-ux-ico-plus"></span>
+  </oj-c-button>
+
+
+  <oj-table id="psicologos" data="[[dataProvider]]" class="tabla oj-sm-margin-2x-bottom"
+    columns-default='{"sortable": "enabled"}' selection-mode.row="single" first-selected-row="{{psicologoSeleccionado}}"
+    scroll-policy="loadMoreOnScroll" scroll-policy-options.fetch-size="15" 
+    on-first-selected-row-changed="[[firstSelectedRowChangedListener]]"
+    columns='[
+    {
+      "headerText": "ID", 
+      "field": "id", 
+      "minWidth": "50"
+    },
+    {
+      "headerText": "Número", 
+      "field": "numero", 
+      "minWidth": "100"
+    },
+    {
+      "headerText": "Estatus", 
+      "field": "estatus", 
+      "minWidth": "100",
+      "template": "estatusTemplate"
+    },
+    {
+      "headerText": "Nombre Completo", 
+      "field": "usuario.nombre", 
+      "minWidth": "200"
+    },
+    {
+      "headerText": "Apellido Paterno", 
+      "field": "usuario.apellidoPaterno", 
+      "minWidth": "200"
+    },
+    {
+      "headerText": "Apellido Materno", 
+      "field": "usuario.apellidoMaterno", 
+      "minWidth": "200"
+    },
+    {
+          "headerText": "Detalle",
+          "maxWidth": "10rem",
+          "sortable": "disabled",
+          "headerStyle": "text-align: center;",
+          "frozenEdge": "end",
+          "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+          "template": "actionTemplate",
+          "id": "action" 
+      }
+  ]'>
+
+    <template slot="estatusTemplate" data-oj-as="cell">
+      <oj-bind-if test="[[cell.row.estatus === 1]]">
+        <span>Activo</span>
+      </oj-bind-if>
+      <oj-bind-if test="[[cell.row.estatus === 0]]">
+        <span>Inactivo</span>
+      </oj-bind-if>
+    </template>
+
+    <template slot="actionTemplate" data-oj-as="cell">
+      <oj-c-button chroming="borderless" display="icons" on-oj-action="[[ detallepsicologos ]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+      </oj-c-button>
+    </template>
+
+  </oj-table>
+
+
+  <oj-bind-if test="[[psicologoSeleccionado()]]">
+
+    <div class="oj-panel oj-bg-info-10">
+      <h1 class="oj-typography-heading-xs">Psicologo </h1>
+      <oj-validation-group id="trackerPsicologo" valid="{{groupValid}}" role="group">
+
+        <oj-c-form-layout id="personal-information" direction="row" max-columns="2">
+          
+          <oj-c-input-text id="numeroId" label-hint="Número" required="true" value="{{ numero }}"
+            autocomplete="off"></oj-c-input-text>
+
+          <oj-switch id="estatusId" label-hint="Estatus" id="enabledSwitchOn" value="{{ estatus }}"></oj-switch>
+
+          <oj-c-select-single id="usuarioId" data="[[dataProviderUsuarios]]" item-text="label" value=" {{ usuario }} "
+            label-hint="Usuario" required="true"></oj-c-select-single>
+
+        </oj-c-form-layout>
+
+      </oj-validation-group>
+    </div>
+
+    <oj-toolbar chroming="outlined">
+
+      <oj-c-button label="Cancelar" on-oj-action="[[cancelar]]" data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-cancel"></span>
+      </oj-c-button>
+
+
+      <oj-c-button label="Guardar" on-oj-action="[[guardar]]" data-oj-clickthrough="disabled" chroming="callToAction">
+        <span slot="startIcon" class="oj-ux-ico-save"></span>
+      </oj-c-button>
+
+
+    </oj-toolbar>
+  </oj-bind-if>
+
+
+</div>

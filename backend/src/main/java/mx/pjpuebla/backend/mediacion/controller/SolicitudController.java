@@ -5,15 +5,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mx.pjpuebla.backend.core.entitiy.Archivo;
 import mx.pjpuebla.backend.core.entitiy.Materia;
 import mx.pjpuebla.backend.core.entitiy.Persona;
+import mx.pjpuebla.backend.core.service.ArchivoService;
 import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
+import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
+import mx.pjpuebla.backend.mediacion.entitiy.SolicitudCanalizacion;
 import mx.pjpuebla.backend.mediacion.entitiy.TipoApertura;
+import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudCanalizacionService;
 import mx.pjpuebla.backend.mediacion.service.SolicitudService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +43,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class SolicitudController {
     private final SolicitudService solicitudes;
     private final PersonaService personas;
+    private final ArchivoService archivos;
+    private final SolicitudCanalizacionService solicitudCanalizaciones;
+    private final SolicitudArchivoService solicitudArchivos;
     private GenericResponse response;
+    
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> listar() {
@@ -125,6 +136,7 @@ public class SolicitudController {
                 }
 
                 entidad.setInvitadoPersona(invitadoPersona);
+                entidad.setFechaSesion(null);
             }
         }catch(Exception e){
             response.setMessage("No se pudo registrar al Usuario o Invitado");
@@ -137,6 +149,21 @@ public class SolicitudController {
         entidad.setUsuarioCreo("TEST");
 
         Solicitud nueva = solicitudes.save(entidad);
+
+        //Creamos el registro para que genere correctamente el archivo de solicitud:
+            Archivo archivo = new Archivo();
+            archivo.setUsuario_creo("SISTEMA");
+            archivo.setNombre("");
+            archivo.setTipo("SOLICITUD");
+            archivos.save(archivo);
+
+            SolicitudArchivo sa = new SolicitudArchivo();
+            sa.setSolicitudId(nueva.getId());
+            sa.setFormato(1);
+            sa.setArchivoId(archivo.id);
+            sa.setEstatus(1);
+            sa.setUsuarioCreo("SISTEMA");
+            solicitudArchivos.save(sa);
         
         response.setSuccess(true);
         response.setMessage("OK");
@@ -146,21 +173,23 @@ public class SolicitudController {
     }
 
     @PostMapping("/save/{id}")
-    public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad) {
+    public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad, Errors errors) {
+        if (errors.hasErrors()) {
+            GenericResponse response = new GenericResponse();
+            response.setMessage("La entidad tiene errores");
+            response.setErrors(errors.getAllErrors());
+            return ResponseEntity.badRequest().body(response);
+        }
 
-        //entidad.setFolio(solicitudes.generarFolio("CJA"));
-        //entidad.setUsuarioCreo("TEST");
-
-        entidad.setFechaActualizacion(new Date());
-        entidad.setUsuarioActualizo("TEST");
-        
-        return ResponseEntity.ok(response);
+        // Procesa la solicitud y maneja posibles errores
+        return solicitudes.procesarSolicitud(entidad);
     }
-
     @PostMapping("/delete/{id}")
     public ResponseEntity<GenericResponse> eliminar(@PathVariable("id") Integer id) {
         //TODO: process POST request
         response = new GenericResponse();
+
+        
 
         if (solicitudes.esEliminable(id)){
             response.setSuccess(solicitudes.delete(id));

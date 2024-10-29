@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2.final using JasperReports Library version 6.21.2-8434a0bd7c3bbc37cbf916f2968d35e4b165821a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ConstanciaNoMediable" pageWidth="612" pageHeight="792" columnWidth="486" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="28" uuid="14c5d9c7-9f45-4e1d-9b9c-a1f93ab34d59">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="PosgreSQL_Adapter"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="p_solicitud_id" class="java.lang.Integer"/>
+	<parameter name="p_acuse" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[new Boolean(false)]]></defaultValueExpression>
+	</parameter>
+	<parameter name="p_image_path" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["images"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select * from mediacion.qry_solicitud where id = $P{p_solicitud_id}]]>
+	</queryString>
+	<field name="id" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="id"/>
+		<property name="com.jaspersoft.studio.field.label" value="id"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="folio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="folio"/>
+		<property name="com.jaspersoft.studio.field.label" value="folio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="fecha_solicitud" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_solicitud"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="materia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="materia"/>
+		<property name="com.jaspersoft.studio.field.label" value="materia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_apaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_apaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_apaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_amaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_amaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_amaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_sexo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_sexo"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_persona_moral" class="java.lang.Boolean">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_persona_moral"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_persona_moral"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_nombre_completo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_representante" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_representante"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_representante"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="usuario_representante_sexo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="usuario_representante_sexo"/>
+		<property name="com.jaspersoft.studio.field.label" value="usuario_representante_sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_apaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_apaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_apaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_amaterno" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_amaterno"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_amaterno"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_sexo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_sexo"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_persona_moral" class="java.lang.Boolean">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_persona_moral"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_persona_moral"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_nombre_completo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_nombre_completo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_representante" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_representante"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_representante"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="invitado_representante_sexo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="invitado_representante_sexo"/>
+		<property name="com.jaspersoft.studio.field.label" value="invitado_representante_sexo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="descripcion_conflicto" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="descripcion_conflicto"/>
+		<property name="com.jaspersoft.studio.field.label" value="descripcion_conflicto"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="fecha_sesion" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="fecha_sesion"/>
+		<property name="com.jaspersoft.studio.field.label" value="fecha_sesion"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<field name="institucion_canalizadora" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="institucion_canalizadora"/>
+		<property name="com.jaspersoft.studio.field.label" value="institucion_canalizadora"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="qry_solicitud"/>
+	</field>
+	<variable name="v_fecha_sesion" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("d 'de' MMMM  'de' yyyy 'a las' h:mm a", $P{REPORT_LOCALE}).format($F{fecha_sesion})]]></variableExpression>
+	</variable>
+	<variable name="v_fecha_solicitud" class="java.lang.String">
+		<variableExpression><![CDATA[new SimpleDateFormat("d 'de' MMMM  'de' yyyy", $P{REPORT_LOCALE}).format($F{fecha_solicitud})]]></variableExpression>
+	</variable>
+	<variable name="v_hora_fecha_constancia" class="java.lang.String">
+		<variableExpression><![CDATA[$V{v_number_spell}.format(new Date().getHours())+" horas y "+ $V{v_number_spell}.format(new Date().getMinutes() )+" minutos del día "+
+new SimpleDateFormat("EEEE d 'de' MMMM  'de' yyyy ", $P{REPORT_LOCALE}).format(new Date())]]></variableExpression>
+	</variable>
+	<variable name="v_number_spell" class="com.ibm.icu.text.RuleBasedNumberFormat">
+		<initialValueExpression><![CDATA[new com.ibm.icu.text.RuleBasedNumberFormat($P{REPORT_LOCALE}, com.ibm.icu.text.RuleBasedNumberFormat.SPELLOUT)]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="74" splitType="Stretch">
+			<textField>
+				<reportElement x="320" y="10" width="160" height="30" uuid="3f947c8d-f353-47ac-a13e-1d3b787074e4"/>
+				<textElement textAlignment="Right">
+					<font size="7.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SOLICITUD "+$F{folio}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="0" width="180" height="60" uuid="7470a979-9cb9-4f1f-8b57-6da4637b79e9"/>
+				<imageExpression><![CDATA[$P{p_image_path}+"/centro_justicia_a.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="41" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="480" height="40" uuid="6ee7be92-ecdc-4193-868d-888263d5d7a5"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CANALIZACIÓN"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="444" splitType="Stretch">
+			<textField>
+				<reportElement x="2" y="10" width="480" height="220" uuid="a61c988a-cb26-4095-81b0-31efb8ca6999">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="9"/>
+					<paragraph lineSpacing="1_1_2" lineSpacingSize="1.0" firstLineIndent="40"/>
+				</textElement>
+				<textFieldExpression><![CDATA["En Ciudad Judicial, Puebla; siendo las "+$V{v_hora_fecha_constancia} +" con fundamento en los artículos 2, 7, 15 fracción VII, 23 y 27 de LEY DE MECANISMOS ALTERNATIVOS DE SOLUCIÓN DE CONTROVERSIAS DEL ESTADO LIBRE Y SOBERANO DE PUEBLA; la que suscribe <b>LIC. ROSA MARÍA MORALES CISNEROS, Directora del Centro de Justicia Alternativa del Poder Judicial del Estado de Puebla</b>, hago constar que fue solicitado el desahogo de un <b>PROCEDIMIENTO DE MEDIACIÓN</b> aplicable en materias Familiar, Civil y Mercantil, no obstante, derivado de la información proporcionada respecto del asunto a tratar, así como de su naturalieza, se concluye que este <b>no es susceptible de ser atendido</b> por esta institución, por lo que se deja a salvo los derechos de los intervinientes para hacerlos valer en la via que consideren oportuna."+
+" En atención a lo anterior se solicita el apoyo e intervención del " + $F{institucion_canalizadora} + " Institución que por la naturaleza del asunto podrá presentar una adecuada atención a las necesidades del solicitante."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="310" width="200" height="15" uuid="0ae6c40a-a44d-47c4-96c0-7749065161a2">
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" markup="html">
+					<font size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["LIC. ROSA MARÍA MORALES CISNEROS"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="325" width="200" height="30" uuid="71858a38-6452-40e9-a700-9c25bb5c0b5e"/>
+				<textElement textAlignment="Center">
+					<font size="7.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["TITULAR DEL CENTRO DE JUSTICIA ALTERNATIVA DEL TRIBUNAL SUPERIOR DE JUSTICIA DEL PODER JUDICIAL DEL ESTADO DE PUEBLA"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="95" splitType="Stretch">
+			<staticText>
+				<reportElement x="190" y="10" width="290" height="80" uuid="52eddb18-0b59-4064-91d7-8126cf50f801"/>
+				<textElement textAlignment="Right" markup="html">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Centro de Justicia Alternativa del <br> Tribunal Superior de Justicia del Poder Judicial del Estado de Puebla <br>Periférico Ecológico Arco Sur Núm. 4000 Edif. A <br>Ciudad Judicial Siglo XXI<br>San Andrés Cholula, Puebla, Pue. CP 72810<br>Teléfono 222.240.86.14 / 222.240.89.14 / 222.240.89.45 <br><b>Horario de Atención Lunes a Viernes 8:00 a 15:00 Hrs.</b><br>Correo Electrónico: mediacion@pjpuebla.gob.mx
+
+]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="10" y="9" width="80" height="80" uuid="959ba264-fb82-409b-871c-38e4430830ac">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.margin" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" margin="1">
+					<jr:codeExpression><![CDATA["https://www.pjpuebla.gob.mx"]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

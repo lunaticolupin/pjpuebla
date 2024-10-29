@@ -1,0 +1,125 @@
+<h4>Instituciones</h4>
+<div class="oj-panel">
+  <oj-c-button label="Agregar" on-oj-action="[[agregarInstitucion]]" data-oj-clickthrough="disabled"
+    disabled="[[institucionSeleccionada]]">
+    <span slot="startIcon" class="oj-ux-ico-plus"></span>
+  </oj-c-button>
+
+  <oj-table id="instituciones" data="[[dataProvider]]" class="tabla oj-sm-margin-2x-bottom"
+    columns-default='{"sortable": "enabled"}' selection-mode.row="single" first-selected-row="{{institucionSeleccionada}}"
+    scroll-policy="loadMoreOnScroll" scroll-policy-options.fetch-size="15" 
+    on-first-selected-row-changed="[[firstSelectedRowChangedListener]]"
+    columns='[
+    {
+      "headerText": "ID", 
+      "field": "id", 
+      "minWidth": "50"
+    },
+    {
+      "headerText": "Clave", 
+      "field": "clave", 
+      "minWidth": "100"
+    },
+    {
+      "headerText": "Nombre", 
+      "field": "nombre", 
+      "minWidth": "100"
+    },
+    {
+      "headerText": "Direccion", 
+      "field": "direccion", 
+      "minWidth": "200"
+    },
+    {
+      "headerText": "Tipo", 
+      "field": "tipo", 
+      "minWidth": "200"
+    },
+    {
+      "headerText": "Estatus", 
+      "template": "estatusTemplate",
+      "minWidth": "200"
+    },
+    {
+        "headerText": "Contacto", 
+        "field": "contacto", 
+        "minWidth": "200"
+      },
+    {
+          "headerText": "Detalle",
+          "maxWidth": "10rem",
+          "sortable": "disabled",
+          "headerStyle": "text-align: center;",
+          "frozenEdge": "end",
+          "style":"text-align: center; padding-top: 0px; padding-bottom: 0px;",
+          "template": "actionTemplate",
+          "id": "action" 
+      }
+  ]'>
+
+    <template slot="estatusTemplate" data-oj-as="cell">
+      <oj-bind-if test="[[ cell.row.activo ]]">
+        <span>Activo</span>
+      </oj-bind-if>
+      <oj-bind-if test="[[ !cell.row.activo ]]">
+        <span>Inactivo</span>
+      </oj-bind-if>
+    </template>
+
+    <template slot="actionTemplate" data-oj-as="cell">
+      <oj-c-button chroming="borderless" display="icons" on-oj-action="[[ detalleInstituciones ]]"
+        data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-add-edit-page"></span>
+      </oj-c-button>
+    </template>
+
+  </oj-table>
+
+
+  <oj-bind-if test="[[institucionSeleccionada()]]">
+
+    <div class="oj-panel oj-bg-info-10">
+      <h1 class="oj-typography-heading-xs">Institución </h1>
+      <oj-validation-group id="trackerInstitucion" valid="{{groupValid}}" role="group">
+
+        <oj-c-form-layout id="personal-information" direction="row" max-columns="3">
+          
+        <oj-c-input-text id="claveId" label-hint="Clave" required="true" value="{{ clave }}"
+            autocomplete="off"></oj-c-input-text>
+
+        <oj-c-input-text id="nombreId" label-hint="Nombre" required="true" value="{{ nombre }}"
+            autocomplete="off"></oj-c-input-text>
+
+        <oj-c-input-text id="direccionId" label-hint="Dirección" required="true" value="{{ direccion }}"
+            autocomplete="off"></oj-c-input-text>
+
+        <oj-c-input-text id="TipoId" label-hint="Tipo" required="true" value="{{ tipo }}"
+            autocomplete="off"></oj-c-input-text>
+
+        <oj-c-input-text id="ContactoId" label-hint="Contacto" required="true" value="{{ contacto }}"
+            autocomplete="off"></oj-c-input-text>
+
+        <oj-switch id="estatusId" label-hint="Estatus" id="enabledSwitchOn" value="{{ estatus }}"></oj-switch>
+       
+        </oj-c-form-layout>
+
+      </oj-validation-group>
+    </div>
+
+    <oj-toolbar chroming="outlined">
+
+      <oj-c-button label="Cancelar" on-oj-action="[[cancelar]]" data-oj-clickthrough="disabled">
+        <span slot="startIcon" class="oj-ux-ico-cancel"></span>
+      </oj-c-button>
+
+
+      <oj-c-button label="Guardar" on-oj-action="[[guardar]]" data-oj-clickthrough="disabled" chroming="callToAction">
+        <span slot="startIcon" class="oj-ux-ico-save"></span>
+      </oj-c-button>
+
+
+    </oj-toolbar>
+  </oj-bind-if>
+
+
+</div>

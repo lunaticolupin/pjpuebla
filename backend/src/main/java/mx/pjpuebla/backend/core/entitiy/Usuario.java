@@ -80,7 +80,7 @@ public class Usuario implements Serializable{
 	
 	@OneToOne
 	@JoinColumns(value={ @JoinColumn(name="persona_id", referencedColumnName="id", nullable=false) })
-	@JsonIgnore	
+	//@JsonIgnore	
 	private Persona persona;
 
 	@ManyToMany

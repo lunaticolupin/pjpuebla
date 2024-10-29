@@ -90,3 +90,70 @@ AS SELECT s.id,
      JOIN core.persona p2 ON p2.id = s.invitado_persona_id
      JOIN core.materia m ON m.id = s.materia_id
      JOIN mediacion.tipo_apertura ta ON ta.id = s.tipo_apertura_id;
+
+
+
+
+
+
+ALTER TABLE mediacion.solicitud_canalizacion ADD CONSTRAINT solicitud_canalizacion_unique UNIQUE (solicitud_id);
+
+-- se camia el tipo de dato a es_mediable quedando como entero, se almacenaran los siguientes valores;
+-- 0 - por determinar
+-- 1 - mediable
+-- 2 - no es mediable
+ALTER TABLE mediacion.solicitud ADD es_mediable int4 NULL;
+ALTER TABLE mediacion.solicitud ALTER COLUMN es_mediable SET DEFAULT 0;
+
+
+
+ALTER TABLE mediacion.asistencia ALTER COLUMN fecha_asistencia TYPE timestamp USING fecha_asistencia::timestamp;
+
+
+ALTER TABLE core.archivo ADD estatus integer DEFAULT 1 NULL;
+ALTER TABLE core.formato ADD nombre_reporte varchar NULL;
+
+
+-- actualización de vista solicitudes para obtener si una solicitud fue canalizada:
+
+CREATE OR REPLACE VIEW mediacion.qry_solicitud
+AS SELECT s.id,
+    s.folio,
+    s.fecha_solicitud,
+    m.descripcion AS materia,
+    p.nombre AS usuario_nombre,
+    p.apellido_paterno AS usuario_apaterno,
+    p.apellido_materno AS usuario_amaterno,
+    p.sexo AS usuario_sexo,
+    p.persona_moral AS usuario_persona_moral,
+    core.nombre_persona(p.id) AS usuario_nombre_completo,
+        CASE
+            WHEN p.representante IS NULL THEN ''::character varying
+            ELSE core.nombre_persona(p.representante)
+        END AS usuario_representante,
+    ( SELECT persona.sexo
+           FROM core.persona
+          WHERE persona.id = p.representante) AS usuario_representante_sexo,
+    p2.nombre AS invitado_nombre,
+    p2.apellido_paterno AS invitado_apaterno,
+    p2.apellido_materno AS invitado_amaterno,
+    p2.sexo AS invitado_sexo,
+    p2.persona_moral AS invitado_persona_moral,
+    core.nombre_persona(p2.id) AS invitado_nombre_completo,
+        CASE
+            WHEN p2.representante IS NULL THEN ''::character varying
+            ELSE core.nombre_persona(p2.representante)
+        END AS invitado_representante,
+    ( SELECT persona.sexo
+           FROM core.persona
+          WHERE persona.id = p2.representante) AS invitado_representante_sexo,
+    s.descripcion_conflicto,
+    s.fecha_sesion,
+    i.nombre
+   FROM mediacion.solicitud s
+     JOIN core.persona p ON p.id = s.usuario_persona_id
+     JOIN core.persona p2 ON p2.id = s.invitado_persona_id
+     JOIN core.materia m ON m.id = s.materia_id
+     JOIN mediacion.tipo_apertura ta ON ta.id = s.tipo_apertura_id
+     left join mediacion.solicitud_canalizacion sc on sc.solicitud_id = s.id
+     left join core.instituciones i on i.id = sc.institucion_id

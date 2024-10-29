@@ -32,7 +32,7 @@ public class SolicitudArchivo {
     private UUID  id;
 
     @JsonIgnore
-    private Long solicitudId;
+    private Integer solicitudId;
 
     // @OneToOne
     @JoinColumn(name = "archivo_id")
