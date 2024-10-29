@@ -49,6 +49,8 @@ import org.springframework.core.io.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
+// import javax.servlet.http.HttpServletRequest;
+// import javax.servlet.http.HttpServletRequest;
 // import java.io.IOException;
 
 
@@ -64,7 +66,7 @@ public class ArchivoController {
     private String uploadDir;
 
     @PostMapping("/upload")
-    public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Long solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo) {
+    public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Long solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo, HttpServletRequest request) {
         
         GenericResponse response = new GenericResponse();
         try {
@@ -96,9 +98,17 @@ public class ArchivoController {
             sa.setUsuarioCreo(usuario_creo);
             solicitudArchivos.save(sa);
 
+            // jakarta.servlet.http.HttpServletRequest request;
+            // String url = this.getUrl(request);
+
+            // String url = this.getUrl(null);
+
+            String url = this.getUrl(request);
+
             Map<String, Object> data = new HashMap<>();
             data.put("id", archivo.id);
-            data.put("url", "http://localhost:8080/archivos/download/"+archivo.id);
+            // data.put("url", "http://localhost:8080/archivos/download/"+archivo.id);
+            data.put("url",url );
 
             response.setSuccess(true);
             response.setMessage("Archivo almacenado con éxito");
@@ -152,5 +162,12 @@ public class ArchivoController {
         } catch (MalformedURLException | FileNotFoundException ex) {
             throw new RuntimeException("Archivo no encontrado " + fileName, ex);
         }
+    }
+
+    // @GetMapping("/get-url")
+    public String getUrl(HttpServletRequest request) {
+        String url = request.getLocalAddr();
+        // String url = request.getRequestURL().toString();
+        return url;
     }
 }
