@@ -92,10 +92,16 @@
                                 disabled="[[ solicitudMediable() == 0 ]]">
                             </oj-c-radioset>
                         </div>
+                        <!-- <div class="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
+                            <oj-c-select-single id="estatusSolicitud" data="[[estadoSolicitudDP]]" item-text="label"
+                                value="{{solicitudEstatus}}"
+                                disabled="{{ estatusSolicitudDisabled }}" 
+                                label-hint="Seguimientosss"></oj-c-select-single>
+                        </div> -->
                         <div class="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
                             <oj-c-select-single id="estatusSolicitud" data="[[estadoSolicitudDP]]" item-text="label"
-                                value="{{solicitudEstatus}}" disabled="{{ estatusSolicitudDisabled }}"
-                                label-hint="Seguimiento"></oj-c-select-single>
+                                value="{{solicitudEstatus}}"
+                                label-hint="Seguimientosss"></oj-c-select-single>
                         </div>
                         <oj-bind-if test="[[ solicitudMediable() == 1 ]]">
 
@@ -134,7 +140,6 @@
                                         <oj-bind-text value="[[ item.data == true ? 'Si' : item.data == false ? 'No' : 'Sin registro' ]]" ></oj-bind-text>
                                     </template>
 
-
                                     <template slot="botonesTemplate" data-oj-as="cell">
                                         <oj-c-button label="Editar" display="icons" chroming="borderless" size="sm"
                                             on-oj-action="[[  btnOpenDetailAsistencia ]]"><span slot="startIcon"
@@ -149,7 +154,7 @@
                         <oj-bind-if test="[[ solicitudMediable() == 2 ]]">
                             <div class="oj-flex-item oj-sm-4 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-switch id="enabledSwitchOn" value="{{solicitudCanalizada}}"
-                                    label-hint="Canalizada"></oj-switch>
+                                    label-hint="Canalizada "></oj-switch>
                             </div>
                             <div class="oj-flex-item oj-sm-8 oj-sm-padding-2x-end oj-md-padding-3x-end">
                                 <oj-c-select-single id="estatusSolicitud" data="[[institucionesDP]]" item-text="label"
@@ -162,11 +167,35 @@
                                 value="{{ descripcionNoMediable  }}"></oj-c-text-area>
                         </oj-bind-if>
 
-
                         <div class="oj-flex-item oj-sm-4"></div>
                     </div>
                 </oj-c-form-layout>
             </div>
+
+
+            <!-- Mediadores-->
+            <div class="oj-panel oj-sm-margin-2x-top">
+                <h4 class="oj-typography-subheading-xs">Mediador</h4>
+                
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Seleccione el mediador a asignar.</b></p>                           
+                        </div>    
+                        <div class="oj-flex-item oj-sm-6">
+                            <oj-c-select-single id="formatosSelected" data="[[ mediadoresDP ]]" value="{{ mediadorSeleccionado }}" item-text="label" label-hint="mediador"></oj-c-select-single>
+                        </div>
+                    </div>
+
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <oj-c-button label="Agregar" on-oj-action="[[ generar_expediente ]]"></oj-c-button>
+                    
+                    </div>
+                </div>
+            </div>
+            <!-- Fin mediadores -->
+
+
 
             <div class="oj-panel oj-sm-margin-2x-top">
                 <h4 class="oj-typography-subheading-xs">Documentos</h4>
@@ -174,16 +203,11 @@
                 <div class="oj-panel">
                     <div class="oj-flex oj-sm-margin-2x-top">
                         <div class="oj-flex-item oj-sm-6">
-                            <p><b>Seleccione el documento que desea agregar.</b></p>
-                           
-                        </div>
-    
+                            <p><b>Seleccione el documento que desea agregar.</b></p>                           
+                        </div>    
                         <div class="oj-flex-item oj-sm-6">
                             <oj-c-select-single id="formatosSelected" data="[[ formatosDP ]]" value="{{ formatoSeleccionado }}" item-text="label" label-hint="formatos disponibles"></oj-c-select-single>
                         </div>
-    
-                     
-                    
                     </div>
 
                     <div class="oj-flex oj-sm-margin-2x-top">
@@ -235,7 +259,12 @@
                     </template>
                 </oj-c-list-view>
             </div>
+
+
+            
         </oj-bind-if>
+
+        
 
         <oj-toolbar chroming="outlined">
             <oj-c-button id="btnCancelar" label="Cancelar" on-oj-action="[[btnCancelarSolicitud]]"><span

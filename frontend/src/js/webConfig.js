@@ -1,5 +1,5 @@
 define ([], () => {
-    const baseEndPoint = 'http://localhost:8081'; 
+    const baseEndPoint = 'http://localhost:8080'; 
     return{
         baseEndPoint: baseEndPoint
     }

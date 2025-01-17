@@ -118,15 +118,18 @@ public class AsistenciaService {
 
     }
 
-    public ResponseEntity<GenericResponse> actualizarAsistencia(Asistencia asistencia, Integer solicitud_id,
-            Date fecha_solicitud) {
+    public ResponseEntity<GenericResponse> actualizarAsistencia(Asistencia asistencia, Integer solicitud_id, Date fecha_solicitud) 
+    {
         GenericResponse response = new GenericResponse();
+
+        System.out.println(response);
 
         try {
 
             Solicitud solicitud = solService.findById(solicitud_id);
 
-            if (solicitud != null && solicitud.getEsMediable() == 1) {
+            if (solicitud != null && solicitud.getEsMediable() == 1) 
+            {
 
                 String jsonResult = repositorio.validar_fecha_sesion(fecha_solicitud);
                 // Convertir el JSON resultante en un objeto

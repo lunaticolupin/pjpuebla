@@ -15,8 +15,10 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 rootViewModel.validaSesion();
 
                 self.urlBase = config.baseEndPoint + '/mediacion';
+
+                console.log("urlbase",this.urlBase)
                 this.ModuleElementUtils = ModuleElementUtils;
-                /** Observables */
+                /** Observables */ 
                 self.solicitudes = ko.observableArray();
                 self.solicitudSeleccionada = ko.observable();
 
@@ -52,14 +54,19 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.asistenciaSeleccionada = ko.observableArray();
                 self.solicitudArchivos = ko.observableArray();
                 self.archivoSeleccionado = ko.observable();
+                self.esMediableDP = ko.observable()
+                
             
                 /* Funciones flecha para mostrar o ocultar formularios  */
                 self.solicitudCanalizada.subscribe((value) => {
+                    console.log("shusus",self.solicitudMediable())
+                    // console.log("shusus",self.esMediableDP())
                     if (!self.documentos().some(item => item.nombre_documento == 'CANALIZACIÓN')) {
                         if (value) {
                             const documento = self.formatos().find(item => item.clave == 'F006');
                             addDocument(null, documento.descripcion, null, false, documento.esAcuse, documento.id);
                         }
+                        
                     }
                     // value ? addDocument(8, "Canalización", true, "") : self.documentos.remove((item) => item.label === 'Canalización');
                 });
@@ -76,6 +83,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.formatos_selected = ko.observableArray();
                 self.documentos = ko.observableArray([]);
                 self.formatoSeleccionado = ko.observable();
+
+                self.mediadorSeleccionado  = ko.observable();
 
                 /** variables y funciones Knockout */
                 this.userInfoSignal = new signals.Signal();
@@ -214,6 +223,45 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     });
                 });
 
+
+                //agregar mediador y generar expediente
+                self.generar_expediente = () => {
+                    if(!self.mediadorSeleccionado()){
+                        swal('Error: mediador no seleccionado', 'Es necesario seleccionar un mediador a asignar', 'warning');
+                        return false;
+                    }
+                    
+                    utils.confirmar('Mediador', '¿Esta usted seguro(a) de asignar este mediador y generar numero de expediente?').then(response =>{
+                        const url = config.baseEndPoint + '/mediacion/expediente/create';
+                        const data = {
+                            solicitud_id: self.solicitudId(),
+                            mediador_id: self.mediadorSeleccionado(),
+                            solicitud_mediable: self.solicitudMediable()
+                        } 
+                        if(response){
+                            utils.postDataFiles(url, data).then((response) => {
+
+                                console.log(response);
+                                
+                                if (response.success) {
+                                    swal('Exito', 'Mediador asignado con éxito', 'success')
+                                    comprobarArchivos();
+                                    return true;
+                                }
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+                        }
+                        
+                    });
+                }
+                //fin mediador y expediente
+
                 self.agregar_formato = () => {
                     if(!self.formatoSeleccionado()){
                         swal('Error: documento no seleccionado', 'Es necesario seleccionar un docuemnto a agregar', 'warning');
@@ -300,6 +348,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
 
                 self.solicitudMediable.subscribe((value) => {   
+                    console.log("val",value)
                     
                     self.solicitudProtocoloViolencia(null);
                     self.estadoSolicitud.removeAll();
@@ -311,11 +360,13 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                 { value: 1, label: 'En Dirección' }
                             ]);
                             self.estatusSolicitudDisabled(false);
+                            self.solicitudCanalizada(false)
+                            console.log(self.solicitudCanalizada())
                             break;
 
                         case 1:
 
-                            self.estadoSolicitud([
+                            self.estadoSolicitud([  
                                 { value: 0, label: 'En Recepción' },
                                 { value: 1, label: 'En Dirección' },
                                 { value: 2, label: "Mediable" },
@@ -323,8 +374,10 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                 { value: 4, label: "1ra invitación" },
                                 { value: 5, label: "2da invitación" }
                             ])
-
                             self.estatusSolicitudDisabled(true);
+                            self.solicitudCanalizada(false)
+
+                            console.log(self.solicitudCanalizada())
                             break;
 
                         case 2:
@@ -372,7 +425,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                     self.solicitudEstatus(solicitud.estatus);
                     self.solicitudTipoApertura(solicitud.tipoApertura);
-                    self.solicitudTipoAperturaId(solicitud.tipoApertura.id);
+                    self.solicitudTipoAperturaId(solicitud.tipoApertura.id);;
 
                     if (solicitud.id) {
                         //definiendo variables de canalización:
@@ -581,7 +634,34 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 });
 
                 self.btnEditarSolicitud = ((event, detail) => {
+                    const url = config.baseEndPoint + '/mediacion/solicitud/getExpedienteMediador';
+                        const data = {
+                            solicitud_id: detail.item.data.id
+                        }
+                        utils.postDataFiles(url, data).then((response) => {
 
+                            console.log("SOLMED",response.data.mediador);
+                            
+                            if (response.message == 'OK') {
+                                self.mediadorSeleccionado(response.data.mediador.id)
+                                // this.mediadorSeleccionado = response.data.mediador.id;
+                                console.log("mediador",this.mediadorSeleccionado)
+                                console.log("selfmediador",self.mediadorSeleccionado())
+                                // self.mediadorSeleccionado() = response.data.mediador.id;   
+                            }else {
+                                this.mediadorSeleccionado = ''
+                            }
+                            // const errores = JSON.stringify(response.errors);
+                            // swal(response.message, errores, "error");
+
+                        })
+                        // .catch((response) => {
+                        //     const errores = JSON.stringify(response);
+
+                        //     swal("Error al procesar la petición", errores, "error");
+                        // });
+
+                    //Funcionalidad boton editar
                     self.solicitudDetalle(true);
                     self.solicitudSeleccionada({ key: detail.item.key, data: detail.item.data });
                     self.parseSolicitud(detail.item.data);
@@ -593,6 +673,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     };
 
                     element.selected = seleccion;
+                    // console.log("id_solicitus",detail.item.data.id)
                 });
 
                 this.btnClose = (event, detail) => {
@@ -816,7 +897,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 /** REST */
                 self.getSolicitudes = (() => {
-                    const url = self.urlBase + '/solicitud';
+                    const url  = self.urlBase + '/solicitud';
                     self.solicitudes([]);
 
                     return utils.getData(url, {}).then((response) => {
@@ -880,6 +961,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 self.getFormatos = (() => {
                     const url = config.baseEndPoint + '/formatos'
+                    console.log("urllllllllllll",url)
                     return utils.getData(url, {}).then((response) => {
                         if (response.success) {
                             let formatos_temp = [];
@@ -898,6 +980,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         }
                     })
                 })
+
 
                 self.getJSONTemp = (() => {
                     const url = self.urlBase + '/solicitud/template';
@@ -964,6 +1047,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         tipoApertura: self.solicitudTipoApertura(),
                         fechaSesion: self.solicitudFechaSesion() ? self.dateConverter(self.solicitudFechaSesion()) : null
                     }
+
+                    console.log("data",data) 
 
 
                     if (data.canalizado && data.canalizacion.institucion == null) {

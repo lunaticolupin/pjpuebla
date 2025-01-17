@@ -10,16 +10,16 @@
         converter="[[dateTimeConverterInput]]" min="[[maxFecha]]" required readonly="[[ isToday ]]"></oj-input-date-time>
 
       <oj-c-radioset id="radioSetsAsistenciaPer" value="{{ asistencia().asiste_usuario }}" direction="row"
-        label-hint="Asiste persona" options="[[asistenciaDP]]" required></oj-c-radioset>
+        label-hint="Asiste persona" options="[[asistenciaDP]]" ></oj-c-radioset>
 
       <oj-c-radioset id="radioSetsAsistenciaInv" value="{{ asistencia().asiste_invitado }}" direction="row"
-        label-hint="Asiste Invitado" options="[[asistenciaDP]]" required></oj-c-radioset>
+        label-hint="Asiste Invitado" options="[[asistenciaDP]]" ></oj-c-radioset>
 
       <oj-c-radioset id="radioSetsAceptaPer" value="{{ asistencia().acepta_usuario }}" direction="row"
-        label-hint="Acepta Persona" options="[[asistenciaDP]]" required></oj-c-radioset>
+        label-hint="Acepta Persona" options="[[asistenciaDP]]" ></oj-c-radioset>
 
       <oj-c-radioset id="radioSetsAceptaInv" value="{{ asistencia().acepta_invitado }}" direction="row"
-        label-hint="Acepta Invitado" options="[[asistenciaDP]]" required></oj-c-radioset>
+        label-hint="Acepta Invitado" options="[[asistenciaDP]]" ></oj-c-radioset>
 
     </oj-c-form-layout>
   </oj-validation-group>

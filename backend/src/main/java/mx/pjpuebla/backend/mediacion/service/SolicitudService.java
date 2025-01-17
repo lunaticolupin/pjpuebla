@@ -180,6 +180,8 @@ public class SolicitudService {
         }
 
         if(entidad.getEsMediable() == 0){
+
+            System.out.println("bubduidb");
             if (entidad.getCanalizacion().getId() != null) {
                 SolicitudCanalizacion solicitudEntity = entidad.getCanalizacion();
 

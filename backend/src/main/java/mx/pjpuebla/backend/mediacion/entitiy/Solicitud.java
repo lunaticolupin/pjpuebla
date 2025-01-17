@@ -45,7 +45,10 @@ public class Solicitud {
 
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
+    // // @JsonFormat(pattern = "dd/MM/yy")
+    // @JsonFormat(pattern = "dd/MM/yy")
     private Date fechaSolicitud = new Date();
+    // private Date fechaSolicitud ;
 
     //@JsonFormat(pattern = "dd/MM/yyyy")
     private Date fechaSesion;

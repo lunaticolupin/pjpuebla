@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import mx.pjpuebla.backend.core.entitiy.Archivo;
 import mx.pjpuebla.backend.core.entitiy.Materia;
 import mx.pjpuebla.backend.core.entitiy.Persona;
+import mx.pjpuebla.backend.mediacion.entitiy.Expediente;
 import mx.pjpuebla.backend.core.service.ArchivoService;
 import mx.pjpuebla.backend.core.service.PersonaService;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
@@ -17,12 +18,14 @@ import mx.pjpuebla.backend.mediacion.entitiy.TipoApertura;
 import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
 import mx.pjpuebla.backend.mediacion.service.SolicitudCanalizacionService;
 import mx.pjpuebla.backend.mediacion.service.SolicitudService;
+import mx.pjpuebla.backend.mediacion.service.ExpedienteService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.exception.DataException;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +49,7 @@ public class SolicitudController {
     private final ArchivoService archivos;
     private final SolicitudCanalizacionService solicitudCanalizaciones;
     private final SolicitudArchivoService solicitudArchivos;
+    private final ExpedienteService expedientes;
     private GenericResponse response;
     
 
@@ -151,19 +155,19 @@ public class SolicitudController {
         Solicitud nueva = solicitudes.save(entidad);
 
         //Creamos el registro para que genere correctamente el archivo de solicitud:
-            Archivo archivo = new Archivo();
-            archivo.setUsuario_creo("SISTEMA");
-            archivo.setNombre("");
-            archivo.setTipo("SOLICITUD");
-            archivos.save(archivo);
+        Archivo archivo = new Archivo();
+        archivo.setUsuario_creo("SISTEMA");
+        archivo.setNombre("");
+        archivo.setTipo("SOLICITUD");
+        archivos.save(archivo);
 
-            SolicitudArchivo sa = new SolicitudArchivo();
-            sa.setSolicitudId(nueva.getId());
-            sa.setFormato(1);
-            sa.setArchivoId(archivo.id);
-            sa.setEstatus(1);
-            sa.setUsuarioCreo("SISTEMA");
-            solicitudArchivos.save(sa);
+        SolicitudArchivo sa = new SolicitudArchivo();
+        sa.setSolicitudId(nueva.getId());
+        sa.setFormato(9);
+        sa.setArchivoId(archivo.id);
+        sa.setEstatus(1);
+        sa.setUsuarioCreo("SISTEMA");
+        solicitudArchivos.save(sa);
         
         response.setSuccess(true);
         response.setMessage("OK");
@@ -171,7 +175,6 @@ public class SolicitudController {
 
         return ResponseEntity.ok(response);
     }
-
     @PostMapping("/save/{id}")
     public ResponseEntity<GenericResponse> guardar(@Valid @RequestBody Solicitud entidad, Errors errors) {
         if (errors.hasErrors()) {
@@ -258,5 +261,31 @@ public class SolicitudController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/getExpedienteMediador")
+    public ResponseEntity<GenericResponse> getExpedienteMediador(@RequestParam("solicitud_id") Integer solicitud_id) {
+        //TODO: process POST request
+        response = new GenericResponse();
+
+        // Solicitud sol = solicitudes.findById(solicitud_id);
+        // Expediente exp = expedientes.findBySolicitud(sol.getId());
+        Expediente exp = expedientes.findBySolicitud(solicitud_id);
+
+        if(exp != null)
+        {
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(exp);
+            return ResponseEntity.ok(response);
+        }else {
+            response.setSuccess(true);
+            response.setMessage("ERROR");
+            response.setData(null);
+            return ResponseEntity.ok(response);
+            // return null;
+        }
+
+    }
+    
     
 }

@@ -34,8 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.AbstractFileResolvingResource;
 import org.springframework.core.io.UrlResource;
@@ -60,13 +59,18 @@ import java.util.UUID;
 
 
 @RestController
-@RequiredArgsConstructor
+//@RequiredArgsConstructork
 @RequestMapping("archivos")
 public class ArchivoController {
 
-    private final ArchivoService archivos;
-    private final SolicitudArchivoService solicitudArchivos;
-    private final FormatoService formatoService;
+    @Autowired
+    private  ArchivoService archivos;
+
+    @Autowired
+    private  SolicitudArchivoService solicitudArchivos;
+    
+    @Autowired
+    private  FormatoService formatoService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -130,11 +134,7 @@ public class ArchivoController {
 
 
     @PostMapping("/upload")
-<<<<<<< HEAD
-    public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Long solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo, HttpServletRequest request) {
-=======
     public ResponseEntity<GenericResponse> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("solicitud_id") Integer solicitud ,@RequestParam("formato_id") Integer formato, @RequestParam("usuario_creo") String usuario_creo, @RequestParam("archivo_id") Integer archivo_id ) {
->>>>>>> c5e42d29328993c72846ea179fcb695e68bda9de
         
         GenericResponse response = new GenericResponse();
         try {
@@ -172,12 +172,12 @@ public class ArchivoController {
 
             // String url = this.getUrl(null);
 
-            String url = this.getUrl(request);
+            // String url = this.getUrl(request);
 
             Map<String, Object> data = new HashMap<>();
             data.put("id", archivo.id);
             // data.put("url", "http://localhost:8080/archivos/download/"+archivo.id);
-            data.put("url",url );
+            // data.put("url",url );
 
             response.setSuccess(true);
             response.setMessage("Archivo almacenado con éxito");
