@@ -5,10 +5,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mx.pjpuebla.backend.core.entitiy.Archivo;
+import mx.pjpuebla.backend.core.entitiy.Formato;
+import mx.pjpuebla.backend.core.service.ArchivoService;
 import mx.pjpuebla.backend.mediacion.entitiy.Asistencia;
 import mx.pjpuebla.backend.mediacion.entitiy.SesionMediacion;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
+import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
 import mx.pjpuebla.backend.mediacion.service.AsistenciaService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,11 +37,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AsistenciaController {
     private GenericResponse response;
     private final AsistenciaService asistenciaService;
+    private final ArchivoService archivoService;
+    private final SolicitudArchivoService solicitudArchivoService;
 
     @PostMapping("/add")
     public ResponseEntity<GenericResponse> agregar(@Valid @RequestBody Asistencia entidad,  Errors errors){
         Integer esAgendable;
         response = new GenericResponse();
+        List<String> errores;
+        response.setSuccess(false);
 
         if (errors.hasErrors()){
             response.setMessage("La entidad tiene errores");
@@ -55,33 +64,39 @@ public class AsistenciaController {
 
         if(esAgendable == 1){
             Asistencia asistencia = asistenciaService.obtenerFecha(entidad.getSolicitud().getId());
-            
             if(asistencia  != null){
+
+                //Si se logro generar una cita, se generaran los dos registros para subir su invitación así como su acuse.
+                archivoService.registrarArchivosInvitaciones(entidad.getSolicitud().getId());
                 response.setData(asistencia);
                 response.setSuccess(true);
                 response.setMessage("OK");
+            
             }else{
-                response.setSuccess(false);
                 response.setMessage("Ocurrio un error al generar su fecha de invitación");
-                 List<String> errores = new ArrayList<>();
-                 errores.add("Ha ocurrido un error al generar la fecha de invitación");
+                errores = new ArrayList<>();
+                errores.add("Ha ocurrido un error al generar la fecha de invitación");
                 response.setErrors(errores);
             }
-            
         }else if(esAgendable == 2){
-            response.setSuccess(false);
-            List<String> errores = new ArrayList<>();
-            errores.add("No es posible generar una nueva invitación ya que aun sigue activa una.");
+           
+            errores = new ArrayList<>();
+            errores.add("No es posible agendar mas invitaciones ya que las personas han aceptado la mediación.");
             response.setErrors(errores);
             response.setMessage("Error al generar invitación.");
+
         }else if(esAgendable == 3){
-            response.setSuccess(false);
-            List<String> errores = new ArrayList<>();
+            errores = new ArrayList<>();
             errores.add("No es posible agendar mas invitaciones para esta solicitud.");
             response.setErrors(errores);
             response.setMessage("Error al generar invitación.");
+       
+        }else if(esAgendable == 4){
+            errores = new ArrayList<>();
+            errores.add("No es posible generar una nueva invitación ya que aun sigue activa una.");
+            response.setErrors(errores);
+            response.setMessage("Error al generar invitación.");
         }
-
 
         return ResponseEntity.ok(response);
 
@@ -97,7 +112,7 @@ public class AsistenciaController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        return asistenciaService.actualizarAsistencia(entidad, entidad.getSolicitud().getId(), entidad.getFecha_asistencia());
+        return asistenciaService.actualizarAsistencia(entidad, entidad.getSolicitud().getId(), entidad.getFechaAsistencia());
     }
     
 
@@ -105,7 +120,7 @@ public class AsistenciaController {
     public ResponseEntity<GenericResponse> getAsistenciasBySolicitud(@PathVariable("solicitud_id") Integer solicitud_id){
         response = new GenericResponse(true, "OK", null, null);
 
-        List<Asistencia> asistencia = asistenciaService.findAllBySolicitudId(solicitud_id);
+        List<Asistencia> asistencia = asistenciaService.findAllBySolicitudIdOrderByFechaAsistenciaAsc(solicitud_id);
         response.setData(asistencia);
 
         return ResponseEntity.ok(response);

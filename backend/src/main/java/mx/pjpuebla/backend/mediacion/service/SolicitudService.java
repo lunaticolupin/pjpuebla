@@ -138,42 +138,6 @@ public class SolicitudService {
 
         entidad.setInvitadoPersona(usuarioInvitado);
         entidad.setUsuarioPersona(usuarioPersona);
-
-        /* 
-        // Validación y ajuste de la fecha de sesión
-        if (entidad.getEsMediable() == 1 && entidad.getFechaSesion() == null) {
-            Date fechaSesion = generarFechaSesion(entidad.getId());
-            entidad.setFechaSesion(fechaSesion);
-        }
-
-        if (entidad.getEsMediable() == 1 && entidad.getFechaSesion() != null) {
-            Integer fechaValida = validar_fecha_sesion(entidad.getFechaSesion());
-
-            if (fechaValida != 1) {
-                List<String> errores = new ArrayList<>();
-                switch (fechaValida) {
-                    case 2:
-                        errores.add("La Hora seleccionada no es válida.");
-                        errores.add(
-                                "Seleccione una hora entre los siguientes rangos: '08:30', '10:00', '12:00', '13:30'.");
-                        break;
-                    case 3:
-                        errores.add("El día elegido no puede ser sábado o domingo.");
-                        break;
-                    case 4:
-                        errores.add("La fecha seleccionada no puede ser un día inhábil.");
-                        break;
-                    case 5:
-                        errores.add("La fecha seleccionada ya tiene todas las sesiones asignadas.");
-                        break;
-                }
-                response.setSuccess(false);
-                response.setMessage("Error en la fecha de sesión.");
-                response.setErrors(errores);
-                return ResponseEntity.ok(response);
-            }
-        }
-        */
         
         // Manejo de la canalización
         if (entidad.getEsMediable() == 2) {
@@ -216,6 +180,8 @@ public class SolicitudService {
         }
 
         if(entidad.getEsMediable() == 0){
+
+            System.out.println("bubduidb");
             if (entidad.getCanalizacion().getId() != null) {
                 SolicitudCanalizacion solicitudEntity = entidad.getCanalizacion();
 
@@ -239,33 +205,6 @@ public class SolicitudService {
         response.setData(solicitudActualizada);
 
         return ResponseEntity.ok(response);
-    }
-
-
-    /* 
-    public Integer validar_fecha_sesion(Date p_fecha_solicitud) {
-
-        try {
-
-            String jsonResult = repositorio.validar_fecha_sesion(p_fecha_solicitud);
-            // Convertir el JSON resultante en un objeto
-            JsonNode jsonNode = objectMapper.readTree(jsonResult);
-
-            int estatus = jsonNode.path("estatus").asInt();
-            String fecha = jsonNode.path("fecha").asText();
-
-            return estatus;
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-    */
-
-    public void validar_fecha_sesion(){
-        
     }
 
 }

@@ -38,10 +38,13 @@ public class Archivo implements Serializable {
     private String tipo;
     
     @Column(name = "fecha_creacion", nullable = true)
-    private Date fecha_creacion = new Date();
+    private Date fechaCreacion = new Date();
     
     @Column(name = "usuario_creo", nullable = true)
     private String usuario_creo;
+
+    @Column(name = "estatus", nullable = true)
+    private Integer estatus = 1;
     
     
     // @JsonIgnore

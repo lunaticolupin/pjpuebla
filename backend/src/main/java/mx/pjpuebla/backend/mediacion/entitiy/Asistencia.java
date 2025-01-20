@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +37,8 @@ public class Asistencia {
     @JsonBackReference
     private Solicitud  solicitud;
 
-    private Date fecha_asistencia;
+    @Column(name = "fecha_asistencia")
+    private Date fechaAsistencia;
     private Boolean asiste_usuario;
     private Boolean asiste_invitado;
     private Integer tipo;
@@ -50,7 +52,7 @@ public class Asistencia {
     @JsonIgnore
     private String usuario_creo = "TEST";
     @JsonIgnore
-    private Date fecha_actualizacion = new Date();
+    private Date fecha_actualizacion;
     @JsonIgnore
     private String usuario_actualizo = "TEST";
 

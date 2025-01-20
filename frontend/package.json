@@ -5,6 +5,7 @@
   "dependencies": {
     "@oracle/oraclejet": "~16.0.0",
     "@oracle/oraclejet-core-pack": "~16.0.0",
+    "frontend": "file:",
     "sweetalert": "^2.1.2"
   },
   "devDependencies": {

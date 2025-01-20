@@ -22,14 +22,16 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Expediente {
+public class    Expediente {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EXPEDIENTE_ID_GENERATOR")
     @SequenceGenerator(name = "EXPEDIENTE_ID_GENERATOR", sequenceName = "mediacion.expediente_id_seq", allocationSize = 1)
     private Integer id;
 
-    @NotBlank
-    private String folio;
+    // @NotNull
+	public
+    // private String folio;
+    Integer folio;
 
     @NotNull
     @JsonIgnore
@@ -48,11 +50,8 @@ public class Expediente {
     private Boolean asistencia_psicologica;
     private Boolean asistencia_juridica;
     private Integer estatus;
-    
-    @ManyToOne
-    @JoinColumn(name = "psicologo_id")
-    private Psicologo psicologo;
 
-
-
+    // @ManyToOne
+    // @JoinColumn(name = "psicologo_id")
+    // private Psicologo psicologo;
 }

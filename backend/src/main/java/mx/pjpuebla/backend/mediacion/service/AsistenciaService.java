@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,8 +34,12 @@ public class AsistenciaService {
         return this.repositorio.save(asistencia);
     }
 
-    public List<Asistencia> findAllBySolicitudId(Integer id) {
-        List<Asistencia> asistencias = this.repositorio.findAllBySolicitudId(id);
+    public Integer numAsistencia(Integer solicitudId){
+        return repositorio.countBySolicitudId(solicitudId);
+    }
+
+    public List<Asistencia> findAllBySolicitudIdOrderByFechaAsistenciaAsc(Integer id) {
+        List<Asistencia> asistencias = this.repositorio.findAllBySolicitudIdOrderByFechaAsistenciaAsc(id);
         return asistencias;
     }
 
@@ -51,33 +56,31 @@ public class AsistenciaService {
      *         - `1` si ninguna de las condiciones anteriores se cumple.
      */
     public Integer esAgendable(Integer solicitud_id) {
+        //Declaramos variables a utilizar
+        List<Asistencia> asistencias = findAllBySolicitudIdOrderByFechaAsistenciaAsc(solicitud_id);
 
-        List<Asistencia> asistencias = findAllBySolicitudId(solicitud_id);
-    
-        // Obtener la fecha de hoy como LocalDate
-        LocalDate today = LocalDate.now();
-        
         // Mostrar las fechas para depuración
         for (Asistencia asistencia2 : asistencias) {
-            LocalDate fechaAsistencia = asistencia2.getFecha_asistencia().toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDate();
-            System.out.println(fechaAsistencia + " YYYY " + today);
+            if(Boolean.TRUE.equals(asistencia2.getAcepta_usuario()) && 
+                Boolean.TRUE.equals(asistencia2.getAcepta_invitado())){
+                return 2;
+            }   
         }
-    
+
         // Si hay dos asistencias, devuelve 2
         if (asistencias.size() == 2) {
-            return 2;
-        }
-    
-        // Verifica si alguna asistencia tiene una fecha igual o mayor a hoy
-        boolean fecha_activa = asistencias.stream()
-                .anyMatch(asistencia -> asistencia.getFecha_asistencia().toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate().compareTo(today) >= 0);
-    
-        if (fecha_activa) {
             return 3;
         }
-    
+
+        // Verifica si alguna asistencia tiene una fecha igual o mayor a hoy tomando en consideracion el tiepo
+        boolean fecha_activa = asistencias.stream()
+                .anyMatch(asistencia -> asistencia.getFechaAsistencia().toInstant()
+                        .atZone(ZoneId.systemDefault()).compareTo(ZonedDateTime.now()) >= 0);
+
+        if (fecha_activa) {
+            return 4;
+        }
+
         return 1;
     }
 
@@ -86,7 +89,7 @@ public class AsistenciaService {
 
             Solicitud solicitud = solService.findById(solicitud_id);
 
-            if (solicitud != null && solicitud.getEsMediable() == 1) {
+            if (solicitud != null) {
                 String jsonResult = this.repositorio.generarFechaSesion();
                 JsonNode jsonNode = objectMapper.readTree(jsonResult);
 
@@ -96,12 +99,14 @@ public class AsistenciaService {
                 Date fechaSesion = formatter.parse(fs);
 
                 solicitud.setFechaSesion(fechaSesion);
+                solicitud.setEsMediable(1);
                 solService.save(solicitud);
 
                 Asistencia asistencia = new Asistencia();
                 asistencia.setSolicitud(solicitud);
-                asistencia.setFecha_asistencia(fechaSesion);
-                ;
+                asistencia.setTipo( numAsistencia(solicitud_id) + 1);
+                asistencia.setFechaAsistencia(fechaSesion);
+                asistencia.setFecha_actualizacion(new Date());   
 
                 return this.repositorio.save(asistencia);
             }
@@ -113,15 +118,18 @@ public class AsistenciaService {
 
     }
 
-    public ResponseEntity<GenericResponse> actualizarAsistencia(Asistencia asistencia, Integer solicitud_id,
-            Date fecha_solicitud) {
+    public ResponseEntity<GenericResponse> actualizarAsistencia(Asistencia asistencia, Integer solicitud_id, Date fecha_solicitud) 
+    {
         GenericResponse response = new GenericResponse();
+
+        System.out.println(response);
 
         try {
 
             Solicitud solicitud = solService.findById(solicitud_id);
 
-            if (solicitud != null && solicitud.getEsMediable() == 1) {
+            if (solicitud != null && solicitud.getEsMediable() == 1) 
+            {
 
                 String jsonResult = repositorio.validar_fecha_sesion(fecha_solicitud);
                 // Convertir el JSON resultante en un objeto

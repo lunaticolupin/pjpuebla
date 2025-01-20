@@ -11,7 +11,9 @@ import mx.pjpuebla.backend.mediacion.entitiy.Asistencia;
 
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Integer> {
     
-    public List<Asistencia> findAllBySolicitudId(Integer id);
+    public List<Asistencia> findAllBySolicitudIdOrderByFechaAsistenciaAsc(Integer id);
+
+    public Integer countBySolicitudId(Integer id);
 
     @Query(value = "SELECT * FROM mediacion.fun_fecha_sesion()", nativeQuery = true)
     public String generarFechaSesion();
