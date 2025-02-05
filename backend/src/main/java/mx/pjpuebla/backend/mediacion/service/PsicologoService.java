@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import mx.pjpuebla.backend.mediacion.entitiy.Mediador;
 import mx.pjpuebla.backend.mediacion.entitiy.Psicologo;
 import mx.pjpuebla.backend.mediacion.repository.PsicologoRepository;
 
@@ -48,6 +49,10 @@ public class PsicologoService {
         Optional<Psicologo> psicologo = this.repo.findTopByOrderByNumeroDesc();
         
         return psicologo.isPresent() ? psicologo.get().getNumero() + 1 : 1;
+    }
+
+    public List<Psicologo> obtenerMPsicologosActivos() {
+        return repo.findAllByEstatus(1);  // 1 representa el estatus activo
     }
 
 }

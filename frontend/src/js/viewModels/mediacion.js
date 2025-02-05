@@ -75,6 +75,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.materias = ko.observableArray();
                 self.instituciones = ko.observableArray();
                 self.mediadores = ko.observableArray();
+                self.psicologos = ko.observableArray();
                 self.tipoAperturas = self.catalogos.aperturas
                 self.estadoSolicitud = ko.observableArray(self.catalogos.estadosSolicitudes);
                 self.esMediableArray = self.catalogos.esMediable;
@@ -83,8 +84,10 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.formatos_selected = ko.observableArray();
                 self.documentos = ko.observableArray([]);
                 self.formatoSeleccionado = ko.observable();
-
                 self.mediadorSeleccionado  = ko.observable();
+                self.servicioSeleccionado = ko.observable();
+
+                
 
                 /** variables y funciones Knockout */
                 this.userInfoSignal = new signals.Signal();
@@ -93,6 +96,19 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.groupValid = ko.observable();
                 this.frameHabilitado = rootViewModel.pdfViewerEnable;
                 this.filtro = ko.observable();
+
+                // Datos de ejemplo para el selector
+                const servicios = [
+                    { value: '0', label: 'Ninguno' },
+                    { value: '1', label: 'Asistencia Psicología' },
+                    { value: '2', label: 'Asesoría Jurídica' },
+                ];
+
+                const acuerdo = [
+                    { value: '1', label: 'Si' },
+                    { value: '2', label: 'No'},
+                ];
+
 
                 /** Data Providers */
                 // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
@@ -106,6 +122,11 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.asistenciasDP = new ArrayDataProvider(self.asistencias, { keyAttributes: 'id' });
                 this.documentosDP = ko.computed(() => new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }));
                 this.formatosDP = new ArrayDataProvider(self.formatos_selected, { keyAttributes: 'value' })
+
+                this.psicologosDP = new ArrayDataProvider(self.psicologos, { keyAttributes: 'value' });
+                //Servicios
+                this.serviciosDP = new ArrayDataProvider(servicios, { keyAttributes: 'value' });
+                this.acuerdoDP = new ArrayDataProvider(acuerdo, { keyAttributes: 'value' });
                 this.dataProvider = ko.computed(() => {
                     let criterio = null;
 
@@ -400,6 +421,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         self.getSolicitudes(),
                         self.getInstituciones(),
                         self.getMediadores(),
+                        self.getPsicologos(),
                         self.getFormatos()
                     ]).finally(() => {
                         utils.waiting(true);
@@ -943,6 +965,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     })
                 })
 
+                //GetMediadore
                 self.getMediadores = (() => {
                     const url = config.baseEndPoint + '/mediacion/mediadores/activos'
                     return utils.getData(url, {}).then((response) => {
@@ -955,6 +978,23 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                                 mediadores_temp.push({ value: element.id, label: element.usuario.nombreCompleto });
                             });
                             self.mediadores(mediadores_temp);
+                        }
+                    })
+                })
+
+                //getPsicologos
+                self.getPsicologos = (() => {
+                    const url = config.baseEndPoint + '/mediacion/psicologs/activos'
+                    return utils.getData(url, {}).then((response) => {
+                        if (response.success) {
+                            let psicologos_temp = [];
+
+                            psicologos_temp.push({ value: '', label: 'No aplica' });
+
+                            response.data.forEach(element => {
+                                psicologos_temp.push({ value: element.id, label: element.usuario.nombreCompleto });
+                            });
+                            self.psicologos(psicologos_temp);
                         }
                     })
                 })

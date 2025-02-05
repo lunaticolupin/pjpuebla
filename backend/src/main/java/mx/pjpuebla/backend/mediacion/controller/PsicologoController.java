@@ -142,4 +142,14 @@ public class PsicologoController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("/activos")
+    public ResponseEntity<GenericResponse> getMediadoresActivos() {
+        GenericResponse response = new GenericResponse();
+
+        response.setSuccess(true);
+        response.setData(psicologos.obtenerMPsicologosActivos());
+
+        return ResponseEntity.ok(response);
+    }
+
 }

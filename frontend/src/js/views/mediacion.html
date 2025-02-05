@@ -183,17 +183,30 @@
                             <p><b>Seleccione el mediador a asignar.</b></p>                           
                         </div>    
                         <div class="oj-flex-item oj-sm-6">
-                            <oj-c-select-single id="formatosSelected" data="[[ mediadoresDP ]]" value="{{ mediadorSeleccionado }}" item-text="label" label-hint="mediador"></oj-c-select-single>
+                            <oj-c-select-single id="mediadorSelected" data="[[ mediadoresDP ]]" value="{{ mediadorSeleccionado }}" item-text="label" label-hint="Mediador"></oj-c-select-single>
                         </div>
                     </div>
 
                     <div class="oj-flex oj-sm-margin-2x-top">
-                        <oj-c-button label="Agregar" on-oj-action="[[ generar_expediente ]]"></oj-c-button>
-                    
-                    </div>
+                        <oj-c-button label="Asignar Mediador" on-oj-action="[[ generar_expediente ]]"></oj-c-button>                    
+                    </div>                   
                 </div>
+
+                <!-- Funciones que captura el mediador -->
+                <div class="oj-flex-item oj-sm-4">
+                    <oj-c-select-single id="servicioSelected" data="[[ serviciosDP ]]" value="{{ servicioSeleccionado }}" item-text="label" label-hint="Servicios"></oj-c-select-single>
+                </div>
+
+                <div class="oj-flex-item oj-sm-6">
+                    <oj-c-select-single id="mediadorSelected" data="[[ psicologosDP ]]" value="{{ mediadorSeleccionado }}" item-text="label" label-hint="Psicologos"></oj-c-select-single>
+                </div>
+
+                <div class="oj-flex-item oj-sm-4">
+                    <oj-c-select-single id="servicioSelected" data="[[ acuerdoDP ]]" value="{{ servicioSeleccionado }}" item-text="label" label-hint="¿Hay Acuerdo?"></oj-c-select-single>
+                </div>
+
             </div>
-            <!-- Fin mediadores -->
+            <!-- Fin mediadores --> 
 
 
 
