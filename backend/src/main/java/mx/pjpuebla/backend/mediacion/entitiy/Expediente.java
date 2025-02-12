@@ -50,6 +50,7 @@ public class    Expediente {
     private Boolean asistencia_psicologica;
     private Boolean asistencia_juridica;
     private Integer estatus;
+    private Boolean continuar_mediacion;
 
     // @ManyToOne
     // @JoinColumn(name = "psicologo_id")

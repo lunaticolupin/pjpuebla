@@ -193,20 +193,57 @@
                 </div>
 
                 <!-- Funciones que captura el mediador -->
-                <div class="oj-flex-item oj-sm-4">
-                    <oj-c-select-single id="servicioSelected" data="[[ serviciosDP ]]" value="{{ servicioSeleccionado }}" item-text="label" label-hint="Servicios"></oj-c-select-single>
+
+                <div class="oj-flex oj-sm-flex-items-initial oj-sm-align-items-center oj-md-margin-3x-top">
+                    <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end">
+                        <oj-c-select-single id="servicioSelected" data="[[ serviciosDP ]]" 
+                            value="{{ servicioSeleccionado }}" item-text="label" 
+                            label-hint="Servicios">
+                        </oj-c-select-single>
+                    </div>
+                
+                    <oj-bind-if test="[[servicioSeleccionado() == 1]]">
+                        <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end">
+                            <oj-c-select-single id="mediadorSelected" data="[[ psicologosDP ]]" 
+                                value="{{ psicologoSeleccionado }}" item-text="label"  
+                                label-hint="Psicólogos">
+                            </oj-c-select-single>
+                        </div>
+                    </oj-bind-if>
+                
+                    <div class="oj-flex-item oj-sm-4">
+                        <oj-c-button label="Guardar Información" on-oj-action="[[ aceptacionPsicologica ]]">
+                        </oj-c-button>                    
+                    </div>
                 </div>
 
-                <div class="oj-flex-item oj-sm-6">
-                    <oj-c-select-single id="mediadorSelected" data="[[ psicologosDP ]]" value="{{ mediadorSeleccionado }}" item-text="label" label-hint="Psicologos"></oj-c-select-single>
-                </div>
-
-                <div class="oj-flex-item oj-sm-4">
-                    <oj-c-select-single id="servicioSelected" data="[[ acuerdoDP ]]" value="{{ servicioSeleccionado }}" item-text="label" label-hint="¿Hay Acuerdo?"></oj-c-select-single>
+                <div class="oj-flex-item oj-sm-4 oj-md-margin-3x-top">
+                    <oj-c-select-single id="servicioSelected" data="[[ acuerdoDP ]]" value="{{ acuerdoseleccionado }}" item-text="label" label-hint="¿Hay Acuerdo?"></oj-c-select-single>
                 </div>
 
             </div>
             <!-- Fin mediadores --> 
+
+            <!-- Psicologo -->
+            <div class="oj-panel oj-sm-margin-2x-top">
+                <h4 class="oj-typography-subheading-xs">Psicólogo</h4>
+                
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <!-- <div class="oj-flex-item oj-sm-6">
+                            <p><b>Se puede continuar con el proceso Mediacion  .</b></p>                           
+                        </div>     -->
+                        <div class="oj-flex-item oj-sm-6">
+                            <oj-c-select-single id="mediadorSelected" data="[[ continuarMediacion ]]" value="{{ continuarMedSeleccionado }}" item-text="label" label-hint="Se puede continuar con el proceso Mediación  "></oj-c-select-single>
+                        </div>
+                    </div>
+
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <oj-c-button label="Guardar" on-oj-action="[[ guardarContinuarMed ]]"></oj-c-button>                    
+                    </div>                   
+                </div>
+            </div>
+            <!-- fin psicologo -->
 
 
 

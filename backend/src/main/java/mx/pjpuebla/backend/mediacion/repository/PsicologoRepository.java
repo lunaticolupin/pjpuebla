@@ -21,6 +21,6 @@ public interface PsicologoRepository extends JpaRepository<Psicologo,Integer> {
 
     public Optional<Psicologo> findTopByOrderByNumeroDesc();
 
-    @Query(value = "SELECT * FROM mediacion.psicologo where estatus = 1 order by orden asc", nativeQuery = true)
+    @Query(value = "SELECT * FROM mediacion.psicologo where estatus = 1", nativeQuery = true)
     public List<Psicologo> findAllByEstatus(Integer num);
 }

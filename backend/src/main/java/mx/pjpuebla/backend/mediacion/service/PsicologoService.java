@@ -51,7 +51,7 @@ public class PsicologoService {
         return psicologo.isPresent() ? psicologo.get().getNumero() + 1 : 1;
     }
 
-    public List<Psicologo> obtenerMPsicologosActivos() {
+    public List<Psicologo> obtenerPsicologosActivos() {
         return repo.findAllByEstatus(1);  // 1 representa el estatus activo
     }
 

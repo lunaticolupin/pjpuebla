@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -12,14 +13,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.core.service.PersonaService;
+import mx.pjpuebla.backend.mediacion.entitiy.Expediente;
 import mx.pjpuebla.backend.mediacion.entitiy.Psicologo;
+import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
+import mx.pjpuebla.backend.mediacion.service.ExpedienteService;
 import mx.pjpuebla.backend.mediacion.service.PsicologoService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudService;
 import mx.pjpuebla.backend.response.GenericResponse;
 
 @RestController
@@ -29,6 +35,12 @@ public class PsicologoController {
     private final PersonaService personas;
     private GenericResponse response;
     private final PsicologoService psicologos;
+
+     @Autowired
+    private SolicitudService solicitudService;
+
+    @Autowired
+    private ExpedienteService expedienteService;
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> listar() {
@@ -143,13 +155,46 @@ public class PsicologoController {
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<GenericResponse> getMediadoresActivos() {
+    public ResponseEntity<GenericResponse> getPsicologosActivos() {
         GenericResponse response = new GenericResponse();
 
         response.setSuccess(true);
-        response.setData(psicologos.obtenerMPsicologosActivos());
+        response.setData(psicologos.obtenerPsicologosActivos());
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/continuarMediacion")
+    public ResponseEntity<GenericResponse> continuarMediacion(@RequestParam("solicitud_id") Integer solicitud_id, @RequestParam("continuar_med") Integer continuar_med) {
+        response  = new GenericResponse();
+
+        try {
+            Solicitud sol = solicitudService.findById(solicitud_id);
+
+            Expediente exp = expedienteService.findBySolicitud(sol.getId());
+
+            if(continuar_med == 1)
+            {
+                exp.setContinuar_mediacion(true);
+                expedienteService.save(exp);
+            }else{
+                exp.setContinuar_mediacion(false);
+                expedienteService.save(exp);
+            }
+
+            // exp.set
+            
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(exp);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("No se pudo registrar la información");
+            response.setErrors(e.getMessage());
+
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 
 }

@@ -6,12 +6,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -19,12 +21,16 @@ import lombok.RequiredArgsConstructor;
 
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.core.service.PersonaService;
+import mx.pjpuebla.backend.mediacion.entitiy.Expediente;
 import mx.pjpuebla.backend.mediacion.entitiy.Mediador;
 import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
 import mx.pjpuebla.backend.mediacion.service.MediadorService;
 import mx.pjpuebla.backend.response.GenericResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import mx.pjpuebla.backend.mediacion.service.SolicitudService;
+import mx.pjpuebla.backend.mediacion.service.ExpedienteService;
 
 @RestController
 @RequestMapping("mediacion/mediadores")
@@ -33,6 +39,12 @@ public class MediadorController {
     private final MediadorService mediadores;
     private GenericResponse response;
     private PersonaService persona;
+    
+    @Autowired
+    private SolicitudService solicitudService;
+
+    @Autowired
+    private ExpedienteService expedienteService;
 
     @GetMapping("")
     public ResponseEntity<GenericResponse> getMediadores() {
@@ -164,5 +176,65 @@ public class MediadorController {
         }
 
     }
+
+    @PostMapping("/registrarServicio")
+    public ResponseEntity<GenericResponse> registrarServicio(@RequestParam("solicitud_id") Integer solicitud_id, @RequestParam("servicio") Integer servicio) {
+        response  = new GenericResponse();
+
+        try {
+            Solicitud sol = solicitudService.findById(solicitud_id);
+
+            Expediente exp = expedienteService.findBySolicitud(sol.getId());
+
+            switch (servicio) {
+                case 1:
+                    exp.setAsistencia_psicologica(true);
+                    expedienteService.save(exp);
+                break;
+
+                case 2:
+                    exp.setAsistencia_juridica(true);
+                    expedienteService.save(exp);
+                break;
+            }
+            
+            response.setSuccess(true);
+            response.setMessage("OK");
+            response.setData(exp);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage("No se pudo registrar la asistencia psicologica");
+            response.setErrors(e.getMessage());
+
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    // @PostMapping("/asistenciaPsicologica")
+    // public ResponseEntity<GenericResponse> asistenciaPsicologica(@RequestParam("solicitud_id") Integer solicitud_id, @RequestParam("servicio") Integer servicio) {
+    //     response  = new GenericResponse();
+
+    //     try {
+    //         Solicitud sol = solicitudService.findById(solicitud_id);
+
+    //         Expediente exp = expedienteService.findBySolicitud(sol.getId());
+
+    //         exp.setAsistencia_psicologica(true);
+    //         expedienteService.save(exp);
+            
+    //         response.setSuccess(true);
+    //         response.setMessage("OK");
+    //         response.setData(exp);
+    //         return ResponseEntity.ok(response);
+    //     } catch (Exception e) {
+    //         response.setMessage("No se pudo registrar la asistencia psicologica");
+    //         response.setErrors(e.getMessage());
+
+    //         e.printStackTrace();
+    //         return ResponseEntity.internalServerError().body(response);
+    //     }
+    // }
+    
 
 }
