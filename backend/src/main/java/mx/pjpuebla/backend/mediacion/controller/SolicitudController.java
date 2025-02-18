@@ -163,7 +163,8 @@ public class SolicitudController {
 
         SolicitudArchivo sa = new SolicitudArchivo();
         sa.setSolicitudId(nueva.getId());
-        sa.setFormato(9);
+        // sa.setFormato(9);
+        sa.setFormato(1);
         sa.setArchivoId(archivo.id);
         sa.setEstatus(1);
         sa.setUsuarioCreo("SISTEMA");

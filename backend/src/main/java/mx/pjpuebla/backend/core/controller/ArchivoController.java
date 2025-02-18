@@ -100,14 +100,15 @@ public class ArchivoController {
                 if(formato_id == 18)
                 {
 
-                    response.setSuccess(true);
-                    response.setMessage("ok");
-                    response.setData(formato_id);
+                    // response.setSuccess(true);
+                    // response.setMessage("ok");
+                    // response.setData(formato_id);
                     
-                    return ResponseEntity.ok(response);
+                    // return ResponseEntity.ok(response);
                     
                     Solicitud sol = solicitudService.findById(solicitud);
 
+                    
                     Expediente exp = expedienteService.findBySolicitud(sol.getId());
 
                     if(exp != null)
