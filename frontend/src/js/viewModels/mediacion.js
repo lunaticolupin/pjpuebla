@@ -75,6 +75,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.materias = ko.observableArray();
                 self.instituciones = ko.observableArray();
                 self.mediadores = ko.observableArray();
+                self.psicologos = ko.observableArray();
                 self.tipoAperturas = self.catalogos.aperturas
                 self.estadoSolicitud = ko.observableArray(self.catalogos.estadosSolicitudes);
                 self.esMediableArray = self.catalogos.esMediable;
@@ -83,8 +84,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.formatos_selected = ko.observableArray();
                 self.documentos = ko.observableArray([]);
                 self.formatoSeleccionado = ko.observable();
-
                 self.mediadorSeleccionado  = ko.observable();
+                self.servicioSeleccionado = ko.observable();
+                self.psicologoSeleccionado = ko.observable();
+                self.acuerdoseleccionado = ko.observable();
+                self.continuarMedSeleccionado = ko.observable()
+                
 
                 /** variables y funciones Knockout */
                 this.userInfoSignal = new signals.Signal();
@@ -93,6 +98,24 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.groupValid = ko.observable();
                 this.frameHabilitado = rootViewModel.pdfViewerEnable;
                 this.filtro = ko.observable();
+
+                // Datos de ejemplo para el selector
+                const servicios = [
+                    { value: '0', label: 'Ninguno' },
+                    { value: '1', label: 'Asistencia Psicología' },
+                    { value: '2', label: 'Asesoría Jurídica' },
+                ];
+
+                const acuerdo = [
+                    { value: '1', label: 'Si' },
+                    { value: '2', label: 'No'},
+                ];
+
+                const mediacionPsicologo = [
+                    { value: '1', label: 'Si' },
+                    { value: '2', label: 'No'},
+                ];
+
 
                 /** Data Providers */
                 // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
@@ -106,6 +129,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.asistenciasDP = new ArrayDataProvider(self.asistencias, { keyAttributes: 'id' });
                 this.documentosDP = ko.computed(() => new ArrayDataProvider(self.documentos(), { keyAttributes: 'value' }));
                 this.formatosDP = new ArrayDataProvider(self.formatos_selected, { keyAttributes: 'value' })
+
+                this.psicologosDP = new ArrayDataProvider(self.psicologos, { keyAttributes: 'value' });
+                //Servicios
+                this.serviciosDP = new ArrayDataProvider(servicios, { keyAttributes: 'value' });
+                this.acuerdoDP = new ArrayDataProvider(acuerdo, { keyAttributes: 'value' });
+                this.continuarMediacion = new ArrayDataProvider(mediacionPsicologo, { keyAttributes: 'value' });
                 this.dataProvider = ko.computed(() => {
                     let criterio = null;
 
@@ -262,11 +291,85 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }
                 //fin mediador y expediente
 
+
+                //FUNCIONES DEL MEDIADOR(ASIGNAR SERVICIO PSICOLOGICO Y ASIGNAR PSICOLOGO)
+                self.aceptacionPsicologica = () => {
+                    if(!self.servicioSeleccionado()){
+                        swal('Error: Servicio no seleccionado', 'Es necesario seleccionar un servicio', 'warning');
+                        return false;
+                    }
+                    if(self.servicioSeleccionado() == 1)
+                    {
+                        if(!self.psicologoSeleccionado()){
+                            swal('Error: Psicologo no seleccionado', 'Es necesario seleccionar un psicólogo a asignar', 'warning');
+                            return false;
+                        }
+                    }
+                    utils.confirmar('Mediador', '¿Esta usted seguro(a) de registrar el servicio ofrecido?').then(response =>{
+                        const url = config.baseEndPoint + '/mediacion/mediadores/registrarServicio';
+                        const data = {
+                            solicitud_id: self.solicitudId(),
+                            psicologo_id: self.psicologoSeleccionado(),
+                            servicio: self.servicioSeleccionado()
+                        } 
+                        if(response){
+                            utils.postDataFiles(url, data).then((response) => {
+
+                                console.log(response);
+                                
+                                if (response.success) {
+                                    swal('Exito', 'Se registro la asignación del servicio con éxito', 'success')
+                                    return true;
+                                }
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+                        }
+                        
+                    });
+                }
+
+                //Función para guardar la informacion que genera el psicologo
+                self.guardarContinuarMed = () => {
+                    utils.confirmar('Mediador', '¿Esta usted seguro(a) de registrar la información?').then(response =>{
+                        const url = config.baseEndPoint + '/mediacion/psicologos/continuarMediacion';
+                        const data = {
+                            solicitud_id: self.solicitudId(),
+                            continuar_med: self.continuarMedSeleccionado(),
+                        } 
+                        if(response){
+                            utils.postDataFiles(url, data).then((response) => {
+
+                                console.log(response);
+                                
+                                if (response.success) {
+                                    swal('Exito', 'Se registro la información', 'success')
+                                    return true;
+                                }
+                                const errores = JSON.stringify(response.errors);
+                                swal(response.message, errores, "error");
+
+                            }).catch((response) => {
+                                const errores = JSON.stringify(response);
+
+                                swal("Error al procesar la petición", errores, "error");
+                            });
+                        }
+                        
+                    });
+                }
+                // guardarContinuarMed
+                
                 self.agregar_formato = () => {
                     if(!self.formatoSeleccionado()){
                         swal('Error: documento no seleccionado', 'Es necesario seleccionar un docuemnto a agregar', 'warning');
                         return false;
-                    }
+                    }          
                     
                     utils.confirmar('Documento', '¿Esta usted seguro(a) de agregar el documento seleccionado?').then(response =>{
                         const url = config.baseEndPoint + '/archivos/create';
@@ -303,12 +406,12 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 }
 
                 this.moduleDetallePersona = ModuleElementUtils.createConfig(
-                    {
-                        name: 'catalogos/persona-detalle',
-                        params: {
-                            userInfoSignal: this.userInfoSignal
-                        }
-                    })
+                {
+                    name: 'catalogos/persona-detalle',
+                    params: {
+                        userInfoSignal: this.userInfoSignal
+                    }
+                })
 
                 this.moduleDetalleAsistencia = ModuleElementUtils.createConfig(
                     {
@@ -400,6 +503,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         self.getSolicitudes(),
                         self.getInstituciones(),
                         self.getMediadores(),
+                        self.getPsicologos(),
                         self.getFormatos()
                     ]).finally(() => {
                         utils.waiting(true);
@@ -943,6 +1047,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     })
                 })
 
+                //GetMediadore
                 self.getMediadores = (() => {
                     const url = config.baseEndPoint + '/mediacion/mediadores/activos'
                     return utils.getData(url, {}).then((response) => {
@@ -959,9 +1064,25 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     })
                 })
 
+                //getPsicologos
+                self.getPsicologos = (() => {
+                    const url = config.baseEndPoint + '/mediacion/psicologos/activos'
+                    return utils.getData(url, {}).then((response) => {
+                        if (response.success) {
+                            let psicologos_temp = [];
+
+                            psicologos_temp.push({ value: '', label: 'No aplica' });
+
+                            response.data.forEach(element => {
+                                psicologos_temp.push({ value: element.id, label: element.usuario.nombreCompleto });
+                            });
+                            self.psicologos(psicologos_temp);
+                        }
+                    })
+                })
+
                 self.getFormatos = (() => {
                     const url = config.baseEndPoint + '/formatos'
-                    console.log("urllllllllllll",url)
                     return utils.getData(url, {}).then((response) => {
                         if (response.success) {
                             let formatos_temp = [];
@@ -996,7 +1117,6 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.postSolicitud = (() => {
                     const url = self.urlBase + '/solicitud/add';
                     const data = self.fromSolicitud();
-
 
                     utils.confirmar('Solicitud').then((confirmacion) => {
 

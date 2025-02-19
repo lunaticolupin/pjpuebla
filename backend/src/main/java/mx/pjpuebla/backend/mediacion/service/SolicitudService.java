@@ -32,7 +32,7 @@ public class SolicitudService {
     private final SolicitudCanalizacionService solicitudCanalizacionService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<Solicitud> findAll() {
+    public List<Solicitud>  findAll() {
         return this.repositorio.findAll();
     }
 

@@ -12,11 +12,17 @@ import lombok.RequiredArgsConstructor;
 import mx.pjpuebla.backend.core.DTO.FileInfoDto;
 import mx.pjpuebla.backend.core.entitiy.Archivo;
 import mx.pjpuebla.backend.core.entitiy.Formato;
+import mx.pjpuebla.backend.mediacion.entitiy.Expediente;
+import mx.pjpuebla.backend.mediacion.entitiy.Solicitud;
 import mx.pjpuebla.backend.mediacion.entitiy.SolicitudArchivo;
 import mx.pjpuebla.backend.core.entitiy.Persona;
 import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudService;
 import mx.pjpuebla.backend.core.service.ArchivoService;
 import mx.pjpuebla.backend.core.service.FormatoService;
+import mx.pjpuebla.backend.mediacion.service.ExpedienteService;
+import mx.pjpuebla.backend.mediacion.service.SolicitudArchivoService;
+
 import mx.pjpuebla.backend.response.GenericResponse;
 
 import java.nio.file.Files;
@@ -72,6 +78,12 @@ public class ArchivoController {
     @Autowired
     private  FormatoService formatoService;
 
+    @Autowired
+    private ExpedienteService expedienteService;
+
+    @Autowired
+    private SolicitudService solicitudService;
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 
@@ -84,6 +96,55 @@ public class ArchivoController {
             Formato formato = formatoService.findById(formato_id);
             
             if(solicitudArchivos.findBySolicitudIdAndFormato(solicitud, formato_id) == null){
+
+                if(formato_id == 18)
+                {
+
+                    // response.setSuccess(true);
+                    // response.setMessage("ok");
+                    // response.setData(formato_id);
+                    
+                    // return ResponseEntity.ok(response);
+                    
+                    Solicitud sol = solicitudService.findById(solicitud);
+
+                    
+                    Expediente exp = expedienteService.findBySolicitud(sol.getId());
+
+                    if(exp != null)
+                    {
+                        if(exp.getAsistencia_psicologica())
+                        {
+                            archivo = new Archivo();
+                            archivo.setUsuario_creo(usuario_creo);
+                            archivo.setNombre("");
+                            archivo.setTipo(formato.getDescripcion());
+                            archivo.setEstatus(1);
+                            archivos.save(archivo);
+                
+                            SolicitudArchivo sa = new SolicitudArchivo();
+                            sa.setSolicitudId(solicitud);
+                            sa.setFormato(formato_id);
+                            sa.setArchivoId(archivo.id);
+                            sa.setEstatus(1);
+                            sa.setUsuarioCreo(usuario_creo);
+                            solicitudArchivos.save(sa);
+
+                            response.setSuccess(true);
+                            response.setMessage("ok");
+                            
+                            return ResponseEntity.ok(response);
+                        }else {
+                            List<String> errores = new ArrayList<>();
+                            errores.add("La solicitud no contiene el servicio de asistencia psicologica.");
+                            response.setSuccess(false);
+                            response.setMessage("Error: documento no valido.");
+                            response.setErrors(errores);
+                            return ResponseEntity.ok(response);
+                        }
+                    }
+
+                }
 
                 archivo = new Archivo();
                 archivo.setUsuario_creo(usuario_creo);
