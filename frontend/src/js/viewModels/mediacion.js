@@ -55,6 +55,16 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.solicitudArchivos = ko.observableArray();
                 self.archivoSeleccionado = ko.observable();
                 self.esMediableDP = ko.observable()
+
+                // self.handleFileSelect    = ko.observable();
+
+                //variables convenio
+                self.convenio_monto = ko.observable();
+                self.convenio_forma_pago = ko.observable();
+                self.convenio_garantia = ko.observable();
+                self.convenio_num_oficio = ko.observable();
+                self.convenio_convenio_temporal = ko.observable();
+
                 
             
                 /* Funciones flecha para mostrar o ocultar formularios  */
@@ -88,7 +98,8 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 self.servicioSeleccionado = ko.observable();
                 self.psicologoSeleccionado = ko.observable();
                 self.acuerdoseleccionado = ko.observable();
-                self.continuarMedSeleccionado = ko.observable()
+                self.continuarMedSeleccionado = ko.observable();
+                // self.formaPago = ko.observableArray();
                 
 
                 /** variables y funciones Knockout */
@@ -116,6 +127,14 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     { value: '2', label: 'No'},
                 ];
 
+                const formaPago = [
+                    { value: '1', label: 'INMEDIATO' },
+                    { value: '2', label: 'DIFERIDO'},
+                ];
+                const garantiaInmobiliaria = [
+                    { value: '1', label: 'SI' },
+                    { value: '2', label: 'NO'},
+                ];
 
                 /** Data Providers */
                 // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
@@ -131,6 +150,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                 this.formatosDP = new ArrayDataProvider(self.formatos_selected, { keyAttributes: 'value' })
 
                 this.psicologosDP = new ArrayDataProvider(self.psicologos, { keyAttributes: 'value' });
+
+                this.forma_pagoDP = new ArrayDataProvider(formaPago, { keyAttributes: 'value' });
+                this.garantiaDP = new ArrayDataProvider(garantiaInmobiliaria, { keyAttributes: 'value' });
                 //Servicios
                 this.serviciosDP = new ArrayDataProvider(servicios, { keyAttributes: 'value' });
                 this.acuerdoDP = new ArrayDataProvider(acuerdo, { keyAttributes: 'value' });
@@ -742,11 +764,9 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                         const data = {
                             solicitud_id: detail.item.data.id
                         }
-                        utils.postDataFiles(url, data).then((response) => {
-
-                            console.log("SOLMED",response.data.mediador);
-                            
+                        utils.postDataFiles(url, data).then((response) => {                            
                             if (response.message == 'OK') {
+                                console.log("data",response.data)
                                 self.mediadorSeleccionado(response.data.mediador.id)
                                 // this.mediadorSeleccionado = response.data.mediador.id;
                                 console.log("mediador",this.mediadorSeleccionado)
@@ -755,15 +775,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                             }else {
                                 this.mediadorSeleccionado = ''
                             }
-                            // const errores = JSON.stringify(response.errors);
-                            // swal(response.message, errores, "error");
-
                         })
-                        // .catch((response) => {
-                        //     const errores = JSON.stringify(response);
-
-                        //     swal("Error al procesar la petición", errores, "error");
-                        // });
 
                     //Funcionalidad boton editar
                     self.solicitudDetalle(true);
@@ -779,6 +791,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     element.selected = seleccion;
                     // console.log("id_solicitus",detail.item.data.id)
                 });
+                //fin funcion
 
                 this.btnClose = (event, detail) => {
                     const modalId = event.srcElement.offsetParent.id;
