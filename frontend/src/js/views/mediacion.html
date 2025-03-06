@@ -221,6 +221,173 @@
                     <oj-c-select-single id="servicioSelected" data="[[ acuerdoDP ]]" value="{{ acuerdoseleccionado }}" item-text="label" label-hint="¿Hay Acuerdo?"></oj-c-select-single>
                 </div>
 
+                <!-- <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Convenio.</b></p>                           
+                        </div>    
+                        <div class="oj-flex oj-sm-flex-items-initial  oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-input-text
+                                    id="convenio_monto"
+                                    label-hint="Monto del convenio"
+                                    value="{{convenio_monto}}" autocomplete="off">
+                                </oj-c-input-text>
+                            </div>
+                        
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-select-single id="forma_pago" data="[[ forma_pagoDP ]]" 
+                                    value="{{ convenio_forma_pago }}" item-text="label"  
+                                    label-hint="Forma de pago">
+                                </oj-c-select-single>
+                            </div>
+
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end">
+                                <oj-c-select-single id="garantia" data="[[ garantiaDP ]]" 
+                                    value="{{ convenio_garantia }}" item-text="label"  
+                                    label-hint="Garantía Inmobiliaria">
+                                </oj-c-select-single>
+                            </div>
+
+                            <oj-bind-if test="[[convenio_garantia() == 1]]">
+                                <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end">
+                                    <oj-c-input-text
+                                    id="num_oficio"
+                                    label-hint="Numero de oficio de retencion de sueldos y salarios"
+                                    value="{{convenio_num_oficio}}" autocomplete="off">
+                                </oj-c-input-text>
+                                </div>
+                            </oj-bind-if>
+
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-select-single id="convenio_temporal" data="[[ forma_pagoDP ]]" 
+                                    value="{{ convenio_convenio_temporal }}" item-text="label"  
+                                    label-hint="¿Existe convenio temporal?">
+                                </oj-c-select-single>
+                            </div>
+                        
+                            <div class="oj-flex-item oj-sm-4">
+                                <oj-c-button label="Guardar Información" on-oj-action="[[ aceptacionPsicologica ]]">
+                                </oj-c-button>                    
+                            </div>
+                        </div>                               
+                    </div>
+                </div> -->
+
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Convenio.</b></p>
+                        </div>
+                
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-input-text
+                                    id="firstname"
+                                    label-hint="Monto del convenio"
+                                    value="{{convenio_monto}}"
+                                    autocomplete="off">
+                                </oj-c-input-text>
+                            </div>
+                
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-select-single
+                                    id="formaPago"
+                                    data="[[ forma_pagoDP ]]"
+                                    value="{{ convenio_forma_pago }}"
+                                    item-text="label"
+                                    label-hint="Forma de pago">
+                                </oj-c-select-single>
+                            </div>
+                
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end">
+                                <oj-c-select-single
+                                    id="garantia"
+                                    data="[[ garantiaDP ]]"
+                                    value="{{ convenio_garantia }}"
+                                    item-text="label"
+                                    label-hint="Garantía Inmobiliaria">
+                                </oj-c-select-single>
+                            </div>
+                
+                            <oj-bind-if test="[[ convenio_garantia() == 1 ]]">
+                                <div class="oj-flex-item oj-sm-4 oj-md-padding-3x-end oj-md-margin-3x-top">
+                                    <oj-c-input-text
+                                        id="numOficio"
+                                        label-hint="Número de oficio de retención de sueldos y salarios"
+                                        value="{{convenio_num_oficio}}"
+                                        autocomplete="off">
+                                    </oj-c-input-text>
+                                </div>
+                            </oj-bind-if>
+                
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end oj-md-margin-3x-top">
+                                <oj-c-select-single
+                                    id="convenioTemporal"
+                                    data="[[ garantiaDP ]]"
+                                    value="{{ convenio_convenio_temporal }}"
+                                    item-text="label"
+                                    label-hint="¿Existe convenio temporal?">
+                                </oj-c-select-single>
+                            </div>
+                        </div>
+                
+                        <!-- Nueva fila para el botón -->
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-12 oj-text-align-center">
+                                <oj-c-button
+                                    label="Guardar Información"
+                                    on-oj-action="[[ aceptacionPsicologica ]]">
+                                </oj-c-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beneficiarios -->
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Beneficiarios</b></p>
+                        </div>
+                
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-input-text
+                                    id="edad"
+                                    label-hint="Edad"
+                                    value="{{convenio_monto}}"
+                                    autocomplete="off">
+                                </oj-c-input-text>
+                            </div>
+                
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-select-single
+                                    id="sexo"
+                                    data="[[ sexoDP ]]"
+                                    value="{{ convenio_forma_pago }}"
+                                    item-text="label"
+                                    label-hint="sexo">
+                                </oj-c-select-single>
+                            </div>
+
+                
+                        <!-- Nueva fila para el botón -->
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-12 oj-text-align-center">
+                                <oj-c-button
+                                    label="Guardar Información"
+                                    on-oj-action="[[ aceptacionPsicologica ]]">
+                                </oj-c-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Fin beneficiario -->
+                
+
+
+                 
             </div>
             <!-- Fin mediadores --> 
 
@@ -230,12 +397,11 @@
                 
                 <div class="oj-panel">
                     <div class="oj-flex oj-sm-margin-2x-top">
-                        <!-- <div class="oj-flex-item oj-sm-6">
-                            <p><b>Se puede continuar con el proceso Mediacion  .</b></p>                           
-                        </div>     -->
                         <div class="oj-flex-item oj-sm-6">
                             <oj-c-select-single id="mediadorSelected" data="[[ continuarMediacion ]]" value="{{ continuarMedSeleccionado }}" item-text="label" label-hint="Se puede continuar con el proceso Mediación  "></oj-c-select-single>
+                                                    
                         </div>
+                        
                     </div>
 
                     <div class="oj-flex oj-sm-margin-2x-top">
