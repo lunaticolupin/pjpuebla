@@ -16,7 +16,6 @@ public interface BeneficiarioRepository extends JpaRepository<Beneficiario, Inte
 
     // @Query(value = "SELECT max(e.folio) FROM mediacion.expediente e ", nativeQuery = true)
     // public Integer getFolio();
-
     
 }
 

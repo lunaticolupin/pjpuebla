@@ -136,6 +136,11 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
                     { value: '2', label: 'NO'},
                 ];
 
+                const sexos = [
+                    { value: 'M', label: 'MASCULINO' },
+                    { value: 'F', label: 'FEMENINO'},
+                ];
+
                 /** Data Providers */
                 // this.dataProvider = new BufferingDataProvider(new ArrayDataProvider(self.solicitudes, {keyAttributes: 'id'}));
                 this.materiasDP = new ArrayDataProvider(self.materias, { keyAttributes: 'id' });
@@ -153,6 +158,7 @@ define(['../accUtils', 'jquery', 'webConfig', 'utils', 'knockout', 'ojs/ojarrayd
 
                 this.forma_pagoDP = new ArrayDataProvider(formaPago, { keyAttributes: 'value' });
                 this.garantiaDP = new ArrayDataProvider(garantiaInmobiliaria, { keyAttributes: 'value' });
+                this.sexoDP = new ArrayDataProvider(sexos, { keyAttributes: 'value' });
                 //Servicios
                 this.serviciosDP = new ArrayDataProvider(servicios, { keyAttributes: 'value' });
                 this.acuerdoDP = new ArrayDataProvider(acuerdo, { keyAttributes: 'value' });

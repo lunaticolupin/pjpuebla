@@ -38,7 +38,7 @@ public class Convenio {
 
     @OneToOne
     @JoinColumn(name = "expediente_id")
-    private Solicitud solicitud;
+    private Expediente expediente;
 
     // @ManyToOne
     // @JoinColumn(name = "psicologo_id")

@@ -29,15 +29,13 @@ public class Beneficiario {
     @SequenceGenerator(name = "BENEFICIARIO_ID_GENERATOR", sequenceName = "mediacion.beneficiario_id_seq", allocationSize = 1)
     private Integer id;
 
-
-    private Integer numero;
-    private String edades;
     private String sexo;
-    private String tipo_beneficiario; //se consideran nina(o), adolecetes, adultos mayores
+    private String edad;
+    
 
     @OneToOne
     @JoinColumn(name = "expediente_id")
-    private Solicitud solicitud;
+    private Expediente expediente;
 
     // @ManyToOne
     // @JoinColumn(name = "psicologo_id")

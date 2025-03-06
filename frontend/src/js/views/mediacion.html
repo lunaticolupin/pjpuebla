@@ -343,6 +343,47 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Beneficiarios -->
+                <div class="oj-panel">
+                    <div class="oj-flex oj-sm-margin-2x-top">
+                        <div class="oj-flex-item oj-sm-6">
+                            <p><b>Beneficiarios</b></p>
+                        </div>
+                
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-input-text
+                                    id="edad"
+                                    label-hint="Edad"
+                                    value="{{convenio_monto}}"
+                                    autocomplete="off">
+                                </oj-c-input-text>
+                            </div>
+                
+                            <div class="oj-flex-item oj-sm-4 oj-md-padding-10x-end">
+                                <oj-c-select-single
+                                    id="sexo"
+                                    data="[[ sexoDP ]]"
+                                    value="{{ convenio_forma_pago }}"
+                                    item-text="label"
+                                    label-hint="sexo">
+                                </oj-c-select-single>
+                            </div>
+
+                
+                        <!-- Nueva fila para el botón -->
+                        <div class="oj-flex oj-sm-flex-items-initial oj-md-margin-3x-top oj-md-margin-3x-top">
+                            <div class="oj-flex-item oj-sm-12 oj-text-align-center">
+                                <oj-c-button
+                                    label="Guardar Información"
+                                    on-oj-action="[[ aceptacionPsicologica ]]">
+                                </oj-c-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Fin beneficiario -->
                 
 
 
